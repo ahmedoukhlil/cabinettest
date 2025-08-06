@@ -32,7 +32,7 @@ class ConsultationForm extends Component
     // Propriétés du formulaire
     public $selectedPatient = null;
     public $patient_id = null;
-    public $medecin_id = '';
+    public $medecin_id = null;
     public $assureur_id = '';
     public $istp = '';
     public $txpec = '';
@@ -54,6 +54,7 @@ class ConsultationForm extends Component
     public $nomAssureur = '';
 
     public $patient = null;
+    public $patients;
 
     protected $listeners = [
         'patientSelected' => 'handlePatientSelected',
@@ -64,22 +65,30 @@ class ConsultationForm extends Component
 
     protected $rules = [
         'selectedPatient' => 'required',
-        'medecin_id' => 'required',
-        'mode_paiement' => 'required',
+        'medecin_id' => 'required|integer',
+        'mode_paiement' => 'required|string',
         'montant' => 'required|numeric|min:0',
         'txpec' => 'nullable|numeric|min:0|max:100',
+        'acte_id' => 'required|integer',
+        'acte_nom' => 'required|string',
     ];
 
     protected $messages = [
         'selectedPatient.required' => 'Veuillez sélectionner un patient',
         'medecin_id.required' => 'Veuillez sélectionner un médecin',
+        'medecin_id.integer' => 'L\'ID du médecin doit être un nombre entier',
         'mode_paiement.required' => 'Veuillez sélectionner un mode de paiement',
+        'mode_paiement.string' => 'Le mode de paiement doit être une chaîne de caractères',
         'montant.required' => 'Le montant est requis',
         'montant.numeric' => 'Le montant doit être un nombre',
         'montant.min' => 'Le montant doit être supérieur à 0',
         'txpec.numeric' => 'Le taux de prise en charge doit être un nombre',
         'txpec.min' => 'Le taux de prise en charge doit être supérieur à 0',
-        'txpec.max' => 'Le taux de prise en charge ne peut pas dépasser 100'
+        'txpec.max' => 'Le taux de prise en charge ne peut pas dépasser 100',
+        'acte_id.required' => 'L\'ID de l\'acte est requis',
+        'acte_id.integer' => 'L\'ID de l\'acte doit être un nombre entier',
+        'acte_nom.required' => 'Le nom de l\'acte est requis',
+        'acte_nom.string' => 'Le nom de l\'acte doit être une chaîne de caractères'
     ];
 
     public function mount($patient = null)
@@ -239,7 +248,35 @@ class ConsultationForm extends Component
     {
         try {
             \Log::info('Début de la méthode save()');
-            $this->validate();
+            
+            // Log des données avant validation
+            \Log::info('Données avant validation', [
+                'selectedPatient' => $this->selectedPatient,
+                'medecin_id' => $this->medecin_id,
+                'mode_paiement' => $this->mode_paiement,
+                'montant' => $this->montant,
+                'txpec' => $this->txpec,
+                'patient_id' => $this->patient_id,
+                'acte_id' => $this->acte_id,
+                'acte_nom' => $this->acte_nom
+            ]);
+            
+            try {
+                $this->validate();
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                \Log::error('Erreur de validation', [
+                    'errors' => $e->errors(),
+                    'data' => [
+                        'selectedPatient' => $this->selectedPatient,
+                        'medecin_id' => $this->medecin_id,
+                        'mode_paiement' => $this->mode_paiement,
+                        'montant' => $this->montant,
+                        'acte_id' => $this->acte_id,
+                        'acte_nom' => $this->acte_nom
+                    ]
+                ]);
+                throw $e;
+            }
 
             if (!$this->selectedPatient) {
                 throw new \Exception('Veuillez sélectionner un patient');
@@ -271,13 +308,21 @@ class ConsultationForm extends Component
                 // Ajouter un message de succès
                 session()->flash('success', 'La consultation a été enregistrée avec succès.');
                 
-                // Réinitialiser le formulaire
-                $this->resetForm();
-                
                 // Ouvrir le reçu dans un nouvel onglet
                 $receiptUrl = route('consultations.receipt', $facture->Idfacture);
                 \Log::info('Émission de l\'événement open-receipt', ['url' => $receiptUrl, 'facture_id' => $facture->Idfacture]);
+                
+                // Émettre l'événement pour ouvrir le reçu AVANT de réinitialiser le formulaire
                 $this->dispatchBrowserEvent('open-receipt', ['url' => $receiptUrl]);
+                
+                // Log pour débogage
+                \Log::info('Événement dispatchBrowserEvent émis', ['url' => $receiptUrl]);
+                
+                // Petit délai pour s'assurer que l'événement est traité avant le rechargement
+                usleep(100000); // 100ms
+                
+                // Réinitialiser le formulaire APRÈS avoir émis l'événement
+                $this->resetForm();
                 
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -410,7 +455,7 @@ class ConsultationForm extends Component
     protected function createRendezVous($facture)
     {
         $date = Carbon::now();
-        $ordreRDV = Rendezvou::generateNextOrderNumber($date);
+        $ordreRDV = Rendezvou::generateNextOrderNumber($date, $this->medecin_id);
         
         $rendezVous = Rendezvou::create([
             'fkidPatient' => $this->selectedPatient['ID'],
@@ -513,4 +558,6 @@ class ConsultationForm extends Component
         $this->showReceipt = false;
         $this->receiptUrl = '';
     }
+
+
 } 

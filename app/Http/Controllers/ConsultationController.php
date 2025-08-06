@@ -51,6 +51,11 @@ class ConsultationController extends Controller
 
             \Log::info('Facture trouvée', ['facture' => $facture->toArray()]);
 
+            // Mettre en cache la conversion en lettres (1h)
+            $facture->en_lettres = cache()->remember('facture_lettres_' . $factureId, 3600, function() use ($facture) {
+                return $this->numberToWords($facture->TotFacture ?? 0);
+            });
+
             return view('consultations.receipt', compact('facture', 'cabinet'));
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'affichage du reçu', [

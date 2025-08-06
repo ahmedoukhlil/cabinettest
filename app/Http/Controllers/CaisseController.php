@@ -19,7 +19,9 @@ class CaisseController extends Controller
         $query = CaisseOperation::where('fkidcabinet', $user->fkidcabinet)
             ->whereDate('dateoper', $date);
 
-        if ($user->IdClasseUser == 2) { // Si c'est un médecin
+        if ($user->IdClasseUser == 1) { // Si c'est une secrétaire
+            $query->where('fkiduser', $user->Iduser);
+        } elseif ($user->IdClasseUser == 2) { // Si c'est un médecin
             $query->where('fkidmedecin', $user->fkidmedecin);
         }
 

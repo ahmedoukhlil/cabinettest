@@ -44,15 +44,22 @@ class PatientInterfaceController extends Controller
                 ->orderBy('dtPrevuRDV', 'asc')
                 ->orderBy('OrdreRDV', 'asc')
                 ->first();
+            
+
 
             // Récupérer les rendez-vous du médecin pour la journée (si le patient a un prochain RDV)
             $rendezVousMedecinJournee = collect();
             if ($prochainRdv) {
+                // Afficher tous les rendez-vous du médecin du patient pour la journée
                 $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
                     ->where('fkidMedecin', $prochainRdv->fkidMedecin)
                     ->where('dtPrevuRDV', $prochainRdv->dtPrevuRDV)
+                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
                     ->orderBy('OrdreRDV', 'asc')
                     ->get();
+                
+
+
             }
 
             $fileAttente = null;
@@ -140,7 +147,9 @@ class PatientInterfaceController extends Controller
      */
     public static function generateToken($patientId)
     {
-        $data = $patientId . '|' . time();
+        // Utiliser la date du jour pour limiter l'accès à la journée en cours
+        $dateDuJour = date('Y-m-d');
+        $data = $patientId . '|' . $dateDuJour;
         return base64_encode($data);
     }
 
@@ -151,21 +160,39 @@ class PatientInterfaceController extends Controller
     {
         try {
             $decoded = base64_decode($token);
+            
+            // Essayer d'abord le nouveau format (patientId|date)
             $parts = explode('|', $decoded);
             
-            if (count($parts) !== 2) {
-                return null;
+            if (count($parts) === 2) {
+                $patientId = $parts[0];
+                $dateToken = $parts[1];
+                $dateDuJour = date('Y-m-d');
+
+                // Vérifier que le token correspond à la date du jour
+                if ($dateToken !== $dateDuJour) {
+                    return null;
+                }
+
+                return $patientId;
+            }
+            
+            // Si ce n'est pas le nouveau format, essayer l'ancien format (juste la date)
+            // Pour la compatibilité avec les anciens QR codes
+            $dateToken = $decoded;
+            $dateDuJour = date('Y-m-d');
+            
+            if ($dateToken === $dateDuJour) {
+                // Pour les anciens QR codes, on doit récupérer l'ID du patient différemment
+                // On va chercher un patient qui a un rendez-vous aujourd'hui
+                $patient = \App\Models\Rendezvou::where('dtPrevuRDV', $dateDuJour)
+                    ->with('patient')
+                    ->first();
+                
+                return $patient ? $patient->fkidPatient : null;
             }
 
-            $patientId = $parts[0];
-            $timestamp = $parts[1];
-
-            // Vérifier que le token n'est pas expiré (24 heures)
-            if (time() - $timestamp > 24 * 60 * 60) {
-                return null;
-            }
-
-            return $patientId;
+            return null;
             
         } catch (\Exception $e) {
             return null;

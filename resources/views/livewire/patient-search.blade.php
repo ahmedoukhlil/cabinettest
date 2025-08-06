@@ -43,7 +43,7 @@
     @endif
 
     <!-- Résultats de recherche -->
-    @if(strlen(trim($search)) >= 1)
+    @if(strlen(trim($search)) >= 1 && !empty($patients))
         <div class="fixed z-50 mt-1 w-full max-w-2xl bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
             @if($isSearching)
                 <div class="px-4 py-3 text-sm text-gray-500 text-center">
@@ -61,12 +61,15 @@
                         {{ count($patients) }} résultat(s) trouvé(s)
                     </div>
                     @foreach($patients as $patient)
-                        <div class="px-4 py-2 hover:bg-primary-light cursor-pointer border-b border-gray-100 last:border-b-0" 
+                        <div class="px-4 py-2 hover:bg-primary-light cursor-pointer border-b border-gray-100 last:border-b-0 {{ $selectedPatient && $selectedPatient['ID'] == $patient['ID'] ? 'bg-primary-light' : '' }}" 
                              wire:click="selectPatient({{ $patient['ID'] }})">
                             <div class="flex flex-col">
                                 <div class="flex items-center">
                                     <i class="fas fa-user-circle text-gray-400 mr-2"></i>
                                     <span class="font-medium text-gray-900">{{ $patient['Prenom'] }}</span>
+                                    @if($selectedPatient && $selectedPatient['ID'] == $patient['ID'])
+                                        <span class="ml-2 px-2 py-1 text-xs bg-primary text-white rounded-full">Sélectionné</span>
+                                    @endif
                                 </div>
                                 <div class="ml-6 mt-1 space-y-1">
                                     @if($patient['IdentifiantPatient'])

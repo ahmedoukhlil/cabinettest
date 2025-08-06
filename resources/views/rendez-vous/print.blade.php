@@ -72,7 +72,7 @@
         <table class="bloc-patient-table">
             <tr>
                 <td class="label">N° Fiche :</td>
-                <td class="value">{{ $rendezVous->patient->NumFiche ?? 'N/A' }}</td>
+                <td class="value">{{ $rendezVous->patient->IdentifiantPatient ?? 'N/A' }}</td>
                 <td class="ref-cell" colspan="2">
                     <span class="ref-label">Réf :</span>
                     <span class="ref-value">{{ str_pad($rendezVous->OrdreRDV ?? 0, 3, '0', STR_PAD_LEFT) }}</span>
@@ -80,7 +80,7 @@
             </tr>
             <tr>
                 <td class="label">Nom Patient :</td>
-                <td class="value">{{ $rendezVous->patient->Prenom ?? 'N/A' }}</td>
+                <td class="value">{{ $rendezVous->patient->NomContact ?? 'N/A' }}</td>
                 <td class="ref-cell" colspan="2">
                     <span class="ref-label">Date :</span>
                     <span class="ref-value">{{ $rendezVous->dtPrevuRDV ? \Carbon\Carbon::parse($rendezVous->dtPrevuRDV)->format('d/m/Y') : 'N/A' }}</span>
@@ -92,8 +92,13 @@
                 <td colspan="2"></td>
             </tr>
             <tr>
+                <td class="label">Téléphone :</td>
+                <td class="value">{{ $rendezVous->patient->Telephone1 ?? 'N/A' }}</td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
                 <td class="label">Praticien :</td>
-                <td class="value">{{ $rendezVous->medecin->Nom ?? '' }} {{ $rendezVous->medecin->Prenom ?? '' }}</td>
+                <td class="value">Dr. {{ $rendezVous->medecin->Nom ?? '' }} {{ $rendezVous->medecin->Prenom ?? '' }}</td>
                 <td colspan="2"></td>
             </tr>
         </table>
@@ -128,7 +133,7 @@
                 </div>
             </div>
             <div style="font-size: 8px; color: #999; margin-top: 3px;">
-                Accès sécurisé - Valide 24h (jusqu'à 23h59)
+                Accès sécurisé - Valide aujourd'hui uniquement
             </div>
         </div>
     </div>

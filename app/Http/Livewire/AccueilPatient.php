@@ -177,7 +177,6 @@ class AccueilPatient extends Component
     {
         $this->reset([
             'showCreateModal',
-            'showCreateRdvModal',
             'showPatientListModal',
             'showGestionPatientsModal',
             'showActeModal',
@@ -238,6 +237,8 @@ class AccueilPatient extends Component
         $this->action = null;
         $this->showPatientMenu = false;
         $this->showCabinetMenu = false;
+        
+        // Réinitialiser l'état sans affecter le modal de création de rendez-vous
         $this->resetState();
     }
 
@@ -278,6 +279,8 @@ class AccueilPatient extends Component
     public function showCreateRdv()
     {
         $this->showCreateRdvModal = true;
+        // Précharger les données essentielles
+        $this->dispatchBrowserEvent('modal-loading', ['loading' => true]);
     }
 
     public function closeCreateRdvModal()

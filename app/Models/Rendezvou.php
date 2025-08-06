@@ -74,7 +74,9 @@ class Rendezvou extends Model
             $date = \Carbon\Carbon::parse($date);
         }
         
-        $query = self::whereDate('dtPrevuRDV', $date->format('Y-m-d'))
+        // Utiliser une requête optimisée avec select pour ne récupérer que le champ nécessaire
+        $query = self::select('OrdreRDV')
+            ->whereDate('dtPrevuRDV', $date->format('Y-m-d'))
             ->where('fkidcabinet', Auth::user()->fkidcabinet);
             
         // Si un médecin est spécifié, filtrer par médecin

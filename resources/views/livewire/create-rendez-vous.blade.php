@@ -14,31 +14,15 @@
     <form wire:submit.prevent="createRendezVous" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Recherche de patient -->
-            @if(!$patient)
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">Rechercher un patient</label>
-                    <div class="relative">
-                        <livewire:patient-search />
-                    </div>
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Rechercher un patient
+                    <span class="text-xs text-gray-500 ml-1">(Alt+P)</span>
+                </label>
+                <div class="relative">
+                    <livewire:patient-search wire:key="patient-search-modal" />
                 </div>
-            @endif
-            @if($patient)
-                <div class="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span class="font-medium text-blue-800 break-words whitespace-normal">
-                                {{ is_array($patient) ? ($patient['Prenom'] ?? '') : ($patient->Prenom ?? '') }}
-                            </span>
-                            @if(is_array($patient) ? ($patient['Telephone1'] ?? null) : ($patient->Telephone1 ?? null))
-                                <span class="text-sm text-blue-600 ml-2">Tél: {{ is_array($patient) ? $patient['Telephone1'] : $patient->Telephone1 }}</span>
-                            @endif
-                        </div>
-                        <button type="button" wire:click="clearPatient" class="text-red-600 hover:text-red-800">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-            @endif
+            </div>
 
             <!-- Sélection du médecin -->
             <div>
@@ -46,7 +30,7 @@
                 <select wire:model="medecin_id" id="medecin_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" {{ $isDocteur ? 'disabled' : '' }}>
                     <option value="">Sélectionner un médecin</option>
                     @foreach($medecins as $medecin)
-                        <option value="{{ $medecin->idMedecin }}">Dr. {{ $medecin->Nom }} {{ $medecin->Prenom }}</option>
+                        <option value="{{ $medecin->idMedecin }}">Dr. {{ $medecin->Nom }}</option>
                     @endforeach
                 </select>
                 @error('medecin_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -91,9 +75,16 @@
         </div>
 
         <div class="flex justify-end">
-            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <button type="submit" 
+                    wire:loading.attr="disabled" 
+                    wire:loading.class="opacity-50 cursor-not-allowed"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <i class="fas fa-plus mr-2"></i>
-                Créer le rendez-vous
+                <span wire:loading.remove wire:target="createRendezVous">Créer le rendez-vous</span>
+                <span wire:loading wire:target="createRendezVous" class="flex items-center">
+                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Création...
+                </span>
             </button>
         </div>
     </form>
@@ -270,6 +261,82 @@
     window.addEventListener('open-receipt', function(e) {
         if (e.detail && e.detail.url) {
             window.open(e.detail.url, '_blank');
+        }
+    });
+    
+    // Empêcher la fermeture du modal quand un patient est sélectionné
+    window.addEventListener('patient-selected', function(e) {
+        console.log('Patient sélectionné dans le modal:', e.detail);
+        // Empêcher la propagation d'événements qui pourraient fermer le modal
+        e.stopPropagation();
+    });
+    
+    // Empêcher la fermeture du modal sur les clics à l'intérieur
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.modal-content')) {
+            e.stopPropagation();
+        }
+    });
+    
+    // Raccourcis clavier pour accélérer la navigation
+    document.addEventListener('keydown', function(e) {
+        // Seulement si le modal est ouvert
+        if (!document.querySelector('.modal-content')) return;
+        
+        // Alt + P : Focus sur la recherche de patient
+        if (e.altKey && e.key === 'p') {
+            e.preventDefault();
+            const patientSearch = document.querySelector('input[placeholder*="patient"]');
+            if (patientSearch) patientSearch.focus();
+        }
+        
+        // Alt + M : Focus sur la sélection du médecin
+        if (e.altKey && e.key === 'm') {
+            e.preventDefault();
+            const medecinSelect = document.getElementById('medecin_id');
+            if (medecinSelect) medecinSelect.focus();
+        }
+        
+        // Alt + D : Focus sur la date
+        if (e.altKey && e.key === 'd') {
+            e.preventDefault();
+            const dateInput = document.getElementById('date_rdv');
+            if (dateInput) dateInput.focus();
+        }
+        
+        // Alt + H : Focus sur l'heure
+        if (e.altKey && e.key === 'h') {
+            e.preventDefault();
+            const heureInput = document.getElementById('heure_rdv');
+            if (heureInput) heureInput.focus();
+        }
+        
+        // Alt + A : Focus sur l'acte prévu
+        if (e.altKey && e.key === 'a') {
+            e.preventDefault();
+            const acteInput = document.getElementById('acte_prevu');
+            if (acteInput) acteInput.focus();
+        }
+        
+        // Alt + S : Focus sur le statut
+        if (e.altKey && e.key === 's') {
+            e.preventDefault();
+            const statutSelect = document.getElementById('rdv_confirmer');
+            if (statutSelect) statutSelect.focus();
+        }
+        
+        // Ctrl + Enter : Soumettre le formulaire
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.click();
+        }
+        
+        // Échap : Fermer le modal
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            const closeBtn = document.querySelector('button[wire\\:click*="closeCreateRdvModal"]');
+            if (closeBtn) closeBtn.click();
         }
     });
 </script>

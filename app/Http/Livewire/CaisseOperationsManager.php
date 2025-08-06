@@ -80,7 +80,7 @@ class CaisseOperationsManager extends Component
             if ($this->isDocteur) {
                 $query->where('fkidmedecin', $user->fkidmedecin);
             } elseif ($this->isSecretaire) {
-                $query->where('fkiduser', $user->id);
+                $query->where('fkiduser', $user->Iduser);
                 if ($this->medecin_id) {
                     $query->where('fkidmedecin', $this->medecin_id);
                 }
@@ -104,7 +104,7 @@ class CaisseOperationsManager extends Component
         if ($this->isDocteur) {
             $query->where('fkidmedecin', $user->fkidmedecin);
         } elseif ($this->isSecretaire) {
-            $query->where('fkiduser', $user->id);
+            $query->where('fkiduser', $user->Iduser);
             if ($this->medecin_id) {
                 $query->where('fkidmedecin', $this->medecin_id);
             }

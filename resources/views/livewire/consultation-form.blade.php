@@ -142,15 +142,12 @@
     </style>
     @endpush
 
-    @push('scripts')
     <script>
-        console.log('Script consultation-form chargé');
-        window.addEventListener('open-receipt', function(e) {
-            console.log('Événement open-receipt reçu:', e.detail);
-            if (e.detail && e.detail.url) {
-                console.log('Ouverture de l\'URL:', e.detail.url);
-                window.open(e.detail.url, '_blank');
-            }
-        });
-    </script>
-    @endpush 
+    window.addEventListener('open-receipt', function(e) {
+        console.log('Événement open-receipt reçu:', e.detail);
+        if (e.detail && e.detail.url) {
+            console.log('Ouverture de l\'URL:', e.detail.url);
+            window.open(e.detail.url, '_blank');
+        }
+    });
+</script> 

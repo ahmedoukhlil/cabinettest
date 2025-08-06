@@ -44,8 +44,15 @@
                             </select>
                         </div>
                         <div class="relative">
-                            <label class="block text-sm font-semibold text-white mb-2">Date du jour</label>
-                            <input type="date" value="{{ now()->toDateString() }}" class="w-full px-4 py-3 rounded-lg border border-[#1e3a8a] bg-gray-100 cursor-not-allowed" disabled>
+                            <label class="block text-sm font-semibold text-white mb-2">Date</label>
+                            <input type="date" wire:model="date_debut" class="w-full px-4 py-3 rounded-lg border border-[#1e3a8a] focus:ring-2 focus:ring-[#1e3a8a] focus:border-[#1e3a8a] transition-colors">
+                        </div>
+                        <div class="relative">
+                            <label class="block text-sm font-semibold text-white mb-2">&nbsp;</label>
+                            <button wire:click="resetFilters" class="w-full px-4 py-3 bg-white text-[#1e3a8a] rounded-lg hover:bg-[#1e3a8a]/10 transition-colors font-semibold">
+                                <i class="fas fa-refresh mr-2"></i>
+                                Réinitialiser
+                            </button>
                         </div>
                     @endif
                 </div>
@@ -56,14 +63,24 @@
             <!-- Totaux généraux -->
             <div class="bg-white shadow-2xl rounded-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl mb-8">
                 <div class="bg-gradient-to-r from-[#1e3a8a] to-[#1e3a8a]/80 px-8 py-6 flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-white flex items-center">
-                        <i class="fas fa-chart-line mr-3"></i>
-                        Totaux généraux
-                    </h2>
-                    <a href="{{ route('caisse.etat-journalier', ['date' => $date_debut]) }}" target="_blank" class="bg-white text-[#1e3a8a] px-4 py-2 rounded-lg hover:bg-[#1e3a8a]/10 transition-colors">
-                        <i class="fas fa-print mr-2"></i>
-                        Imprimer l'état de caisse
-                    </a>
+                    <div class="flex items-center">
+                        <h2 class="text-2xl font-bold text-white flex items-center">
+                            <i class="fas fa-chart-line mr-3"></i>
+                            Totaux généraux
+                        </h2>
+                        @if($isSecretaire)
+                            <span class="ml-4 px-3 py-1 bg-yellow-400 text-[#1e3a8a] text-sm font-semibold rounded-full">
+                                <i class="fas fa-user-secret mr-1"></i>
+                                Mes paiements uniquement
+                            </span>
+                        @endif
+                    </div>
+                                         @if(!$isSecretaire)
+                         <a href="{{ route('caisse.etat-journalier', ['date' => $date_debut]) }}" target="_blank" class="bg-white text-[#1e3a8a] px-4 py-2 rounded-lg hover:bg-[#1e3a8a]/10 transition-colors">
+                             <i class="fas fa-print mr-2"></i>
+                             Imprimer l'état de caisse
+                         </a>
+                     @endif
                 </div>
                 <div class="p-8">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -151,11 +168,23 @@
             </div>
 
             <!-- Liste des opérations -->
-            <div class="bg-gradient-to-r from-[#1e3a8a] to-[#1e3a8a]/80 px-8 py-6">
-                <h2 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-list mr-3"></i>
-                    Liste des opérations
-                </h2>
+            <div class="bg-gradient-to-r from-[#1e3a8a] to-[#1e3a8a]/80 px-8 py-6 flex justify-between items-center">
+                <div class="flex items-center">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fas fa-list mr-3"></i>
+                        Liste des opérations
+                    </h2>
+                    @if($isSecretaire)
+                        <span class="ml-4 px-3 py-1 bg-yellow-400 text-[#1e3a8a] text-sm font-semibold rounded-full">
+                            <i class="fas fa-user-secret mr-1"></i>
+                            Mes paiements uniquement
+                        </span>
+                    @endif
+                </div>
+                <div class="text-white text-sm">
+                    <i class="fas fa-calendar mr-1"></i>
+                    {{ \Carbon\Carbon::parse($date_debut)->format('d/m/Y') }}
+                </div>
             </div>
             <div class="p-8">
                 <div class="overflow-x-auto">

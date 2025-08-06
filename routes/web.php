@@ -98,19 +98,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/consultations/create', [ConsultationController::class, 'create'])->name('consultations.create');
         Route::post('/consultations', [ConsultationController::class, 'store'])->name('consultations.store');
         Route::get('/consultations/{id}', [ConsultationController::class, 'show'])->name('consultations.show');
-        Route::get('/consultations/{facture}/receipt', function ($facture) {
-            $facture = \App\Models\Facture::with([
-                'patient',
-                'medecin',
-                'details.acte',
-                'assureur',
-                'rendezVous' => function($query) {
-                    $query->select('IDRdv', 'OrdreRDV', 'fkidFacture');
-                }
-            ])->findOrFail($facture);
-            
-            return view('consultations.receipt', compact('facture'));
-        })->name('consultations.receipt');
+        Route::get('/consultations/{facture}/receipt', [ConsultationController::class, 'showReceipt'])->name('consultations.receipt');
 
         Route::get('/facture-patient/{facture}', [ConsultationController::class, 'showFacturePatient'])->name('consultations.facture-patient');
     });

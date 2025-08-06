@@ -141,16 +141,20 @@
                     <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full modal-content">
                     <div class="bg-primary-light px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-t-2xl flex items-center justify-between">
                         <h2 class="text-xl font-bold text-primary">Créer un rendez-vous</h2>
                         <button type="button" wire:click="closeCreateRdvModal" class="text-gray-500 hover:text-primary text-2xl flex items-center gap-2">
                             <i class="fas fa-times"></i> <span class="text-base font-medium">Fermer</span>
                         </button>
                     </div>
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <livewire:create-rendez-vous wire:key="create-rdv-global" />
-                    </div>
+                                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div id="modal-loading" class="hidden flex items-center justify-center py-8">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                    <span class="ml-3 text-gray-600">Chargement...</span>
+                                </div>
+                                <livewire:create-rendez-vous wire:key="create-rdv-modal" />
+                            </div>
                 </div>
             </div>
         </div>
@@ -405,6 +409,82 @@
                 this.show = false;
             }
         }));
+    });
+    
+    // Gestion du chargement du modal
+    window.addEventListener('modal-loading', function(e) {
+        const loadingDiv = document.getElementById('modal-loading');
+        const contentDiv = document.querySelector('livewire\\:create-rendez-vous');
+        
+        if (e.detail.loading) {
+            if (loadingDiv) loadingDiv.classList.remove('hidden');
+            if (contentDiv) contentDiv.style.display = 'none';
+        } else {
+            if (loadingDiv) loadingDiv.classList.add('hidden');
+            if (contentDiv) contentDiv.style.display = 'block';
+        }
+    });
+    
+    // Raccourcis clavier pour accélérer la navigation
+    document.addEventListener('keydown', function(e) {
+        // Seulement si le modal est ouvert
+        if (!document.querySelector('.modal-content')) return;
+        
+        // Alt + P : Focus sur la recherche de patient
+        if (e.altKey && e.key === 'p') {
+            e.preventDefault();
+            const patientSearch = document.querySelector('input[placeholder*="patient"]');
+            if (patientSearch) patientSearch.focus();
+        }
+        
+        // Alt + M : Focus sur la sélection du médecin
+        if (e.altKey && e.key === 'm') {
+            e.preventDefault();
+            const medecinSelect = document.getElementById('medecin_id');
+            if (medecinSelect) medecinSelect.focus();
+        }
+        
+        // Alt + D : Focus sur la date
+        if (e.altKey && e.key === 'd') {
+            e.preventDefault();
+            const dateInput = document.getElementById('date_rdv');
+            if (dateInput) dateInput.focus();
+        }
+        
+        // Alt + H : Focus sur l'heure
+        if (e.altKey && e.key === 'h') {
+            e.preventDefault();
+            const heureInput = document.getElementById('heure_rdv');
+            if (heureInput) heureInput.focus();
+        }
+        
+        // Alt + A : Focus sur l'acte prévu
+        if (e.altKey && e.key === 'a') {
+            e.preventDefault();
+            const acteInput = document.getElementById('acte_prevu');
+            if (acteInput) acteInput.focus();
+        }
+        
+        // Alt + S : Focus sur le statut
+        if (e.altKey && e.key === 's') {
+            e.preventDefault();
+            const statutSelect = document.getElementById('rdv_confirmer');
+            if (statutSelect) statutSelect.focus();
+        }
+        
+        // Ctrl + Enter : Soumettre le formulaire
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.click();
+        }
+        
+        // Échap : Fermer le modal
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            const closeBtn = document.querySelector('button[wire\\:click*="closeCreateRdvModal"]');
+            if (closeBtn) closeBtn.click();
+        }
     });
 </script>
 @endpush 

@@ -22,13 +22,9 @@ class CreateRendezVous extends Component
     public $heure_rdv;
     public $acte_prevu = 'Consultation';
     public $rdv_confirmer = 'En Attente';
-    public $patient = null;
+    // Suppression de $patient pour éviter les problèmes de type avec Livewire
 
-    // Propriétés pour la recherche de patients
-    public $search = '';
-    public $searchBy = 'phone'; // name, nni, phone
-    public $isSearching = false;
-    public $patients = [];
+    // La recherche de patients est maintenant gérée par le composant PatientSearch
     public $medecins = [];
     public $actes = [];
 
@@ -42,6 +38,9 @@ class CreateRendezVous extends Component
     // Propriété pour l'URL d'impression
     public $printUrl = '';
     public $showPrintButton = false;
+    
+    // Propriété pour empêcher la fermeture du modal
+    public $keepModalOpen = true;
 
     protected $rules = [
         'patient_id' => 'required',
@@ -68,14 +67,24 @@ class CreateRendezVous extends Component
         'patientCleared' => 'handlePatientCleared',
     ];
 
+    // Empêcher le rechargement automatique du composant
+    protected $queryString = [];
+
     public function mount($patient = null)
     {
-        $this->patients = collect();
-        $this->medecins = Medecin::where('Masquer', 0)->orderBy('Nom')->get();
-        $this->actes = Acte::where('Masquer', 0)->orderBy('Acte')->get();
+        // Charger seulement les médecins nécessaires
+        $this->medecins = Medecin::select('idMedecin', 'Nom')
+            ->where('Masquer', 0)
+            ->orderBy('Nom')
+            ->get();
+        // Charger seulement les actes nécessaires
+        $this->actes = Acte::select('ID', 'Acte')
+            ->where('Masquer', 0)
+            ->orderBy('Acte')
+            ->limit(20) // Limiter à 20 actes les plus utilisés
+            ->get();
         $this->initializePermissions();
         if ($patient) {
-            $this->patient = $patient;
             $this->patient_id = is_array($patient) ? $patient['ID'] : $patient->ID;
         }
     }
@@ -111,6 +120,9 @@ class CreateRendezVous extends Component
         }
 
         try {
+            // Utiliser une transaction pour optimiser les performances
+            \DB::beginTransaction();
+            
             $rendezVous = Rendezvou::create([
                 'fkidPatient' => $this->patient_id,
                 'fkidMedecin' => $this->medecin_id,
@@ -124,16 +136,22 @@ class CreateRendezVous extends Component
                 'OrdreRDV' => Rendezvou::generateNextOrderNumber($this->date_rdv, $this->medecin_id)
             ]);
 
+            \DB::commit();
+
             $this->reset(['patient_id', 'heure_rdv', 'acte_prevu']);
             $this->resetPage();
             session()->flash('message', 'Rendez-vous créé avec succès.');
+            
+            // Émettre un événement pour réinitialiser le composant PatientSearch
+            $this->emit('clearPatient');
             
             // Retourner l'URL pour l'impression du reçu dans un nouvel onglet
             $this->printUrl = route('rendez-vous.print', ['id' => $rendezVous->IDRdv]);
             $this->showPrintButton = true;
             $this->dispatchBrowserEvent('open-receipt', ['url' => $this->printUrl]);
         } catch (\Exception $e) {
-            session()->flash('error', 'Erreur lors de la création du rendez-vous.');
+            \DB::rollBack();
+            session()->flash('error', 'Erreur lors de la création du rendez-vous: ' . $e->getMessage());
         }
     }
 
@@ -147,92 +165,7 @@ class CreateRendezVous extends Component
         $this->resetPage();
     }
 
-    public function updatedSearch()
-    {
-        if (strlen(trim($this->search)) < 2) {
-            $this->patients = collect();
-            return;
-        }
-
-        $this->performSearch();
-    }
-
-    public function updatedSearchBy()
-    {
-        if (strlen(trim($this->search)) >= 2) {
-            $this->performSearch();
-        }
-    }
-
-    protected function performSearch()
-    {
-        $this->isSearching = true;
-
-        try {
-            $query = Patient::query();
-
-            switch ($this->searchBy) {
-                case 'name':
-                    $query->where(function($q) {
-                        $q->where('Nom', 'like', '%' . $this->search . '%')
-                          ->orWhere('Prenom', 'like', '%' . $this->search . '%');
-                    });
-                    break;
-                case 'nni':
-                    $query->where('NNI', 'like', '%' . $this->search . '%');
-                    break;
-                case 'phone':
-                    $searchPhone = preg_replace('/[^0-9]/', '', $this->search);
-                    if (!empty($searchPhone)) {
-                        $query->where(function($q) use ($searchPhone) {
-                            $q->where(function($subQ) use ($searchPhone) {
-                                $subQ->whereRaw("REPLACE(REPLACE(REPLACE(Telephone1, ' ', ''), '-', ''), '+', '') LIKE ?", ['%' . $searchPhone . '%'])
-                                     ->orWhereRaw("REPLACE(REPLACE(REPLACE(Telephone2, ' ', ''), '-', ''), '+', '') LIKE ?", ['%' . $searchPhone . '%']);
-                            });
-                        });
-                    }
-                    break;
-            }
-
-            $query->where('fkidcabinet', 1);
-
-            $this->patients = $query->select('ID', 'Nom', 'Prenom', 'NNI', 'Telephone1', 'Telephone2', 'Assureur')
-                                  ->orderBy('Nom')
-                                  ->limit(10)
-                                  ->get();
-
-        } catch (\Exception $e) {
-            logger('Erreur lors de la recherche', [
-                'error' => $e->getMessage()
-            ]);
-            $this->patients = collect();
-        }
-
-        $this->isSearching = false;
-    }
-
-    public function selectPatient($patientId)
-    {
-        try {
-            $patient = $this->patients->firstWhere('ID', $patientId);
-            if ($patient) {
-                $this->patient_id = $patientId;
-                $this->search = '';
-                $this->patients = collect();
-            }
-        } catch (\Exception $e) {
-            logger('Erreur lors de la sélection du patient', [
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
-
-    public function clearPatient()
-    {
-        $this->patient_id = null;
-        $this->search = '';
-        $this->patients = collect();
-    }
+    // Suppression de la logique de recherche dupliquée - maintenant gérée par le composant PatientSearch
 
     public function printRendezVous()
     {
@@ -243,19 +176,35 @@ class CreateRendezVous extends Component
 
     public function handlePatientSelected($patient)
     {
-        $this->patient = $patient;
-        $this->patient_id = is_array($patient) ? $patient['ID'] : $patient->ID;
+        \Log::info('CreateRendezVous: handlePatientSelected appelé', ['patient' => $patient]);
+        
+        if ($patient === null) {
+            $this->patient_id = null;
+        } else {
+            // Le patient vient du composant PatientSearch sous forme d'array
+            $this->patient_id = $patient['ID'];
+        }
+        
+        \Log::info('CreateRendezVous: patient_id mis à jour', ['patient_id' => $this->patient_id]);
     }
 
     public function handlePatientCleared()
     {
-        $this->patient = null;
         $this->patient_id = null;
     }
 
     public function getTotalRdvJourProperty()
     {
         return \App\Models\Rendezvou::whereDate('dtPrevuRDV', now()->toDateString())->count();
+    }
+
+    // Méthode pour accéder aux propriétés du patient sélectionné de manière sécurisée
+    public function getSelectedPatientProperty()
+    {
+        if ($this->patient_id) {
+            return Patient::find($this->patient_id);
+        }
+        return null;
     }
 
     public function changerStatutRendezVous($id, $nouveauStatut)
@@ -305,7 +254,7 @@ class CreateRendezVous extends Component
     public function render()
     {
         $query = Rendezvou::query()
-            ->with(['patient', 'medecin'])
+            ->with(['patient:id,ID,Nom,Prenom', 'medecin:idMedecin,Nom']) // Charger seulement les champs nécessaires
             ->orderBy('dtPrevuRDV', 'desc')
             ->orderBy('HeureRdv', 'desc');
 
@@ -324,11 +273,11 @@ class CreateRendezVous extends Component
             $query->where('fkidMedecin', Auth::user()->fkidmedecin);
         }
 
-        $rendezVous = $query->paginate(10);
+        $rendezVous = $query->paginate(8); // Réduire à 8 éléments par page
 
         return view('livewire.create-rendez-vous', [
             'rendezVous' => $rendezVous,
             'totalRdvJour' => $this->totalRdvJour,
-        ]);
+        ])->layout('layouts.app');
     }
 }

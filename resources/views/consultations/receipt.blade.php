@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REÇU DE CONSULTATION</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fff; font-size: 12px; }
         .a4 { width: 210mm; min-height: 297mm; margin: auto; background: #fff; padding: 0 18mm 0 10mm; position: relative; box-sizing: border-box; display: flex; flex-direction: column; min-height: 297mm; }
@@ -153,7 +154,7 @@
                 <div style="max-width: 100px; height: auto;">
                     @php
                         try {
-                            $qrCode = App\Helpers\QrCodeHelper::generateRendezVousQrCode($facture->fkidPatient);
+                            $qrCode = App\Helpers\QrCodeHelper::generateRendezVousQrCode($facture->IDPatient);
                             echo $qrCode;
                         } catch (Exception $e) {
                             echo '<div style="width: 100px; height: 100px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #999;">QR Code<br>Non disponible</div>';
@@ -162,7 +163,7 @@
                 </div>
             </div>
             <div style="font-size: 8px; color: #999; margin-top: 3px;">
-                Accès sécurisé - Valide 24h (jusqu'à 23h59)
+                Accès sécurisé - Valide aujourd'hui uniquement
             </div>
         </div>
     </div>

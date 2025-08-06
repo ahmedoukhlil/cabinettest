@@ -23,6 +23,12 @@ class PatientSearch extends Component
     public function updatedSearch()
     {
         if (strlen($this->search) < 1) {
+            // Si un patient est sélectionné et que la recherche correspond, garder la liste
+            if ($this->selectedPatient && 
+                (stripos($this->selectedPatient['NomPatient'] . ' ' . $this->selectedPatient['Prenom'], $this->search) !== false ||
+                 stripos($this->selectedPatient['Prenom'] . ' ' . $this->selectedPatient['NomPatient'], $this->search) !== false)) {
+                return;
+            }
             $this->patients = [];
             return;
         }
@@ -117,11 +123,13 @@ class PatientSearch extends Component
                     'NomAssureur' => $assureur ? $assureur->LibAssurance : ''
                 ];
                 
-                // Effacer la recherche pour fermer la liste déroulante
-                $this->search = '';
+                // Afficher le nom du patient dans la recherche
+                $this->search = $patient->Nom . ' ' . $patient->Prenom;
+                
+                // Vider la liste pour masquer la dropdown
                 $this->patients = [];
                 
-                \Log::info('Patient sélectionné', $this->selectedPatient);
+                \Log::info('Patient sélectionné dans PatientSearch', $this->selectedPatient);
                 $this->emit('patientSelected', $this->selectedPatient);
             } else {
                 session()->flash('error', 'Patient non trouvé.');
@@ -137,7 +145,10 @@ class PatientSearch extends Component
         $this->patients = [];
         $this->selectedPatient = null;
         $this->emit('patientCleared');
+        $this->emit('patientSelected', null); // Émettre null pour indiquer qu'aucun patient n'est sélectionné
     }
+    
+
 
     public function render()
     {
