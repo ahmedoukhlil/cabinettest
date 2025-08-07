@@ -17,8 +17,10 @@ class QrCodeHelper
         
         return QrCode::format('svg')
             ->size(120)
-            ->margin(0)
+            ->margin(2)
             ->errorCorrection('M')
+            ->backgroundColor(255, 255, 255)
+            ->color(0, 0, 0)
             ->generate($url);
     }
 
@@ -32,8 +34,10 @@ class QrCodeHelper
         
         return QrCode::format('svg')
             ->size(120)
-            ->margin(0)
+            ->margin(2)
             ->errorCorrection('M')
+            ->backgroundColor(255, 255, 255)
+            ->color(0, 0, 0)
             ->generate($url);
     }
 

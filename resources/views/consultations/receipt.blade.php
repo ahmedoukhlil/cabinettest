@@ -35,7 +35,15 @@
         .recu-header, .recu-footer { width: 100%; text-align: center; }
         .recu-header img, .recu-footer img { max-width: 100%; height: auto; }
         .recu-footer { position: absolute; bottom: 0; left: 0; width: 100%; }
-        @media print { .a4, .a5 { box-shadow: none; } .recu-footer { position: fixed; bottom: 0; left: 0; width: 100%; } .print-controls { display: none !important; } }
+        @media print { 
+            .a4, .a5 { box-shadow: none; } 
+            .recu-footer { position: fixed; bottom: 0; left: 0; width: 100%; } 
+            .print-controls { display: none !important; }
+            .qr-code-container:hover { transform: none; }
+            .qr-code-link { color: #000 !important; }
+            .qr-code-container { background: #fff !important; }
+            a { color: #000 !important; text-decoration: none !important; }
+        }
         .print-controls { display: flex; gap: 10px; justify-content: flex-end; margin: 18px 0; }
         .print-controls select, .print-controls button { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
         .print-controls button { background: #2c5282; color: #fff; border: none; cursor: pointer; }
@@ -52,6 +60,35 @@
         }
         .signature-name {
             font-style: italic;
+        }
+        .qr-code-link {
+            text-decoration: none;
+            color: inherit;
+            display: inline-block;
+        }
+        .qr-code-link:hover {
+            transform: scale(1.02);
+        }
+        .qr-code-container {
+            display: inline-block;
+            padding: 4px;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .qr-code-container:hover {
+            transform: scale(1.02);
+        }
+        .qr-code-accessibility {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
@@ -144,29 +181,36 @@
         <div class="signature-name">Dr. {{ $facture->medecin->Nom ?? 'Non spécifié' }}</div>
     </div>
 
-    <!-- QR Code pour l'interface patient - Positionné en bas à gauche -->
-    <div style="position: fixed; bottom: 120px; left: 20px; z-index: 1000;">
-        <div style="text-align: center;">
-            <div style="font-size: 10px; color: #666; margin-bottom: 5px;">
-                <i class="fas fa-qrcode"></i> Scannez pour suivre votre file d'attente
-            </div>
-            <div style="display: inline-block; padding: 8px; border: 1px solid #ddd; background: #f9f9f9; border-radius: 4px;">
-                <div style="max-width: 100px; height: auto;">
-                    @php
-                        try {
-                            $qrCode = App\Helpers\QrCodeHelper::generateRendezVousQrCode($facture->IDPatient);
-                            echo $qrCode;
-                        } catch (Exception $e) {
-                            echo '<div style="width: 100px; height: 100px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #999;">QR Code<br>Non disponible</div>';
-                        }
-                    @endphp
-                </div>
-            </div>
-            <div style="font-size: 8px; color: #999; margin-top: 3px;">
-                Accès sécurisé - Valide aujourd'hui uniquement
-            </div>
-        </div>
-    </div>
+         <!-- QR Code pour l'interface patient - Positionné en bas à gauche -->
+     <div style="position: fixed; bottom: 120px; left: 20px; z-index: 1000;">
+         <div style="text-align: center;">
+             @php
+                 try {
+                     $token = App\Http\Controllers\PatientInterfaceController::generateToken($facture->IDPatient);
+                     $patientUrl = route('patient.rendez-vous', ['token' => $token]);
+                 } catch (Exception $e) {
+                     $patientUrl = '#';
+                 }
+             @endphp
+             <a href="{{ $patientUrl }}" target="_blank" class="qr-code-link" aria-label="Ouvrir l'interface patient pour suivre votre file d'attente">
+                 <div class="qr-code-container">
+                     <div style="max-width: 100px; height: auto;">
+                         @php
+                             try {
+                                 $qrCode = App\Helpers\QrCodeHelper::generateRendezVousQrCode($facture->IDPatient);
+                                 echo $qrCode;
+                             } catch (Exception $e) {
+                                 echo '<div style="width: 100px; height: 100px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #666; border-radius: 4px;">QR Code<br>Non disponible</div>';
+                             }
+                         @endphp
+                     </div>
+                 </div>
+             </a>
+             <div style="margin-top: 4px; font-size: 8px; color: #333; font-weight: 600;">
+                 Suivez votre file d'attente
+             </div>
+         </div>
+     </div>
 
     <div class="recu-footer">@include('partials.recu-footer')</div>
 </div>
