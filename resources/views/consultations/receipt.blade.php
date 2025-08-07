@@ -90,6 +90,26 @@
             white-space: nowrap;
             border: 0;
         }
+        .ordre-rdv {
+            display: block;
+            background: #2c5282;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 2px solid #1a365d;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin: 15px auto;
+            text-align: center;
+            width: fit-content;
+            min-width: 80px;
+        }
+        .a5 .ordre-rdv {
+            font-size: 12px;
+            padding: 6px 12px;
+            min-width: 70px;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +125,10 @@
     </div>
     <div class="recu-header">@include('partials.recu-header')</div>
     <div class="facture-title">REÇU DE CONSULTATION</div>
+    
+    @if($facture->rendezVous && $facture->rendezVous->OrdreRDV)
+        <div class="ordre-rdv">N° {{ str_pad($facture->rendezVous->OrdreRDV, 3, '0', STR_PAD_LEFT) }}</div>
+    @endif
     
     <div class="bloc-patient">
         <table class="bloc-patient-table">

@@ -349,25 +349,10 @@ class ConsultationForm extends Component
         $montant = floatval($this->montant);
         
         // Récupérer le taux de prise en charge et l'assureur depuis le patient
-        $txpec = 0;
-        $fkidEtsAssurance = null;
-        $totalPEC = 0;
-        $totalPatient = $montant;
-        
-        if (isset($this->selectedPatient['Assureur']) && $this->selectedPatient['Assureur'] > 0) {
-            $patient = Patient::find($this->selectedPatient['ID']);
-
-            if ($patient && $patient->Assureur) {
-                $fkidEtsAssurance = $patient->Assureur;
-                $assureur = Assureur::find($fkidEtsAssurance);
-
-                if ($assureur) {
-                    $txpec = floatval($assureur->TauxdePEC);
-                    $totalPEC = ($montant * $txpec);
-                    $totalPatient = ($montant * (1 - $txpec));
-                }
-            }
-        }
+        $txpec = isset($this->selectedPatient['TauxPEC']) ? floatval($this->selectedPatient['TauxPEC']) : 0;
+        $fkidEtsAssurance = isset($this->selectedPatient['Assureur']) ? $this->selectedPatient['Assureur'] : null;
+        $totalPEC = ($montant * $txpec);
+        $totalPatient = ($montant * (1 - $txpec));
 
         // Récupérer l'utilisateur connecté depuis la base de données
         $userId = Auth::id();
@@ -379,7 +364,7 @@ class ConsultationForm extends Component
             'nordre' => $nordre,
             'DtFacture' => Carbon::now(),
             'IDPatient' => $this->selectedPatient['ID'],
-            'ISTP' => $this->istp ? intval($this->istp) : 0,
+            'ISTP' => ($txpec > 0) ? 1 : 0,
             'fkidEtsAssurance' => $fkidEtsAssurance,
             'TXPEC' => $txpec,
             'TotFacture' => $montant,
@@ -461,7 +446,7 @@ class ConsultationForm extends Component
             'fkidPatient' => $this->selectedPatient['ID'],
             'fkidMedecin' => $this->medecin_id,
             'dtPrevuRDV' => $date,
-            'HeureRdv' => $date->setHour(0)->setMinute(0),
+            'HeureRdv' => $date,
             'ActePrevu' => 'Consultation',
             'rdvConfirmer' => 'Confirmé',
             'DtAjRdv' => now(),

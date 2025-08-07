@@ -17,6 +17,7 @@ class CreateRendezVous extends Component
 
     // Propriétés du formulaire
     public $patient_id = '';
+    public $selectedPatient = null;
     public $medecin_id = '';
     public $date_rdv = '';
     public $heure_rdv;
@@ -84,9 +85,34 @@ class CreateRendezVous extends Component
             ->limit(20) // Limiter à 20 actes les plus utilisés
             ->get();
         $this->initializePermissions();
+        
+        // Gérer le patient passé en paramètre
+        \Log::info('CreateRendezVous mount: patient reçu', ['patient' => $patient]);
+        
         if ($patient) {
-            $this->patient_id = is_array($patient) ? $patient['ID'] : $patient->ID;
+            if (is_array($patient)) {
+                $this->patient_id = $patient['ID'];
+                $this->selectedPatient = $patient;
+            } else {
+                $this->patient_id = $patient->ID;
+                $this->selectedPatient = $patient->toArray();
+            }
+            
+            \Log::info('CreateRendezVous mount: patient traité', [
+                'patient_id' => $this->patient_id,
+                'selectedPatient' => $this->selectedPatient
+            ]);
+            
+            // Sauvegarder l'état dans la session
+            session(['rdv_patient' => [
+                'id' => $this->patient_id,
+                'data' => $this->selectedPatient
+            ]]);
         }
+        
+        // Initialiser la date et l'heure par défaut
+        $this->date_rdv = now()->format('Y-m-d');
+        $this->heure_rdv = now()->format('H:i');
     }
 
     protected function initializePermissions()
@@ -180,17 +206,33 @@ class CreateRendezVous extends Component
         
         if ($patient === null) {
             $this->patient_id = null;
+            $this->selectedPatient = null;
         } else {
             // Le patient vient du composant PatientSearch sous forme d'array
             $this->patient_id = $patient['ID'];
+            $this->selectedPatient = $patient;
         }
         
+        // Sauvegarder l'état dans la session
+        session(['rdv_patient' => [
+            'id' => $this->patient_id,
+            'data' => $this->selectedPatient
+        ]]);
+        
         \Log::info('CreateRendezVous: patient_id mis à jour', ['patient_id' => $this->patient_id]);
+        
+        // Forcer la mise à jour des propriétés
+        $this->emit('refresh');
     }
 
     public function handlePatientCleared()
     {
         $this->patient_id = null;
+        $this->selectedPatient = null;
+        session()->forget('rdv_patient');
+        
+        // Empêcher le re-rendu complet du composant
+        $this->skipRender();
     }
 
     public function getTotalRdvJourProperty()
@@ -248,6 +290,27 @@ class CreateRendezVous extends Component
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la modification du statut: ' . $e->getMessage());
+        }
+    }
+
+    public function hydrate()
+    {
+        // Restaurer l'état du patient depuis la session si nécessaire
+        if (!$this->selectedPatient && session()->has('rdv_patient')) {
+            $rdvPatient = session('rdv_patient');
+            $this->patient_id = $rdvPatient['id'];
+            $this->selectedPatient = $rdvPatient['data'];
+        }
+    }
+
+    public function dehydrate()
+    {
+        // Sauvegarder l'état du patient dans la session
+        if ($this->selectedPatient) {
+            session(['rdv_patient' => [
+                'id' => $this->patient_id,
+                'data' => $this->selectedPatient
+            ]]);
         }
     }
 

@@ -10,6 +10,25 @@
         </div>
     </div>
 
+    <!-- Debug: selectedPatient = {{ var_dump($selectedPatient) }} -->
+    <!-- Patient sélectionné -->
+    @if($selectedPatient)
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-user text-blue-600 mr-3"></i>
+                    <div>
+                        <p class="text-sm text-blue-600 font-medium">Patient sélectionné</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ $selectedPatient['Nom'] ?? '' }} {{ $selectedPatient['Prenom'] ?? '' }}</p>
+                    </div>
+                </div>
+                <button type="button" wire:click="handlePatientCleared" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                    <i class="fas fa-times mr-1"></i>Changer
+                </button>
+            </div>
+        </div>
+    @endif
+
     <!-- Formulaire de création -->
     <form wire:submit.prevent="createRendezVous" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -99,6 +118,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médecin</th>
@@ -112,6 +132,17 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                @if($rdv->OrdreRDV)
+                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
+                                        {{ str_pad($rdv->OrdreRDV, 2, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-gray-500 rounded-full min-w-[2rem]">
+                                        {{ str_pad($rdv->IDRdv, 2, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
@@ -220,7 +251,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            <td colspan="8" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                 Aucun rendez-vous à venir
                             </td>
                         </tr>

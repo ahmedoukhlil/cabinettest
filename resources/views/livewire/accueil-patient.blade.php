@@ -153,7 +153,7 @@
                                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                                     <span class="ml-3 text-gray-600">Chargement...</span>
                                 </div>
-                                <livewire:create-rendez-vous wire:key="create-rdv-modal" />
+                                <livewire:create-rendez-vous wire:key="create-rdv-modal" :patient="$selectedPatient" />
                             </div>
                 </div>
             </div>

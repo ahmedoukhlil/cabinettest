@@ -62,6 +62,7 @@
                 <thead class="bg-white">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médecin</th>
@@ -74,6 +75,17 @@
                     @forelse($RendezVous as $rdv)
                         <tr>
                             <td class="px-4 py-3 whitespace-nowrap">{{ \Carbon\Carbon::parse($rdv->DateRdv)->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-center">
+                                @if($rdv->OrdreRDV)
+                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
+                                        {{ str_pad($rdv->OrdreRDV, 2, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-gray-500 rounded-full min-w-[2rem]">
+                                        {{ str_pad($rdv->IDRdv, 2, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ $rdv->HeureRdv ? \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') : '' }}</td>
                             <td class="px-4 py-3 whitespace-nowrap font-semibold">{{ $rdv->patient->Prenom ?? '' }}</td>
                             <td class="px-4 py-3 whitespace-nowrap">{{ $rdv->medecin->Nom ?? '' }}</td>
@@ -180,11 +192,11 @@
                                 @endif
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="px-4 py-12 text-center text-gray-500">Aucun rendez-vous à venir</td>
-                        </tr>
-                    @endforelse
+                                         @empty
+                         <tr>
+                             <td colspan="8" class="px-4 py-12 text-center text-gray-500">Aucun rendez-vous à venir</td>
+                         </tr>
+                     @endforelse
                 </tbody>
             </table>
         </div>
