@@ -67,21 +67,28 @@ class PatientInterfaceController extends Controller
             $tempsAttenteEstime = null;
             $patientEnCours = null;
             $positionPatientEnCours = null;
+            $patientsAvantMoi = 0;
 
             if ($prochainRdv) {
                 // Récupérer tous les rendez-vous du même médecin pour la même date
                 $fileAttente = Rendezvou::with(['patient', 'medecin'])
                     ->where('fkidMedecin', $prochainRdv->fkidMedecin)
                     ->where('dtPrevuRDV', $prochainRdv->dtPrevuRDV)
-                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
+                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé', 'Terminé', 'terminé'])
                     ->orderBy('OrdreRDV', 'asc')
                     ->get();
 
                 // Utiliser directement l'ordreRDV du patient comme position
                 $positionPatient = $prochainRdv->OrdreRDV;
                 
-                // Estimer le temps d'attente (15 minutes par patient en moyenne)
-                $tempsAttenteEstime = $positionPatient * 15; // en minutes
+                // Calculer le nombre de patients avant ce patient dans la file d'attente
+                $patientsAvantMoi = $fileAttente->filter(function($rdv) use ($prochainRdv) {
+                    return $rdv->OrdreRDV < $prochainRdv->OrdreRDV && 
+                           !in_array($rdv->rdvConfirmer, ['Terminé', 'terminé', 'Annulé', 'annulé']);
+                })->count();
+                
+                // Estimer le temps d'attente basé sur les patients réellement en attente
+                $tempsAttenteEstime = $patientsAvantMoi * 15; // 15 minutes par patient en moyenne
 
                 // Trouver le patient en cours de traitement
                 $patientEnCours = $fileAttente->first(function($rdv) {
@@ -102,7 +109,8 @@ class PatientInterfaceController extends Controller
                 'positionPatient', 
                 'tempsAttenteEstime',
                 'patientEnCours',
-                'positionPatientEnCours'
+                'positionPatientEnCours',
+                'patientsAvantMoi'
             ));
             
         } catch (\Exception $e) {

@@ -1,18 +1,26 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suivi File d'Attente - {{ $patient->Nom }}</title>
+    <title>تتبع طابور الانتظار - {{ $patient->Nom }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         .status-en-attente { @apply bg-yellow-100 text-yellow-800; }
         .status-confirme { @apply bg-green-100 text-green-800; }
         .status-annule { @apply bg-red-100 text-red-800; }
         .status-termine { @apply bg-blue-100 text-blue-800; }
         .current-patient { @apply bg-blue-500 text-white; }
         .other-patient { @apply bg-gray-200 text-gray-700; }
+        
+        /* RTL specific styles */
+        .rtl-text { direction: rtl; text-align: right; }
+        .icon-left { margin-left: 0.5rem; margin-right: 0; }
+        .icon-right { margin-right: 0.5rem; margin-left: 0; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -25,115 +33,133 @@
                   <!-- Informations principales -->
          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 <!-- Informations patient -->
-                 <div>
-                     <h2 class="text-xl font-bold text-gray-800 mb-4">
-                         <i class="fas fa-user text-blue-600 mr-2"></i>
-                         Informations Patient
-                     </h2>
-                     <div class="space-y-3">
-                         <div>
-                             <span class="text-sm font-medium text-gray-600">Nom :</span>
-                             <span class="text-lg font-semibold text-gray-800">{{ $patient->Nom }}</span>
-                         </div>
-                         @if($prochainRdv)
-                             <div>
-                                 <span class="text-sm font-medium text-gray-600">Médecin :</span>
-                                 <span class="text-lg font-semibold text-gray-800">Dr. {{ $prochainRdv->medecin->Nom ?? '' }} {{ $prochainRdv->medecin->Prenom ?? '' }}</span>
-                             </div>
-                             <div>
-                                 <span class="text-sm font-medium text-gray-600">Date :</span>
-                                 <span class="text-lg font-semibold text-gray-800">{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</span>
-                             </div>
-                         @endif
-                     </div>
-                 </div>
+                                 <!-- معلومات المريض -->
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-user text-blue-600 icon-left"></i>
+                        معلومات المريض
+                    </h2>
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-sm font-medium text-gray-600">الاسم:</span>
+                            <span class="text-lg font-semibold text-gray-800">{{ $patient->Nom }}</span>
+                        </div>
+                        @if($prochainRdv)
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">الطبيب:</span>
+                                <span class="text-lg font-semibold text-gray-800">د. {{ $prochainRdv->medecin->Nom ?? '' }} {{ $prochainRdv->medecin->Prenom ?? '' }}</span>
+                            </div>
+                            <div>
+                                <span class="text-sm font-medium text-gray-600">التاريخ:</span>
+                                <span class="text-lg font-semibold text-gray-800">{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
  
-                 <!-- Statut actuel -->
-                 <div>
-                     <h2 class="text-xl font-bold text-gray-800 mb-4">
-                         <i class="fas fa-clock text-green-600 mr-2"></i>
-                         Statut Actuel
-                     </h2>
-                     @if($prochainRdv && $positionPatient)
-                         <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
-                             <div class="text-center">
-                                 <div class="text-3xl font-bold mb-2">{{ $prochainRdv->ordreRDV ?? $positionPatient }}</div>
-                                 <div class="text-sm opacity-90">Votre position dans la file</div>
-                                 @if(($prochainRdv->ordreRDV ?? $positionPatient) > 1)
-                                     <div class="text-sm opacity-90 mt-1">
-                                         <i class="fas fa-users mr-1"></i>
-                                         {{ ($prochainRdv->ordreRDV ?? $positionPatient) - 1 }} patient(s) avant vous
-                                     </div>
-                                 @endif
-                                 @if($tempsAttenteEstime)
-                                     <div class="text-sm opacity-90 mt-2">
-                                         <i class="fas fa-hourglass-half mr-1"></i>
-                                         ~{{ $tempsAttenteEstime }} min d'attente
-                                     </div>
-                                 @endif
-                             </div>
-                         </div>
-                     @else
-                         <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
-                             <div class="text-center">
-                                 <i class="fas fa-info-circle text-yellow-600 text-2xl mb-2"></i>
-                                 <div class="text-yellow-800 font-medium">Aucun rendez-vous aujourd'hui</div>
-                             </div>
-                         </div>
-                     @endif
-                 </div>
+                                                 <!-- الحالة الحالية -->
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                        <i class="fas fa-clock text-green-600 icon-left"></i>
+                        الحالة الحالية
+                    </h2>
+                    @if($prochainRdv && $positionPatient)
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold mb-2">{{ $prochainRdv->OrdreRDV ?? $positionPatient }}</div>
+                                <div class="text-sm opacity-90">رقم موعدك</div>
+                                
+                                @if($patientsAvantMoi > 0)
+                                    <div class="bg-white bg-opacity-20 rounded-lg p-3 mt-3">
+                                        <div class="text-2xl font-bold text-yellow-200">{{ $patientsAvantMoi }}</div>
+                                        <div class="text-sm opacity-90">
+                                            <i class="fas fa-users icon-left"></i>
+                                            مريض قبلك
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="bg-green-500 bg-opacity-30 rounded-lg p-3 mt-3">
+                                        <div class="text-lg font-bold text-green-200">
+                                            <i class="fas fa-star icon-left"></i>
+                                            حان دورك !
+                                        </div>
+                                        <div class="text-sm opacity-90">يمكنك الحضور</div>
+                                    </div>
+                                @endif
+                                
+                                @if($tempsAttenteEstime > 0)
+                                    <div class="text-sm opacity-90 mt-2">
+                                        <i class="fas fa-hourglass-half icon-left"></i>
+                                        وقت الانتظار المقدر: ~{{ $tempsAttenteEstime }} دقيقة
+                                    </div>
+                                @else
+                                    <div class="text-sm opacity-90 mt-2">
+                                        <i class="fas fa-clock icon-left"></i>
+                                        لا انتظار متوقع
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @else
+                        <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
+                            <div class="text-center">
+                                <i class="fas fa-info-circle text-yellow-600 text-2xl mb-2"></i>
+                                <div class="text-yellow-800 font-medium">لا توجد مواعيد اليوم</div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
  
-                 <!-- Patient en cours de traitement -->
-                 @if($prochainRdv && $patientEnCours)
-                     <div>
-                         <h2 class="text-xl font-bold text-gray-800 mb-4">
-                             <i class="fas fa-user-md text-green-600 mr-2"></i>
-                             Patient en cours
-                         </h2>
-                         <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
-                             <div class="text-center">
-                                 <div class="text-3xl font-bold mb-2">
-                                     <i class="fas fa-user-md mr-2"></i>
-                                     N° {{ $patientEnCours->OrdreRDV ?? $positionPatientEnCours ?? 'N/A' }}
-                                 </div>
-                                 <div class="text-sm opacity-90">Avec le médecin</div>
-                                 <div class="text-xs opacity-75 mt-1">En cours de traitement</div>
-                             </div>
-                         </div>
-                     </div>
-                 @endif
+                                 <!-- المريض الحالي -->
+                @if($prochainRdv && $patientEnCours)
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">
+                            <i class="fas fa-user-md text-green-600 icon-left"></i>
+                            المريض الحالي
+                        </h2>
+                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold mb-2">
+                                    <i class="fas fa-user-md icon-left"></i>
+                                    رقم {{ $patientEnCours->OrdreRDV ?? $positionPatientEnCours ?? 'غير متوفر' }}
+                                </div>
+                                <div class="text-sm opacity-90">مع الطبيب</div>
+                                <div class="text-xs opacity-75 mt-1">قيد العلاج</div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
              </div>
          </div>
 
-        <!-- Patient en cours -->
+        <!-- المريض قيد العلاج -->
         @if($prochainRdv && $patientEnCours)
             <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-lg font-semibold text-green-800">
-                            <i class="fas fa-user-md mr-2"></i>
-                            Patient en cours de traitement
+                            <i class="fas fa-user-md icon-left"></i>
+                            المريض قيد العلاج
                         </h3>
-                                                 <p class="text-green-700">Numéro : <span class="font-bold">{{ $patientEnCours->ordreRDV ?? $positionPatientEnCours ?? 'N/A' }}</span></p>
+                        <p class="text-green-700">الرقم: <span class="font-bold">{{ $patientEnCours->ordreRDV ?? $positionPatientEnCours ?? 'غير متوفر' }}</span></p>
                     </div>
-                    <div class="text-right">
-                                                 <div class="text-2xl font-bold text-green-600">
-                             <i class="fas fa-user-md mr-2"></i>
-                             Avec le médecin
+                    <div class="text-left">
+                        <div class="text-2xl font-bold text-green-600">
+                             <i class="fas fa-user-md icon-left"></i>
+                             مع الطبيب
                          </div>
                     </div>
                 </div>
             </div>
         @endif
 
-        <!-- Planning du médecin -->
+        <!-- برنامج الطبيب -->
         @if($prochainRdv && $rendezVousMedecinJournee->count() > 0)
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-day mr-2"></i>
-                        Planning du Dr. {{ $prochainRdv->medecin->Nom ?? '' }} {{ $prochainRdv->medecin->Prenom ?? '' }}
+                        <i class="fas fa-calendar-day icon-left"></i>
+                        برنامج د. {{ $prochainRdv->medecin->Nom ?? '' }} {{ $prochainRdv->medecin->Prenom ?? '' }}
                         <span class="text-sm font-normal text-gray-600">
                             - {{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}
                         </span>
@@ -144,14 +170,14 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <i class="fas fa-sort-numeric-up mr-1"></i>N° RDV
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-sort-numeric-up icon-left"></i>رقم الموعد
                                 </th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <i class="fas fa-clock mr-1"></i>Heure
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-clock icon-left"></i>الوقت
                                 </th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <i class="fas fa-info-circle mr-1"></i>Statut
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <i class="fas fa-info-circle icon-left"></i>الحالة
                                 </th>
                             </tr>
                         </thead>
@@ -163,27 +189,27 @@
                                     $rowClass = $isCurrentPatient ? 'bg-blue-50 border-l-4 border-blue-500' : ($isEnCours ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50');
                                 @endphp
                                 <tr class="{{ $rowClass }}">
-                                    <td class="px-4 py-3 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <span class="inline-flex items-center justify-center w-8 h-8 {{ $isCurrentPatient ? 'current-patient' : ($isEnCours ? 'bg-green-500 text-white' : 'other-patient') }} text-sm font-bold rounded-full mr-3">
+                                    <td class="px-4 py-3 whitespace-nowrap text-right">
+                                        <div class="flex items-center justify-end">
+                                            <span class="inline-flex items-center justify-center w-8 h-8 {{ $isCurrentPatient ? 'current-patient' : ($isEnCours ? 'bg-green-500 text-white' : 'other-patient') }} text-sm font-bold rounded-full ml-3">
                                                 {{ $rdv->OrdreRDV ?? ($index + 1) }}
                                             </span>
                                             @if($isCurrentPatient)
-                                                <span class="text-sm text-blue-600 font-medium">Vous</span>
-                                                                                         @elseif($isEnCours)
-                                                 <span class="text-sm text-green-600 font-medium">Avec le médecin</span>
+                                                <span class="text-sm text-blue-600 font-medium">أنت</span>
+                                            @elseif($isEnCours)
+                                                <span class="text-sm text-green-600 font-medium">مع الطبيب</span>
                                             @else
-                                                <span class="text-sm text-gray-500">Patient masqué</span>
+                                                <span class="text-sm text-gray-500">مريض مخفي</span>
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 whitespace-nowrap">
+                                    <td class="px-4 py-3 whitespace-nowrap text-right">
                                         <div class="text-sm font-medium text-gray-900">
                                             {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 whitespace-nowrap">
-                                                                                                                          @php
+                                    <td class="px-4 py-3 whitespace-nowrap text-right">
+                                        @php
                                              $statusClass = 'bg-yellow-100 text-yellow-800';
                                              $statusIcon = 'fas fa-clock';
                                              
@@ -223,33 +249,33 @@
                                              }
                                          @endphp
                                         
-                                                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
-                                             <i class="{{ $statusIcon }} mr-1"></i>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
+                                             <i class="{{ $statusIcon }} icon-left"></i>
                                              @switch($rdv->rdvConfirmer)
                                                  @case('En Attente')
                                                  @case('En attente')
-                                                     En Attente
+                                                     في الانتظار
                                                      @break
                                                  @case('confirmé')
                                                  @case('Confirmé')
-                                                     Présent au cabinet
+                                                     حاضر في العيادة
                                                      @break
                                                  @case('En cours')
-                                                     Avec le médecin
+                                                     مع الطبيب
                                                      @break
                                                  @case('terminé')
                                                  @case('Terminé')
-                                                     Terminé
+                                                     منتهي
                                                      @break
                                                  @case('annulé')
                                                  @case('Annulé')
-                                                     Annulé
+                                                     ملغى
                                                      @break
                                                  @case('Consultation')
-                                                     Consultation
+                                                     استشارة
                                                      @break
                                                  @default
-                                                     En Attente
+                                                     في الانتظار
                                              @endswitch
                                          </span>
                                     </td>
@@ -260,28 +286,30 @@
                 </div>
             </div>
         @else
-            <!-- Aucun planning disponible -->
+            <!-- لا يوجد برنامج متاح -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h2 class="text-lg font-semibold text-gray-800">
-                        <i class="fas fa-calendar-day mr-2"></i>
-                        Planning du médecin
+                        <i class="fas fa-calendar-day icon-left"></i>
+                        برنامج الطبيب
                     </h2>
                 </div>
                 <div class="text-center py-12">
                     <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun planning disponible</h3>
-                    <p class="text-gray-500">Aucun rendez-vous programmé pour aujourd'hui.</p>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">لا يوجد برنامج متاح</h3>
+                    <p class="text-gray-500">لا توجد مواعيد مبرمجة لليوم.</p>
                 </div>
             </div>
         @endif
 
-        <!-- Pied de page -->
+
+
+        <!-- تذييل الصفحة -->
         <div class="mt-8 text-center text-sm text-gray-500">
-            <p>Cette page se met à jour automatiquement toutes les 30 secondes.</p>
+            <p>تُحدث هذه الصفحة تلقائياً كل 30 ثانية</p>
             <p class="mt-2">
-                <i class="fas fa-shield-alt mr-1"></i>
-                Vos données sont sécurisées et confidentielles
+                <i class="fas fa-shield-alt icon-left"></i>
+                بياناتك محمية وسرية
             </p>
         </div>
     </div>
