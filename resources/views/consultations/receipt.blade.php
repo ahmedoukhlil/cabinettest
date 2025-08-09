@@ -110,6 +110,65 @@
             padding: 6px 12px;
             min-width: 70px;
         }
+        
+        .whatsapp-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
+        }
+        
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+        }
+        
+        .whatsapp-btn:active {
+            transform: translateY(0);
+        }
+        
+        .whatsapp-logo {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        
+        /* Masquer les boutons WhatsApp à l'impression */
+        @media print {
+            .whatsapp-buttons {
+                display: none !important;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .whatsapp-buttons {
+                flex-direction: column;
+            }
+            
+            .whatsapp-btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -122,6 +181,18 @@
         <button onclick="window.print()" class="print-btn">
             Imprimer
         </button>
+        
+        <!-- BOUTON WHATSAPP -->
+        @if($facture->patient->Telephone1 && $facture->patient->Telephone1 !== 'N/A')
+            <div class="whatsapp-buttons">
+                <button onclick="envoyerConfirmationWhatsApp()" class="whatsapp-btn">
+                    <svg class="whatsapp-logo" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                    Envoyer Confirmation WhatsApp
+                </button>
+            </div>
+        @endif
     </div>
     <div class="recu-header">@include('partials.recu-header')</div>
     <div class="facture-title">REÇU DE CONSULTATION</div>
@@ -251,6 +322,207 @@ function updatePageFormat() {
     elements.container.classList.toggle('a4', !isA5);
     elements.container.classList.toggle('a5', isA5);
 }
+
+// FONCTIONS WHATSAPP
+function envoyerConfirmationWhatsApp() {
+    if (!verifierTelephone()) {
+        return;
+    }
+    
+    // Données du patient et de la consultation
+    const nomPatient = "{{ $facture->patient->NomContact }}";
+    const telephone = "{{ $facture->patient->Telephone1 }}";
+    const dateConsultation = "{{ $facture->DtFacture ? \Carbon\Carbon::parse($facture->DtFacture)->format('d/m/Y') : '' }}";
+    const medecin = "{{ $facture->medecin->Nom ?? '' }} {{ $facture->medecin->Prenom ?? '' }}";
+    const numeroFacture = "{{ $facture->Nfacture ?? '' }}";
+    
+    @php
+        // Générer le lien de suivi de la file d'attente
+        try {
+            $token = App\Http\Controllers\PatientInterfaceController::generateToken($facture->IDPatient);
+            $patientUrl = route('patient.rendez-vous', ['token' => $token]);
+        } catch (Exception $e) {
+            $patientUrl = url('/');
+        }
+    @endphp
+    
+    const lienSuivi = "{{ $patientUrl }}";
+    
+    // Nettoyer le numéro de téléphone
+    const phoneClean = telephone.replace(/[\s\-\(\)]/g, '');
+    
+    // Message bilingue
+    const message = construireMessageBilingue(nomPatient, dateConsultation, medecin, numeroFacture, lienSuivi);
+    
+    // Essayer d'abord d'ouvrir l'application WhatsApp Desktop
+    const whatsappDesktopUrl = `whatsapp://send?phone=${phoneClean}&text=${encodeURIComponent(message)}`;
+    const whatsappWebUrl = `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
+    
+    // Détecter si c'est un appareil mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Fonction pour essayer l'app desktop puis fallback vers web
+    function essayerWhatsAppDesktop() {
+        // Créer un lien temporaire pour tester le protocole whatsapp://
+        const testLink = document.createElement('a');
+        testLink.href = whatsappDesktopUrl;
+        testLink.style.display = 'none';
+        document.body.appendChild(testLink);
+        
+        // Variable pour tracker si l'app s'est ouverte
+        let appOuverte = false;
+        
+        // Écouter si la page perd le focus (app s'ouvre)
+        const onBlur = () => {
+            appOuverte = true;
+            window.removeEventListener('blur', onBlur);
+        };
+        window.addEventListener('blur', onBlur);
+        
+        // Essayer d'ouvrir l'app WhatsApp Desktop
+        try {
+            window.location.href = whatsappDesktopUrl;
+        } catch (e) {
+            // Si erreur immédiate, aller vers WhatsApp Web
+            window.location.href = whatsappWebUrl;
+            document.body.removeChild(testLink);
+            return;
+        }
+        
+        // Attendre 3 secondes et vérifier si l'app s'est ouverte
+        setTimeout(() => {
+            window.removeEventListener('blur', onBlur);
+            document.body.removeChild(testLink);
+            
+            if (!appOuverte && !document.hidden) {
+                // L'app ne s'est pas ouverte, utiliser WhatsApp Web
+                console.log('WhatsApp Desktop non disponible, utilisation de WhatsApp Web');
+                window.location.href = whatsappWebUrl;
+            }
+        }, 3000);
+    }
+    
+    if (isMobile) {
+        // Sur mobile, utiliser directement le protocole whatsapp://
+        window.location.href = whatsappDesktopUrl;
+        
+        // Fallback vers wa.me si l'app ne s'ouvre pas
+        setTimeout(() => {
+            if (!document.hidden) {
+                window.location.href = whatsappWebUrl;
+            }
+        }, 2000);
+    } else {
+        // Sur desktop, essayer WhatsApp Desktop puis fallback vers web
+        essayerWhatsAppDesktop();
+    }
+    
+    // Notification de succès
+    mostrarNotificationSucces();
+}
+
+function construireMessageBilingue(nom, date, medecin, numeroFacture, lienSuivi) {
+    return `*Confirmation de Consultation - Cabinet Dentaire*
+*تأكيد الاستشارة - عيادة الأسنان*
+
+Bonjour ${nom} / مرحباً ${nom}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+*FRANÇAIS*
+Votre consultation est confirmée
+
+Détails :
+📅 Date : ${date}
+👨‍⚕️ Praticien : Dr. ${medecin}
+📄 Référence : ${numeroFacture}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+*العربية*
+تم تأكيد استشارتك
+
+التفاصيل:
+📅 التاريخ: ${date}
+👨‍⚕️ الطبيب: د. ${medecin}
+📄 المرجع: ${numeroFacture}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📱 *تابع طابور الانتظار:*
+${lienSuivi}
+
+ℹ️ هذا الرابط يسمح لك برؤية رقمك وتقدير وقت الانتظار.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🙏 شكراً لثقتك
+🦷 *عيادة الأسنان*`;
+}
+
+// Vérification du numéro de téléphone
+function verifierTelephone() {
+    const telephone = "{{ $facture->patient->Telephone1 ?? '' }}";
+    
+    if (!telephone || telephone.trim() === '' || telephone === 'N/A') {
+        alert('❌ Aucun numéro de téléphone disponible pour ce patient.\n\nVeuillez ajouter un numéro dans la fiche patient.');
+        return false;
+    }
+    
+    const phoneClean = telephone.replace(/[\s\-\(\)]/g, '');
+    if (phoneClean.length < 8) {
+        alert('❌ Le numéro de téléphone semble invalide.\n\nVeuillez vérifier le numéro dans la fiche patient.');
+        return false;
+    }
+    
+    return true;
+}
+
+function mostrarNotificationSucces() {
+    const message = 'Message de confirmation envoyé vers WhatsApp !';
+    
+    // Créer une notification temporaire
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #25D366;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-weight: bold;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Supprimer après 3 secondes
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Ajouter les animations CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
 </script>
 </body>
 </html> 
