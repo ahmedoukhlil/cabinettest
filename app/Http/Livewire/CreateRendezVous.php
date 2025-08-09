@@ -145,6 +145,12 @@ class CreateRendezVous extends Component
             return;
         }
 
+        // Vérification des conflits d'horaires
+        if (Rendezvou::hasConflict($this->medecin_id, $this->date_rdv, $this->heure_rdv)) {
+            session()->flash('error', 'Ce créneau horaire n\'est pas disponible. Le médecin a déjà un rendez-vous à cette heure.');
+            return;
+        }
+
         try {
             // Utiliser une transaction pour optimiser les performances
             \DB::beginTransaction();
@@ -255,8 +261,6 @@ class CreateRendezVous extends Component
             $user = Auth::user();
             $rdv = Rendezvou::find($id);
 
-
-
             if (!$this->canManageRdv) {
                 session()->flash('error', 'Vous n\'avez pas la permission de modifier des rendez-vous.');
                 return;
@@ -275,18 +279,13 @@ class CreateRendezVous extends Component
                 return;
             }
 
-            if ($rdv) {
-                $updateData = ['rdvConfirmer' => $nouveauStatut];
-                
-                // Si on confirme, ajouter l'heure de confirmation
-                if ($nouveauStatut === 'Confirmé') {
-                    $updateData['HeureConfRDV'] = now();
-                }
-                
-                $rdv->update($updateData);
-                session()->flash('message', 'Statut du rendez-vous mis à jour avec succès.');
+            // Utiliser la méthode centralisée du modèle
+            $result = Rendezvou::updateStatusWithConflictManagement($id, $nouveauStatut);
+            
+            if ($result['success']) {
+                session()->flash('message', $result['message']);
             } else {
-                session()->flash('error', 'Rendez-vous non trouvé.');
+                session()->flash('error', $result['message']);
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la modification du statut: ' . $e->getMessage());

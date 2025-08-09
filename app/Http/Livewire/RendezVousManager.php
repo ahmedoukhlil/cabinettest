@@ -182,18 +182,13 @@ class RendezVousManager extends Component
                 return;
             }
 
-            if ($rdv) {
-                $updateData = ['rdvConfirmer' => $nouveauStatut];
-                
-                // Si on confirme, ajouter l'heure de confirmation
-                if ($nouveauStatut === 'confirmé') {
-                    $updateData['HeureConfRDV'] = now();
-                }
-                
-                $rdv->update($updateData);
-                session()->flash('message', 'Statut du rendez-vous mis à jour avec succès.');
+            // Utiliser la méthode centralisée du modèle
+            $result = Rendezvou::updateStatusWithConflictManagement($id, $nouveauStatut);
+            
+            if ($result['success']) {
+                session()->flash('message', $result['message']);
             } else {
-                session()->flash('error', 'Rendez-vous non trouvé.');
+                session()->flash('error', $result['message']);
             }
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de la modification du statut: ' . $e->getMessage());

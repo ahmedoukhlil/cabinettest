@@ -24,6 +24,9 @@ class PatientInterfaceController extends Controller
                 return view('patient.error', ['message' => 'Token invalide ou expiré']);
             }
 
+            // Extraire la date du token
+            $dateToken = $this->getDateFromToken($token);
+
             $patient = Patient::find($patientId);
             
             if (!$patient) {
@@ -36,30 +39,41 @@ class PatientInterfaceController extends Controller
                 ->orderBy('dtPrevuRDV', 'desc')
                 ->get();
 
-            // Récupérer le prochain rendez-vous du patient (aujourd'hui ou futur)
+            // Récupérer le rendez-vous spécifique pour la date du token
             $prochainRdv = Rendezvou::with(['medecin', 'cabinet'])
                 ->where('fkidPatient', $patientId)
-                ->where('dtPrevuRDV', '>=', now()->format('Y-m-d'))
+                ->whereDate('dtPrevuRDV', $dateToken)
                 ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
-                ->orderBy('dtPrevuRDV', 'asc')
                 ->orderBy('OrdreRDV', 'asc')
                 ->first();
             
 
 
-            // Récupérer les rendez-vous du médecin pour la journée (si le patient a un prochain RDV)
+            // Récupérer les rendez-vous du médecin pour la journée
             $rendezVousMedecinJournee = collect();
+            $estAujourdhui = false;
+            
             if ($prochainRdv) {
-                // Afficher tous les rendez-vous du médecin du patient pour la journée
-                $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
-                    ->where('fkidMedecin', $prochainRdv->fkidMedecin)
-                    ->where('dtPrevuRDV', $prochainRdv->dtPrevuRDV)
-                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
-                    ->orderBy('OrdreRDV', 'asc')
-                    ->get();
+                $dateAujourdhui = now()->format('Y-m-d');
+                
+                // Vérifier si la date du token correspond à aujourd'hui
+                $estAujourdhui = ($dateToken === $dateAujourdhui);
                 
 
+                
+                // Afficher la file d'attente seulement si le rendez-vous est aujourd'hui
+                if ($estAujourdhui) {
+                    // Récupérer TOUS les rendez-vous de la journée pour le médecin (y compris terminés)
+                    $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
+                        ->where('fkidMedecin', $prochainRdv->fkidMedecin)
+                        ->whereDate('dtPrevuRDV', $dateToken)
+                        ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
+                        ->orderBy('OrdreRDV', 'asc')
+                        ->get();
+                        
 
+
+                }
             }
 
             $fileAttente = null;
@@ -69,8 +83,8 @@ class PatientInterfaceController extends Controller
             $positionPatientEnCours = null;
             $patientsAvantMoi = 0;
 
-            if ($prochainRdv) {
-                // Récupérer tous les rendez-vous du même médecin pour la même date
+            if ($prochainRdv && $estAujourdhui) {
+                // Récupérer tous les rendez-vous du même médecin pour la même date (seulement si c'est aujourd'hui)
                 $fileAttente = Rendezvou::with(['patient', 'medecin'])
                     ->where('fkidMedecin', $prochainRdv->fkidMedecin)
                     ->where('dtPrevuRDV', $prochainRdv->dtPrevuRDV)
@@ -110,7 +124,8 @@ class PatientInterfaceController extends Controller
                 'tempsAttenteEstime',
                 'patientEnCours',
                 'positionPatientEnCours',
-                'patientsAvantMoi'
+                'patientsAvantMoi',
+                'estAujourdhui'
             ));
             
         } catch (\Exception $e) {
@@ -152,13 +167,34 @@ class PatientInterfaceController extends Controller
 
     /**
      * Génère un token sécurisé pour un patient
+     * @param int $patientId ID du patient
+     * @param string|null $dateRendezVous Date du rendez-vous (Y-m-d), si null utilise aujourd'hui
      */
-    public static function generateToken($patientId)
+    public static function generateToken($patientId, $dateRendezVous = null)
     {
-        // Utiliser la date du jour pour limiter l'accès à la journée en cours
-        $dateDuJour = date('Y-m-d');
-        $data = $patientId . '|' . $dateDuJour;
+        // Utiliser la date du rendez-vous ou la date du jour par défaut
+        $dateToken = $dateRendezVous ? date('Y-m-d', strtotime($dateRendezVous)) : date('Y-m-d');
+        $data = $patientId . '|' . $dateToken;
         return base64_encode($data);
+    }
+
+    /**
+     * Extrait la date du token
+     */
+    private function getDateFromToken($token)
+    {
+        try {
+            $decoded = base64_decode($token);
+            $parts = explode('|', $decoded);
+            
+            if (count($parts) === 2) {
+                return $parts[1]; // Retourne la date
+            }
+            
+            return date('Y-m-d'); // Fallback à aujourd'hui pour les anciens tokens
+        } catch (\Exception $e) {
+            return date('Y-m-d');
+        }
     }
 
     /**
@@ -175,13 +211,9 @@ class PatientInterfaceController extends Controller
             if (count($parts) === 2) {
                 $patientId = $parts[0];
                 $dateToken = $parts[1];
-                $dateDuJour = date('Y-m-d');
 
-                // Vérifier que le token correspond à la date du jour
-                if ($dateToken !== $dateDuJour) {
-                    return null;
-                }
-
+                // Le token est valide, on retourne l'ID du patient
+                // La vérification de la date se fait dans showRendezVous pour afficher le bon contenu
                 return $patientId;
             }
             

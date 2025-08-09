@@ -63,55 +63,73 @@
                         <i class="fas fa-clock text-green-600 icon-left"></i>
                         الحالة الحالية
                     </h2>
-                    @if($prochainRdv && $positionPatient)
-                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold mb-2">{{ $prochainRdv->OrdreRDV ?? $positionPatient }}</div>
-                                <div class="text-sm opacity-90">رقم موعدك</div>
-                                
-                                @if($patientsAvantMoi > 0)
-                                    <div class="bg-white bg-opacity-20 rounded-lg p-3 mt-3">
-                                        <div class="text-2xl font-bold text-yellow-200">{{ $patientsAvantMoi }}</div>
-                                        <div class="text-sm opacity-90">
-                                            <i class="fas fa-users icon-left"></i>
-                                            مريض قبلك
+                    @if($prochainRdv)
+                        @if($estAujourdhui)
+                            <!-- موعد اليوم - عرض طابور الانتظار -->
+                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold mb-2">{{ $prochainRdv->OrdreRDV ?? $positionPatient }}</div>
+                                    <div class="text-sm opacity-90">رقم موعدك</div>
+                                    
+                                    @if($patientsAvantMoi > 0)
+                                        <div class="bg-white bg-opacity-20 rounded-lg p-3 mt-3">
+                                            <div class="text-2xl font-bold text-yellow-200">{{ $patientsAvantMoi }}</div>
+                                            <div class="text-sm opacity-90">
+                                                <i class="fas fa-users icon-left"></i>
+                                                مريض قبلك
+                                            </div>
                                         </div>
-                                    </div>
-                                @else
-                                    <div class="bg-green-500 bg-opacity-30 rounded-lg p-3 mt-3">
-                                        <div class="text-lg font-bold text-green-200">
-                                            <i class="fas fa-star icon-left"></i>
-                                            حان دورك !
+                                    @else
+                                        <div class="bg-green-500 bg-opacity-30 rounded-lg p-3 mt-3">
+                                            <div class="text-lg font-bold text-green-200">
+                                                <i class="fas fa-star icon-left"></i>
+                                                حان دورك !
+                                            </div>
+                                            <div class="text-sm opacity-90">يمكنك الحضور</div>
                                         </div>
-                                        <div class="text-sm opacity-90">يمكنك الحضور</div>
-                                    </div>
-                                @endif
-                                
-                                @if($tempsAttenteEstime > 0)
-                                    <div class="text-sm opacity-90 mt-2">
-                                        <i class="fas fa-hourglass-half icon-left"></i>
-                                        وقت الانتظار المقدر: ~{{ $tempsAttenteEstime }} دقيقة
-                                    </div>
-                                @else
-                                    <div class="text-sm opacity-90 mt-2">
-                                        <i class="fas fa-clock icon-left"></i>
-                                        لا انتظار متوقع
-                                    </div>
-                                @endif
+                                    @endif
+                                    
+                                    @if($tempsAttenteEstime > 0)
+                                        <div class="text-sm opacity-90 mt-2">
+                                            <i class="fas fa-hourglass-half icon-left"></i>
+                                            وقت الانتظار المقدر: ~{{ $tempsAttenteEstime }} دقيقة
+                                        </div>
+                                    @else
+                                        <div class="text-sm opacity-90 mt-2">
+                                            <i class="fas fa-clock icon-left"></i>
+                                            لا انتظار متوقع
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @else
+                            <!-- موعد في المستقبل -->
+                            <div class="bg-orange-100 border border-orange-300 rounded-lg p-4">
+                                <div class="text-center">
+                                    <i class="fas fa-calendar-alt text-orange-600 text-3xl mb-3"></i>
+                                    <div class="text-orange-800 font-bold text-lg mb-2">انتظر يوم موعدك</div>
+                                    <div class="text-orange-700 text-sm mb-3">
+                                        موعدك مقرر يوم: <strong>{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</strong>
+                                    </div>
+                                    <div class="text-orange-600 text-xs">
+                                        <i class="fas fa-info-circle icon-left"></i>
+                                        ستتمكن من متابعة طابور الانتظار في يوم موعدك فقط
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     @else
                         <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
                             <div class="text-center">
                                 <i class="fas fa-info-circle text-yellow-600 text-2xl mb-2"></i>
-                                <div class="text-yellow-800 font-medium">لا توجد مواعيد اليوم</div>
+                                <div class="text-yellow-800 font-medium">لا توجد مواعيد مقررة</div>
                             </div>
                         </div>
                     @endif
                 </div>
  
                                  <!-- المريض الحالي -->
-                @if($prochainRdv && $patientEnCours)
+                @if($prochainRdv && $patientEnCours && $estAujourdhui)
                     <div>
                         <h2 class="text-xl font-bold text-gray-800 mb-4">
                             <i class="fas fa-user-md text-green-600 icon-left"></i>
@@ -133,7 +151,7 @@
          </div>
 
         <!-- المريض قيد العلاج -->
-        @if($prochainRdv && $patientEnCours)
+        @if($prochainRdv && $patientEnCours && $estAujourdhui)
             <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -154,7 +172,7 @@
         @endif
 
         <!-- برنامج الطبيب -->
-        @if($prochainRdv && $rendezVousMedecinJournee->count() > 0)
+        @if($prochainRdv && $rendezVousMedecinJournee->count() > 0 && $estAujourdhui)
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                     <h2 class="text-lg font-semibold text-gray-800">
@@ -285,6 +303,8 @@
                     </table>
                 </div>
             </div>
+        @elseif($prochainRdv && !$estAujourdhui)
+            <!-- موعد مستقبلي - لا تظهر برنامج الطبيب -->
         @else
             <!-- لا يوجد برنامج متاح -->
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
