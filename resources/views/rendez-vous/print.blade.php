@@ -43,63 +43,74 @@
             .qr-code-container { background: #fff !important; }
             a { color: #000 !important; text-decoration: none !important; }
         }
-        .print-controls { display: flex; gap: 10px; justify-content: flex-end; margin: 18px 0; }
-        .print-controls select, .print-controls button { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .print-controls button { background: #2c5282; color: #fff; border: none; cursor: pointer; }
-        
-        .whatsapp-buttons {
+        .print-controls {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            justify-content: flex-end;
+            margin: 18px 0;
             flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .print-controls select,
+        .print-controls button,
+        .whatsapp-btn {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .print-btn {
+            background: #2c5282;
+            color: white;
+            border: 1px solid #2c5282;
+        }
+        
+        .print-btn:hover {
+            background: #2a4a7c;
+            border-color: #2a4a7c;
         }
         
         .whatsapp-btn {
             background: #25D366;
             color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+            border: 1px solid #25D366;
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
+            gap: 6px;
+            white-space: nowrap;
         }
         
         .whatsapp-btn:hover {
             background: #128C7E;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-        }
-        
-        .whatsapp-btn:active {
-            transform: translateY(0);
+            border-color: #128C7E;
         }
         
         .whatsapp-logo {
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             fill: currentColor;
         }
         
         /* Masquer les boutons WhatsApp à l'impression */
         @media print {
-            .whatsapp-buttons {
+            .whatsapp-btn {
                 display: none !important;
             }
         }
         
         /* Responsive */
         @media (max-width: 768px) {
-            .whatsapp-buttons {
+            .print-controls {
                 flex-direction: column;
+                align-items: stretch;
             }
             
+            .print-controls select,
+            .print-controls button,
             .whatsapp-btn {
                 width: 100%;
                 margin-bottom: 5px;
@@ -183,14 +194,12 @@
         
         <!-- BOUTON WHATSAPP -->
         @if($rendezVous->patient->Telephone1 && $rendezVous->patient->Telephone1 !== 'N/A')
-            <div class="whatsapp-buttons">
-                <button onclick="envoyerConfirmationRdvWhatsApp()" class="whatsapp-btn">
-                    <svg class="whatsapp-logo" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                    </svg>
-                    Envoyer Confirmation RDV WhatsApp
-                </button>
-            </div>
+            <button onclick="envoyerConfirmationRdvWhatsApp()" class="whatsapp-btn">
+                <svg class="whatsapp-logo" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                </svg>
+                Confirmation RDV
+            </button>
         @endif
     </div>
     <div class="recu-header">@include('partials.recu-header')</div>
@@ -303,9 +312,53 @@ function envoyerConfirmationRdvWhatsApp() {
     const nomPatient = "{{ $rendezVous->patient->NomContact }}";
     const telephone = "{{ $rendezVous->patient->Telephone1 }}";
     const dateRdv = "{{ \Carbon\Carbon::parse($rendezVous->dtPrevuRDV)->format('d/m/Y') }}";
-    const heureRdv = "{{ \Carbon\Carbon::parse($rendezVous->HeureRdv)->format('H:i') }}";
-    const medecin = "{{ $rendezVous->medecin->Nom ?? '' }} {{ $rendezVous->medecin->Prenom ?? '' }}";
-    const ordreRdv = "{{ str_pad($rendezVous->OrdreRDV, 3, '0', STR_PAD_LEFT) }}";
+    
+    // Gestion de l'heure avec debug amélioré
+    let heureRdv = '';
+    
+    // Debug des valeurs brutes
+    console.log('HeureRdv brute:', "{{ $rendezVous->HeureRdv ?? 'null' }}");
+    console.log('Type HeureRdv:', typeof("{{ $rendezVous->HeureRdv ?? 'null' }}"));
+    
+    @php
+        $heureRdv = $rendezVous->HeureRdv;
+        $heureFormatee = '';
+        
+        if ($heureRdv) {
+            try {
+                // Si c'est déjà un objet Carbon
+                if ($heureRdv instanceof \Carbon\Carbon) {
+                    $heureFormatee = $heureRdv->format('H:i');
+                } else {
+                    // Essayer de parser la valeur
+                    $carbon = \Carbon\Carbon::parse($heureRdv);
+                    $heureFormatee = $carbon->format('H:i');
+                }
+            } catch (Exception $e) {
+                // Si le parsing échoue, utiliser la valeur brute
+                $heureFormatee = $heureRdv;
+            }
+        }
+    @endphp
+    
+    heureRdv = "{{ $heureFormatee ?: 'À définir' }}";
+    
+    const medecin = "{{ trim(($rendezVous->medecin->Nom ?? '') . ' ' . ($rendezVous->medecin->Prenom ?? '')) ?: 'Médecin non défini' }}";
+    
+    // Gestion du numéro d'ordre
+    let ordreRdv = '';
+    @if($rendezVous->OrdreRDV && $rendezVous->OrdreRDV > 0)
+        ordreRdv = "{{ str_pad($rendezVous->OrdreRDV, 3, '0', STR_PAD_LEFT) }}";
+    @else
+        ordreRdv = "À définir";
+    @endif
+    
+    // Debug complet
+    console.log('=== DEBUG RENDEZ-VOUS ===');
+    console.log('Heure brute:', "{{ $rendezVous->HeureRdv ?? 'null' }}", '-> Formatée:', heureRdv);
+    console.log('Ordre brut:', "{{ $rendezVous->OrdreRDV ?? 'null' }}", '-> Formaté:', ordreRdv);
+    console.log('Médecin:', medecin);
+    console.log('========================');
     
     @php
         try {
@@ -324,114 +377,60 @@ function envoyerConfirmationRdvWhatsApp() {
     // Message bilingue
     const message = construireMessageRdvBilingue(nomPatient, dateRdv, heureRdv, medecin, ordreRdv, lienSuivi);
     
-    // Essayer d'abord d'ouvrir l'application WhatsApp Desktop
-    const whatsappDesktopUrl = `whatsapp://send?phone=${phoneClean}&text=${encodeURIComponent(message)}`;
+    // Créer le lien WhatsApp Web
     const whatsappWebUrl = `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
     
-    // Détecter si c'est un appareil mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Fonction pour essayer l'app desktop puis fallback vers web
-    function essayerWhatsAppDesktop() {
-        // Créer un lien temporaire pour tester le protocole whatsapp://
-        const testLink = document.createElement('a');
-        testLink.href = whatsappDesktopUrl;
-        testLink.style.display = 'none';
-        document.body.appendChild(testLink);
-        
-        // Variable pour tracker si l'app s'est ouverte
-        let appOuverte = false;
-        
-        // Écouter si la page perd le focus (app s'ouvre)
-        const onBlur = () => {
-            appOuverte = true;
-            window.removeEventListener('blur', onBlur);
-        };
-        window.addEventListener('blur', onBlur);
-        
-        // Essayer d'ouvrir l'app WhatsApp Desktop
-        try {
-            window.location.href = whatsappDesktopUrl;
-        } catch (e) {
-            // Si erreur immédiate, aller vers WhatsApp Web
-            window.location.href = whatsappWebUrl;
-            document.body.removeChild(testLink);
-            return;
-        }
-        
-        // Attendre 3 secondes et vérifier si l'app s'est ouverte
-        setTimeout(() => {
-            window.removeEventListener('blur', onBlur);
-            document.body.removeChild(testLink);
-            
-            if (!appOuverte && !document.hidden) {
-                // L'app ne s'est pas ouverte, utiliser WhatsApp Web
-                console.log('WhatsApp Desktop non disponible, utilisation de WhatsApp Web');
-                window.location.href = whatsappWebUrl;
-            }
-        }, 3000);
-    }
-    
-    if (isMobile) {
-        // Sur mobile, utiliser directement le protocole whatsapp://
-        window.location.href = whatsappDesktopUrl;
-        
-        // Fallback vers wa.me si l'app ne s'ouvre pas
-        setTimeout(() => {
-            if (!document.hidden) {
-                window.location.href = whatsappWebUrl;
-            }
-        }, 2000);
-    } else {
-        // Sur desktop, essayer WhatsApp Desktop puis fallback vers web
-        essayerWhatsAppDesktop();
-    }
+    // Ouvrir WhatsApp Web dans un nouvel onglet
+    window.open(whatsappWebUrl, '_blank');
     
     // Notification de succès
     mostrarNotificationSuccesRdv();
 }
 
 function construireMessageRdvBilingue(nom, date, heure, medecin, ordre, lienSuivi) {
-    return `*Confirmation de Rendez-vous - Cabinet Dentaire*
-*تأكيد الموعد - عيادة الأسنان*
+    // Debug des paramètres reçus
+    console.log('=== CONSTRUCTION MESSAGE ===');
+    console.log('Nom:', nom);
+    console.log('Date:', date);
+    console.log('Heure reçue:', heure);
+    console.log('Médecin:', medecin);
+    console.log('Ordre reçu:', ordre);
+    console.log('Lien:', lienSuivi);
+    console.log('============================');
+    
+    // Construction du message avec formatage simple compatible WhatsApp
+    const message = `*تم تأكيد الموعد*
+*Rendez-vous confirmé*
 
-Bonjour ${nom} / مرحباً ${nom}
+*${nom || 'Nom non défini'}*
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+التاريخ: ${date || 'تاريخ غير محدد'}
+الوقت: ${heure || 'وقت غير محدد'}
+الطبيب: د. ${medecin || 'طبيب غير محدد'}
+الرقم: ${ordre || 'رقم غير محدد'}
 
-*FRANÇAIS*
-Votre rendez-vous est confirmé
+━━━━━━━━━━━━━━━━━━━━━━
 
-Détails :
-📅 Date : ${date}
-⏰ Heure : ${heure}
-👨‍⚕️ Praticien : Dr. ${medecin}
-🔢 Numéro : ${ordre}
+Date: ${date || 'Date non définie'}
+Heure: ${heure || 'Heure non définie'}
+Médecin: Dr. ${medecin || 'Médecin non défini'}
+Numéro: ${ordre || 'Numéro non défini'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*رابط متابعة طابور الانتظار:*
+*Lien de suivi de la file d'attente:*
+${lienSuivi || 'Lien non disponible'}
 
-*العربية*
-تم تأكيد موعدك
+استخدم هذا الرابط لمعرفة رقمك في الطابور ووقت الانتظار المتوقع
+Utilisez ce lien pour connaître votre numéro dans la file et le temps d'attente estimé
 
-التفاصيل:
-📅 التاريخ: ${date}
-⏰ الوقت: ${heure}
-👨‍⚕️ الطبيب: د. ${medecin}
-🔢 الرقم: ${ordre}
+شكراً - Merci`;
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📱 *تابع طابور الانتظار:*
-${lienSuivi}
-
-ℹ️ هذا الرابط يسمح لك برؤية رقمك وتقدير وقت الانتظار.
-
-💡 نصائح: احضر قبل 15 دقيقة من موعدك.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🙏 شكراً لثقتك
-🦷 *عيادة الأسنان*`;
+    // Debug du message final
+    console.log('=== MESSAGE FINAL ===');
+    console.log(message);
+    console.log('====================');
+    
+    return message;
 }
 
 // Vérification du numéro de téléphone pour RDV

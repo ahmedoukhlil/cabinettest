@@ -439,14 +439,14 @@ class ConsultationForm extends Component
 
     protected function createRendezVous($facture)
     {
-        $date = Carbon::now();
-        $ordreRDV = Rendezvou::generateNextOrderNumber($date, $this->medecin_id);
+        $maintenant = Carbon::now();
+        $ordreRDV = Rendezvou::generateNextOrderNumber($maintenant, $this->medecin_id);
         
         $rendezVous = Rendezvou::create([
             'fkidPatient' => $this->selectedPatient['ID'],
             'fkidMedecin' => $this->medecin_id,
-            'dtPrevuRDV' => $date,
-            'HeureRdv' => $date,
+            'dtPrevuRDV' => $maintenant->format('Y-m-d'),
+            'HeureRdv' => $maintenant->format('Y-m-d H:i:s'), // Format datetime complet
             'ActePrevu' => 'Consultation',
             'rdvConfirmer' => 'Confirmé',
             'DtAjRdv' => now(),
