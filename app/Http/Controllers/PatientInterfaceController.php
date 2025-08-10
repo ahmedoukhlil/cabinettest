@@ -24,8 +24,9 @@ class PatientInterfaceController extends Controller
                 return view('patient.error', ['message' => 'Token invalide ou expiré']);
             }
 
-            // Extraire la date du token
+            // Extraire la date et l'ID du médecin du token
             $dateToken = $this->getDateFromToken($token);
+            $medecinIdFromToken = $this->getMedecinIdFromToken($token);
 
             $patient = Patient::find($patientId);
             
@@ -39,13 +40,18 @@ class PatientInterfaceController extends Controller
                 ->orderBy('dtPrevuRDV', 'desc')
                 ->get();
 
-            // Récupérer le rendez-vous spécifique pour la date du token
-            $prochainRdv = Rendezvou::with(['medecin', 'cabinet'])
+            // Récupérer le rendez-vous spécifique pour la date du token et le médecin
+            $query = Rendezvou::with(['medecin', 'cabinet'])
                 ->where('fkidPatient', $patientId)
                 ->whereDate('dtPrevuRDV', $dateToken)
-                ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
-                ->orderBy('OrdreRDV', 'asc')
-                ->first();
+                ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé']);
+            
+            // Si l'ID du médecin est dans le token, filtrer par médecin
+            if ($medecinIdFromToken) {
+                $query->where('fkidMedecin', $medecinIdFromToken);
+            }
+            
+            $prochainRdv = $query->orderBy('OrdreRDV', 'asc')->first();
             
 
 
@@ -169,12 +175,21 @@ class PatientInterfaceController extends Controller
      * Génère un token sécurisé pour un patient
      * @param int $patientId ID du patient
      * @param string|null $dateRendezVous Date du rendez-vous (Y-m-d), si null utilise aujourd'hui
+     * @param int|null $medecinId ID du médecin (optionnel pour compatibilité)
      */
-    public static function generateToken($patientId, $dateRendezVous = null)
+    public static function generateToken($patientId, $dateRendezVous = null, $medecinId = null)
     {
         // Utiliser la date du rendez-vous ou la date du jour par défaut
         $dateToken = $dateRendezVous ? date('Y-m-d', strtotime($dateRendezVous)) : date('Y-m-d');
-        $data = $patientId . '|' . $dateToken;
+        
+        if ($medecinId) {
+            // Nouveau format : patientId|date|medecinId
+            $data = $patientId . '|' . $dateToken . '|' . $medecinId;
+        } else {
+            // Ancien format : patientId|date (pour compatibilité)
+            $data = $patientId . '|' . $dateToken;
+        }
+        
         return base64_encode($data);
     }
 
@@ -187,13 +202,32 @@ class PatientInterfaceController extends Controller
             $decoded = base64_decode($token);
             $parts = explode('|', $decoded);
             
-            if (count($parts) === 2) {
+            if (count($parts) >= 2) {
                 return $parts[1]; // Retourne la date
             }
             
             return date('Y-m-d'); // Fallback à aujourd'hui pour les anciens tokens
         } catch (\Exception $e) {
             return date('Y-m-d');
+        }
+    }
+
+    /**
+     * Extrait l'ID du médecin du token
+     */
+    private function getMedecinIdFromToken($token)
+    {
+        try {
+            $decoded = base64_decode($token);
+            $parts = explode('|', $decoded);
+            
+            if (count($parts) === 3) {
+                return $parts[2]; // Retourne l'ID du médecin
+            }
+            
+            return null; // Pas d'ID médecin dans l'ancien format
+        } catch (\Exception $e) {
+            return null;
         }
     }
 
@@ -205,10 +239,10 @@ class PatientInterfaceController extends Controller
         try {
             $decoded = base64_decode($token);
             
-            // Essayer d'abord le nouveau format (patientId|date)
+            // Essayer d'abord le nouveau format (patientId|date|medecinId)
             $parts = explode('|', $decoded);
             
-            if (count($parts) === 2) {
+            if (count($parts) >= 2) {
                 $patientId = $parts[0];
                 $dateToken = $parts[1];
 

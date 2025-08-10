@@ -272,7 +272,7 @@
          <div style="text-align: center;">
              @php
                  try {
-                     $token = App\Http\Controllers\PatientInterfaceController::generateToken($rendezVous->fkidPatient, $rendezVous->dtPrevuRDV);
+                     $token = App\Http\Controllers\PatientInterfaceController::generateToken($rendezVous->fkidPatient, $rendezVous->dtPrevuRDV, $rendezVous->fkidMedecin);
                      $patientUrl = route('patient.rendez-vous', ['token' => $token]);
                  } catch (Exception $e) {
                      $patientUrl = '#';
@@ -367,7 +367,7 @@ function envoyerConfirmationRdvWhatsApp() {
     
     @php
         try {
-            $token = App\Http\Controllers\PatientInterfaceController::generateToken($rendezVous->fkidPatient, $rendezVous->dtPrevuRDV);
+            $token = App\Http\Controllers\PatientInterfaceController::generateToken($rendezVous->fkidPatient, $rendezVous->dtPrevuRDV, $rendezVous->fkidMedecin);
             $patientUrl = route('patient.rendez-vous', ['token' => $token]);
         } catch (Exception $e) {
             $patientUrl = url('/');

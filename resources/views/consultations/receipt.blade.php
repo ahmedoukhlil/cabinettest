@@ -301,7 +301,8 @@
                  try {
                      // Utiliser la date du rendez-vous associé ou la date de la facture
                      $dateRendezVous = $facture->rendezVous ? $facture->rendezVous->dtPrevuRDV : $facture->DtFacture;
-                     $token = App\Http\Controllers\PatientInterfaceController::generateToken($facture->IDPatient, $dateRendezVous);
+                     $medecinId = $facture->rendezVous ? $facture->rendezVous->fkidMedecin : null;
+                     $token = App\Http\Controllers\PatientInterfaceController::generateToken($facture->IDPatient, $dateRendezVous, $medecinId);
                      $patientUrl = route('patient.rendez-vous', ['token' => $token]);
                  } catch (Exception $e) {
                      $patientUrl = '#';
@@ -413,7 +414,8 @@ function envoyerConfirmationWhatsApp() {
         try {
             // Utiliser la date du rendez-vous associé ou la date de la facture
             $dateRendezVous = $facture->rendezVous ? $facture->rendezVous->dtPrevuRDV : $facture->DtFacture;
-            $token = App\Http\Controllers\PatientInterfaceController::generateToken($facture->IDPatient, $dateRendezVous);
+            $medecinId = $facture->rendezVous ? $facture->rendezVous->fkidMedecin : null;
+            $token = App\Http\Controllers\PatientInterfaceController::generateToken($facture->IDPatient, $dateRendezVous, $medecinId);
             $patientUrl = route('patient.rendez-vous', ['token' => $token]);
         } catch (Exception $e) {
             $patientUrl = url('/');

@@ -10,9 +10,9 @@ class QrCodeHelper
     /**
      * Génère un QR code pour l'interface patient des rendez-vous
      */
-    public static function generateRendezVousQrCode($patientId, $dateRendezVous = null)
+    public static function generateRendezVousQrCode($patientId, $dateRendezVous = null, $medecinId = null)
     {
-        $token = PatientInterfaceController::generateToken($patientId, $dateRendezVous);
+        $token = PatientInterfaceController::generateToken($patientId, $dateRendezVous, $medecinId);
         $url = route('patient.rendez-vous', ['token' => $token]);
         
         return QrCode::format('svg')
@@ -27,9 +27,9 @@ class QrCodeHelper
     /**
      * Génère un QR code pour l'interface patient des consultations
      */
-    public static function generateConsultationQrCode($patientId, $dateConsultation = null)
+    public static function generateConsultationQrCode($patientId, $dateConsultation = null, $medecinId = null)
     {
-        $token = PatientInterfaceController::generateToken($patientId, $dateConsultation);
+        $token = PatientInterfaceController::generateToken($patientId, $dateConsultation, $medecinId);
         $url = route('patient.consultation', ['token' => $token]);
         
         return QrCode::format('svg')
