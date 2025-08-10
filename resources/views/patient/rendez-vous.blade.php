@@ -71,7 +71,16 @@
                                     <div class="text-3xl font-bold mb-2">{{ $prochainRdv->OrdreRDV ?? $positionPatient }}</div>
                                     <div class="text-sm opacity-90">رقم موعدك</div>
                                     
-                                    @if($patientsAvantMoi > 0)
+                                    @if($prochainRdv->rdvConfirmer == 'En cours')
+                                        <!-- المريض مع الطبيب -->
+                                        <div class="bg-green-500 bg-opacity-30 rounded-lg p-3 mt-3">
+                                            <div class="text-lg font-bold text-green-200">
+                                                <i class="fas fa-user-md icon-left"></i>
+                                                انتم الآن مع الطبيب
+                                            </div>
+                                            <div class="text-sm opacity-90">قيد العلاج</div>
+                                        </div>
+                                    @elseif($patientsAvantMoi > 0)
                                         <div class="bg-white bg-opacity-20 rounded-lg p-3 mt-3">
                                             <div class="text-2xl font-bold text-yellow-200">{{ $patientsAvantMoi }}</div>
                                             <div class="text-sm opacity-90">
@@ -167,6 +176,21 @@
                              مع الطبيب
                          </div>
                     </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- المريض الحالي مع الطبيب -->
+        @if($prochainRdv && $prochainRdv->rdvConfirmer == 'En cours' && $estAujourdhui)
+            <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 mb-6 text-white text-center">
+                <div class="text-4xl mb-4">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="text-2xl font-bold mb-2">انتم الآن مع الطبيب</div>
+                <div class="text-lg opacity-90">قيد العلاج - يرجى الانتظار</div>
+                <div class="text-sm opacity-75 mt-2">
+                    <i class="fas fa-clock icon-left"></i>
+                    رقم موعدك: {{ $prochainRdv->OrdreRDV }}
                 </div>
             </div>
         @endif
