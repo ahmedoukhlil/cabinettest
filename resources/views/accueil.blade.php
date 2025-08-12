@@ -77,6 +77,9 @@
             </div>
         </div>
 
+        <!-- Carte Dépenses -->
+        
+
         <!-- Carte Règlement Factures -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
             <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 p-6">

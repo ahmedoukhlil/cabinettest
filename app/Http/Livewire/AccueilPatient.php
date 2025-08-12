@@ -40,6 +40,7 @@ class AccueilPatient extends Component
     public $showCreateActeModal = false;
     public $showListeActesModal = false;
     public $showCaisseOperations = false;
+    public $showDepenses = false;
     public $showUsersModal = false;
     public $showStatistiques = false;
     public $showMedecinsModal = false;
@@ -189,6 +190,7 @@ class AccueilPatient extends Component
             'showCreateActeModal',
             'showListeActesModal',
             'showCaisseOperations',
+            'showDepenses',
             'showPatientMenu',
             'showCabinetMenu',
             'action',
@@ -206,6 +208,7 @@ class AccueilPatient extends Component
     public function closeAllSections()
     {
         $this->showCaisseOperations = false;
+        $this->showDepenses = false;
         $this->showStatistiques = false;
         $this->showPatientMenu = false;
         $this->showCabinetMenu = false;
@@ -224,6 +227,7 @@ class AccueilPatient extends Component
         }
         $this->action = $action;
         $this->showCaisseOperations = false;
+        $this->showDepenses = false;
         $this->showStatistiques = false;
         $this->showCabinetMenu = false;
         // Ne pas fermer le menu patient pour les actions du sous-menu
@@ -297,6 +301,12 @@ class AccueilPatient extends Component
     {
         $this->closeAllSections();
         $this->showCaisseOperations = true;
+    }
+
+    public function openDepenses()
+    {
+        $this->closeAllSections();
+        $this->showDepenses = true;
     }
 
     public function ouvrirAssureurModal()

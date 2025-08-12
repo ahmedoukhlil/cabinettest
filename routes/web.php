@@ -85,6 +85,9 @@ Route::middleware(['auth'])->group(function () {
         })->name('caisse-operations');
     });
 
+    // Routes pour les dépenses (Propriétaire uniquement)
+    
+
     // Routes pour la gestion des utilisateurs (Propriétaire uniquement)
     Route::middleware(['permission:user.view'])->group(function () {
         Route::get('/users', function () {

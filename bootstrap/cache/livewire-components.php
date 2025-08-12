@@ -9,6 +9,7 @@
   'caisse-operations-manager' => 'App\\Http\\Livewire\\CaisseOperationsManager',
   'consultation-form' => 'App\\Http\\Livewire\\ConsultationForm',
   'create-rendez-vous' => 'App\\Http\\Livewire\\CreateRendezVous',
+  'depenses-manager' => 'App\\Http\\Livewire\\DepensesManager',
   'historique-paiement' => 'App\\Http\\Livewire\\HistoriquePaiement',
   'liste-actes' => 'App\\Http\\Livewire\\ListeActes',
   'medecin-manager' => 'App\\Http\\Livewire\\MedecinManager',
