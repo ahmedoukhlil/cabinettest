@@ -140,21 +140,23 @@
 
     {{-- Modal création patient --}}
     @if($showCreateModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-0 relative modal-container animate-modal-fade-in">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
                 <!-- Header du modal -->
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-users header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Gestion des patients</h2>
+                        <i class="fas fa-users header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Gestion des patients</h2>
                     </div>
-                    <button wire:click="closeCreateModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="closeCreateModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
                 <!-- Contenu scrollable -->
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:patient-manager />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:patient-manager />
+                    </div>
                 </div>
             </div>
         </div>
@@ -162,20 +164,21 @@
 
     {{-- Modal création RDV pour tous patients --}}
     @if($showCreateRdvModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-7xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <!-- Header du modal -->
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-calendar-alt header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Gestion des Rendez-vous</h2>
+                        <i class="fas fa-calendar-alt header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Gestion des Rendez-vous</h2>
                     </div>
-                    <button type="button" wire:click="closeCreateRdvModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button type="button" wire:click="closeCreateRdvModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
                 
                 <!-- Onglets -->
-                <div class="bg-white border-b border-gray-200">
+                <div class="bg-white border-b border-gray-200 flex-shrink-0">
                     <nav class="flex space-x-4 sm:space-x-8 px-4 sm:px-6 overflow-x-auto" aria-label="Tabs">
                         <button wire:click="$set('activeRdvTab', 'create')" 
                             class="tab-button py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap {{ $activeRdvTab === 'create' ? 'border-white text-white active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
@@ -199,22 +202,25 @@
                     </nav>
                 </div>
                 
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <div id="modal-loading" class="hidden flex items-center justify-center py-6 sm:py-8">
-                        <div class="animate-spin rounded-full h-6 sm:h-8 w-6 sm:w-8 border-b-2 border-primary"></div>
-                        <span class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-600">Chargement...</span>
-                    </div>
-                    
-                    <div class="tab-content">
-                        @if($activeRdvTab === 'create')
-                            <div class="tab-panel showing" wire:key="create-rdv-panel">
-                                <livewire:create-rendez-vous wire:key="create-rdv-modal" :patient="$selectedPatient" />
-                            </div>
-                        @elseif($activeRdvTab === 'reminders')
-                            <div class="tab-panel showing" wire:key="reminders-panel">
-                                <livewire:rdv-reminders wire:key="rdv-reminders-modal" />
-                            </div>
-                        @endif
+                <!-- Contenu principal avec scroll -->
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <div id="modal-loading" class="hidden flex items-center justify-center py-6 sm:py-8">
+                            <div class="animate-spin rounded-full h-6 sm:h-8 w-6 sm:w-8 border-b-2 border-primary"></div>
+                            <span class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-600">Chargement...</span>
+                        </div>
+                        
+                        <div class="tab-content">
+                            @if($activeRdvTab === 'create')
+                                <div class="tab-panel showing animate-speed-fade-in" wire:key="create-rdv-panel" style="animation-delay: 0.1s;">
+                                    <livewire:create-rendez-vous wire:key="create-rdv-modal" :patient="$selectedPatient" />
+                                </div>
+                            @elseif($activeRdvTab === 'reminders')
+                                <div class="tab-panel showing animate-speed-fade-in" wire:key="reminders-panel" style="animation-delay: 0.1s;">
+                                    <livewire:rdv-reminders wire:key="rdv-reminders-modal" />
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -222,19 +228,21 @@
     @endif
 
     @if($showGestionPatientsModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-7xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-7xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-users header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Gestion des patients</h2>
+                        <i class="fas fa-users header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Gestion des patients</h2>
                     </div>
-                    <button wire:click="closeGestionPatientsModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="closeGestionPatientsModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:patient-manager />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:patient-manager />
+                    </div>
                 </div>
             </div>
         </div>
@@ -326,19 +334,21 @@
     
     {{-- Modal Gestion des assurances --}}
     @if($showAssureurModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-shield-alt header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Gestion des assurances</h2>
+                        <i class="fas fa-shield-alt header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Gestion des assurances</h2>
                     </div>
-                    <button wire:click="fermerAssureurModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="fermerAssureurModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:assureur-manager wire:key="assureur-manager-modal" />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:assureur-manager wire:key="assureur-manager-modal" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -346,19 +356,21 @@
 
     {{-- Modal Liste des actes --}}
     @if($showListeActesModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-list-alt header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Liste des actes</h2>
+                        <i class="fas fa-list-alt header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Liste des actes</h2>
                     </div>
-                    <button wire:click="fermerListeActesModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="fermerListeActesModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:acte-manager wire:key="acte-manager-modal" />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:acte-manager wire:key="acte-manager-modal" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -366,19 +378,21 @@
 
     {{-- Modal Gestion des médecins --}}
     @if($showMedecinsModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-user-md header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Gestion des médecins</h2>
+                        <i class="fas fa-user-md header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Gestion des médecins</h2>
                     </div>
-                    <button wire:click="fermerMedecinsModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="fermerMedecinsModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:medecin-manager wire:key="medecin-manager-modal" />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:medecin-manager wire:key="medecin-manager-modal" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -386,19 +400,21 @@
 
     {{-- Modal Modes de paiement --}}
     @if($showTypePaiementModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-5xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-credit-card header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Modes de paiement</h2>
+                        <i class="fas fa-credit-card header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Modes de paiement</h2>
                     </div>
-                    <button wire:click="fermerTypePaiementModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="fermerTypePaiementModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:type-paiement-manager wire:key="type-paiement-manager-modal" />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:type-paiement-manager wire:key="type-paiement-manager-modal" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -406,19 +422,21 @@
 
     {{-- Modal Gestion des utilisateurs --}}
     @if($showUsersModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-0 relative modal-container animate-modal-fade-in">
-                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-6xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-users-cog header-icon text-lg sm:text-xl"></i>
-                        <h2 class="text-lg sm:text-xl font-bold text-primary">Gestion des utilisateurs</h2>
+                        <i class="fas fa-users-cog header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Gestion des utilisateurs</h2>
                     </div>
-                    <button wire:click="closeUsersModal" class="text-gray-500 hover:text-primary text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly">
+                    <button wire:click="closeUsersModal" class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
                         <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
                     </button>
                 </div>
-                <div class="max-h-[70vh] overflow-y-auto p-3 sm:p-4 md:p-6 modal-body pt-12 sm:pt-16">
-                    <livewire:user-manager wire:key="user-manager-modal" />
+                <div class="flex-1 overflow-hidden">
+                    <div class="h-full overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                        <livewire:user-manager wire:key="user-manager-modal" />
+                    </div>
                 </div>
             </div>
         </div>
