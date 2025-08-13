@@ -47,6 +47,12 @@ class AccueilPatient extends Component
     public $showTypePaiementModal = false;
     public $showCabinetMenu = false;
     public $showPatientMenu = false;
+    
+    // Onglet actif pour le modal RDV
+    public $activeRdvTab = 'create';
+    
+    // Nombre de RDV à rappeler
+    public $rdvRemindersCount = 0;
 
     // États des actions et données
     public $action = null;
@@ -72,7 +78,8 @@ class AccueilPatient extends Component
         'assureurCreated' => 'handleAssureurCreated',
         'acteCreated' => 'handleActeCreated',
         'refreshData' => 'refreshCachedData',
-        'openModal' => 'handleOpenModal'
+        'openModal' => 'handleOpenModal',
+        'refreshReminders' => 'calculateRdvRemindersCount'
     ];
 
     public function mount()
@@ -84,6 +91,7 @@ class AccueilPatient extends Component
         $this->initializeRoles();
         $this->loadCachedData();
         $this->preloadActes();
+        $this->calculateRdvRemindersCount();
         
         // Initialisation explicite des propriétés de menu
         $this->showPatientMenu = false;
@@ -222,7 +230,7 @@ class AccueilPatient extends Component
 
     public function setAction($action)
     {
-        if (!$this->selectedPatient && in_array($action, ['consultation', 'reglement', 'rendezvous'])) {
+        if (!$this->selectedPatient && in_array($action, ['consultation', 'reglement', 'rendezvous', 'dossier'])) {
             return;
         }
         $this->action = $action;
@@ -407,6 +415,27 @@ class AccueilPatient extends Component
         if ($this->showPatientMenu) {
             $this->closeAllSections();
             $this->showPatientMenu = true;
+        }
+    }
+
+    public function calculateRdvRemindersCount()
+    {
+        try {
+            $query = \App\Models\Rendezvou::where('rdvConfirmer', '!=', 'Terminé')
+                ->where('rdvConfirmer', '!=', 'Annulé')
+                ->where('rdvConfirmer', '!=', 'Rappel envoyé') // Exclure les RDV qui ont déjà reçu un rappel
+                ->where('fkidcabinet', Auth::user()->fkidcabinet);
+
+            // Si c'est un docteur simple, ne compter que ses rendez-vous
+            if ($this->isDocteur && !$this->canViewAllRdv) {
+                $query->where('fkidMedecin', Auth::user()->fkidmedecin);
+            }
+
+            // Compter les RDV de demain par défaut
+            $tomorrow = now()->addDay()->format('Y-m-d');
+            $this->rdvRemindersCount = $query->whereDate('dtPrevuRDV', $tomorrow)->count();
+        } catch (\Exception $e) {
+            $this->rdvRemindersCount = 0;
         }
     }
 

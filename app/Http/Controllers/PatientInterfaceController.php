@@ -70,13 +70,13 @@ class PatientInterfaceController extends Controller
                 // Afficher la file d'attente seulement si le rendez-vous est aujourd'hui
                 if ($estAujourdhui) {
                     // Récupérer TOUS les rendez-vous de la journée pour le médecin (y compris terminés)
-                    $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
-                        ->where('fkidMedecin', $prochainRdv->fkidMedecin)
+                $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
+                    ->where('fkidMedecin', $prochainRdv->fkidMedecin)
                         ->whereDate('dtPrevuRDV', $dateToken)
-                        ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
-                        ->orderBy('OrdreRDV', 'asc')
-                        ->get();
-                        
+                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
+                    ->orderBy('OrdreRDV', 'asc')
+                    ->get();
+                
 
 
                 }

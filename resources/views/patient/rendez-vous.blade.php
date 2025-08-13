@@ -34,40 +34,40 @@
          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                  <!-- معلومات المريض -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                 <div>
+                     <h2 class="text-xl font-bold text-gray-800 mb-4">
                         <i class="fas fa-user text-blue-600 icon-left"></i>
                         معلومات المريض
-                    </h2>
-                    <div class="space-y-3">
-                        <div>
+                     </h2>
+                     <div class="space-y-3">
+                         <div>
                             <span class="text-sm font-medium text-gray-600">الاسم:</span>
-                            <span class="text-lg font-semibold text-gray-800">{{ $patient->Nom }}</span>
-                        </div>
-                        @if($prochainRdv)
-                            <div>
+                             <span class="text-lg font-semibold text-gray-800">{{ $patient->Nom }}</span>
+                         </div>
+                         @if($prochainRdv)
+                             <div>
                                 <span class="text-sm font-medium text-gray-600">الطبيب:</span>
                                 <span class="text-lg font-semibold text-gray-800">د. {{ $prochainRdv->medecin->Nom ?? '' }} {{ $prochainRdv->medecin->Prenom ?? '' }}</span>
-                            </div>
-                            <div>
+                             </div>
+                             <div>
                                 <span class="text-sm font-medium text-gray-600">التاريخ:</span>
-                                <span class="text-lg font-semibold text-gray-800">{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
+                                 <span class="text-lg font-semibold text-gray-800">{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</span>
+                             </div>
+                         @endif
+                     </div>
+                 </div>
  
                                                  <!-- الحالة الحالية -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">
+                 <div>
+                     <h2 class="text-xl font-bold text-gray-800 mb-4">
                         <i class="fas fa-clock text-green-600 icon-left"></i>
                         الحالة الحالية
-                    </h2>
+                     </h2>
                     @if($prochainRdv)
                         @if($estAujourdhui)
                             <!-- موعد اليوم - عرض طابور الانتظار -->
-                            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
-                                <div class="text-center">
+                         <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
+                             <div class="text-center">
                                     <div class="text-3xl font-bold mb-2">{{ $prochainRdv->OrdreRDV ?? $positionPatient }}</div>
                                     <div class="text-sm opacity-90">رقم موعدك</div>
                                     
@@ -95,8 +95,8 @@
                                                 حان دورك !
                                             </div>
                                             <div class="text-sm opacity-90">يمكنك الحضور</div>
-                                        </div>
-                                    @endif
+                                     </div>
+                                 @endif
                                     
                                     @if($tempsAttenteEstime > 0)
                                         <div class="text-sm opacity-90 mt-2">
@@ -104,13 +104,13 @@
                                             وقت الانتظار المقدر: ~{{ $tempsAttenteEstime }} دقيقة
                                         </div>
                                     @else
-                                        <div class="text-sm opacity-90 mt-2">
+                                     <div class="text-sm opacity-90 mt-2">
                                             <i class="fas fa-clock icon-left"></i>
                                             لا انتظار متوقع
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
+                                     </div>
+                                 @endif
+                             </div>
+                         </div>
                         @else
                             <!-- موعد في المستقبل -->
                             <div class="bg-orange-100 border border-orange-300 rounded-lg p-4">
@@ -127,35 +127,35 @@
                                 </div>
                             </div>
                         @endif
-                    @else
-                        <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
-                            <div class="text-center">
-                                <i class="fas fa-info-circle text-yellow-600 text-2xl mb-2"></i>
+                     @else
+                         <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
+                             <div class="text-center">
+                                 <i class="fas fa-info-circle text-yellow-600 text-2xl mb-2"></i>
                                 <div class="text-yellow-800 font-medium">لا توجد مواعيد مقررة</div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
+                             </div>
+                         </div>
+                     @endif
+                 </div>
  
                                  <!-- المريض الحالي -->
                 @if($prochainRdv && $patientEnCours && $estAujourdhui)
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800 mb-4">
+                     <div>
+                         <h2 class="text-xl font-bold text-gray-800 mb-4">
                             <i class="fas fa-user-md text-green-600 icon-left"></i>
                             المريض الحالي
-                        </h2>
-                        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
-                            <div class="text-center">
-                                <div class="text-3xl font-bold mb-2">
+                         </h2>
+                         <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+                             <div class="text-center">
+                                 <div class="text-3xl font-bold mb-2">
                                     <i class="fas fa-user-md icon-left"></i>
                                     رقم {{ $patientEnCours->OrdreRDV ?? $positionPatientEnCours ?? 'غير متوفر' }}
-                                </div>
+                                 </div>
                                 <div class="text-sm opacity-90">مع الطبيب</div>
                                 <div class="text-xs opacity-75 mt-1">قيد العلاج</div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+                             </div>
+                         </div>
+                     </div>
+                 @endif
              </div>
          </div>
 
@@ -171,7 +171,7 @@
                         <p class="text-green-700">الرقم: <span class="font-bold">{{ $patientEnCours->ordreRDV ?? $positionPatientEnCours ?? 'غير متوفر' }}</span></p>
                     </div>
                     <div class="text-left">
-                        <div class="text-2xl font-bold text-green-600">
+                                                 <div class="text-2xl font-bold text-green-600">
                              <i class="fas fa-user-md icon-left"></i>
                              مع الطبيب
                          </div>
@@ -238,7 +238,7 @@
                                             </span>
                                             @if($isCurrentPatient)
                                                 <span class="text-sm text-blue-600 font-medium">أنت</span>
-                                            @elseif($isEnCours)
+                                                                                         @elseif($isEnCours)
                                                 <span class="text-sm text-green-600 font-medium">مع الطبيب</span>
                                             @else
                                                 <span class="text-sm text-gray-500">مريض مخفي</span>
@@ -251,7 +251,7 @@
                                         </div>
                                     </td>
                                     <td class="px-4 py-3 whitespace-nowrap text-right">
-                                        @php
+                                                                                                                          @php
                                              $statusClass = 'bg-yellow-100 text-yellow-800';
                                              $statusIcon = 'fas fa-clock';
                                              
@@ -291,7 +291,7 @@
                                              }
                                          @endphp
                                         
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
+                                                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
                                              <i class="{{ $statusIcon }} icon-left"></i>
                                              @switch($rdv->rdvConfirmer)
                                                  @case('En Attente')

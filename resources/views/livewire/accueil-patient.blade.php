@@ -27,12 +27,12 @@
                 </span>
                 <span class="font-semibold transition-all duration-300 ease-in-out">Liste de patients</span>
             </button>
-            <button wire:click="showCreateRdv" class="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl transition-all duration-300 ease-in-out text-base md:text-lg flex items-center justify-center gap-2">
-                <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
-                    <i class="fas fa-calendar-plus text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
-                </span>
-                <span class="font-semibold transition-all duration-300 ease-in-out">Créer RDV</span>
-            </button>
+                         <button wire:click="showCreateRdv" class="w-full sm:w-auto px-4 md:px-6 py-2 md:py-3 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl transition-all duration-300 ease-in-out text-base md:text-lg flex items-center justify-center gap-2">
+                 <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
+                     <i class="fas fa-calendar-plus text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
+                 </span>
+                 <span class="font-semibold transition-all duration-300 ease-in-out">Gestion RDV</span>
+             </button>
         </div>
     </div>
 
@@ -87,35 +87,43 @@
             </button>
         </div>
 
-        {{-- Sous-menu Gestion du patient --}}
-        @if($showPatientMenu)
-        <div class="w-full flex flex-wrap gap-2 md:gap-4 justify-center items-center mt-2 transition-all duration-300 ease-in-out transform {{ $showPatientMenu ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2' }}">
-            {{-- Consultation --}}
-            <button wire:click="setAction('consultation')"
-                class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
-                <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
-                    <i class="fas fa-stethoscope text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
-                </span>
-                <span class="font-semibold transition-all duration-300 ease-in-out">Consultation</span>
-            </button>
-            {{-- Facture/Devis --}}
-            <button wire:click="setAction('reglement')"
-                class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
-                <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
-                    <i class="fas fa-file-invoice-dollar text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
-                </span>
-                <span class="font-semibold transition-all duration-300 ease-in-out">Facture/Devis</span>
-            </button>
-            {{-- RDV Patient --}}
-            <button wire:click="setAction('rendezvous')"
-                class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
-                <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
-                    <i class="fas fa-calendar-plus text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
-                </span>
-                <span class="font-semibold transition-all duration-300 ease-in-out">RDV Patient</span>
-            </button>
-        </div>
-        @endif
+                 {{-- Sous-menu Gestion du patient --}}
+         @if($showPatientMenu)
+         <div class="w-full flex flex-wrap gap-2 md:gap-4 justify-center items-center mt-2 transition-all duration-300 ease-in-out transform {{ $showPatientMenu ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2' }}">
+             {{-- Consultation --}}
+             <button wire:click="setAction('consultation')"
+                 class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
+                 <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
+                     <i class="fas fa-stethoscope text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
+                 </span>
+                 <span class="font-semibold transition-all duration-300 ease-in-out">Consultation</span>
+             </button>
+             {{-- Facture/Devis --}}
+             <button wire:click="setAction('reglement')"
+                 class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
+                 <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
+                     <i class="fas fa-file-invoice-dollar text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
+                 </span>
+                 <span class="font-semibold transition-all duration-300 ease-in-out">Facture/Devis</span>
+             </button>
+             {{-- RDV Patient --}}
+             <button wire:click="setAction('rendezvous')"
+                 class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
+                 <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
+                     <i class="fas fa-calendar-plus text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
+                 </span>
+                 <span class="font-semibold transition-all duration-300 ease-in-out">RDV Patient</span>
+             </button>
+             {{-- Dossier Medical --}}
+             <button wire:click="setAction('dossier')"
+                 class="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out text-base md:text-lg justify-center {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
+                 <span class="inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-300 ease-in-out">
+                     <i class="fas fa-folder-open text-primary text-xl md:text-2xl transition-all duration-300 ease-in-out"></i>
+                 </span>
+                 <span class="font-semibold transition-all duration-300 ease-in-out">Dossier Medical</span>
+             </button>
+         </div>
+         @endif
 
         @if($showCaisseOperations)
             <div class="w-full">
@@ -159,18 +167,45 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full modal-content">
                     <div class="bg-primary-light px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-t-2xl flex items-center justify-between">
-                        <h2 class="text-xl font-bold text-primary">Créer un rendez-vous</h2>
+                        <h2 class="text-xl font-bold text-primary">Gestion des Rendez-vous</h2>
                         <button type="button" wire:click="closeCreateRdvModal" class="text-gray-500 hover:text-primary text-2xl flex items-center gap-2">
                             <i class="fas fa-times"></i> <span class="text-base font-medium">Fermer</span>
                         </button>
                     </div>
-                                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div id="modal-loading" class="hidden flex items-center justify-center py-8">
-                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                    <span class="ml-3 text-gray-600">Chargement...</span>
-                                </div>
-                                <livewire:create-rendez-vous wire:key="create-rdv-modal" :patient="$selectedPatient" />
-                            </div>
+                    
+                    <!-- Onglets -->
+                    <div class="bg-white border-b border-gray-200">
+                        <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                                                         <button wire:click="$set('activeRdvTab', 'create')" 
+                                     class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeRdvTab === 'create' ? 'border-primary text-white bg-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                                 <i class="fas fa-plus mr-2"></i>
+                                 Gestion RDV
+                             </button>
+                                                         <button wire:click="$set('activeRdvTab', 'reminders')" 
+                                     class="py-4 px-1 border-b-2 font-medium text-sm {{ $activeRdvTab === 'reminders' ? 'border-primary text-white bg-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} relative">
+                                 <i class="fas fa-bell mr-2"></i>
+                                 Rappels RDV
+                                 @if($rdvRemindersCount > 0)
+                                     <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-primary rounded-full">
+                                         {{ $rdvRemindersCount }}
+                                     </span>
+                                 @endif
+                             </button>
+                        </nav>
+                    </div>
+                    
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div id="modal-loading" class="hidden flex items-center justify-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                            <span class="ml-3 text-gray-600">Chargement...</span>
+                        </div>
+                        
+                        @if($activeRdvTab === 'create')
+                            <livewire:create-rendez-vous wire:key="create-rdv-modal" :patient="$selectedPatient" />
+                        @elseif($activeRdvTab === 'reminders')
+                            <livewire:rdv-reminders wire:key="rdv-reminders-modal" />
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -239,30 +274,37 @@
             </div>
         @endif
 
-        <div class="mt-8">
-            @if($action === 'consultation')
-                <div wire:loading.remove wire:target="setAction">
-                    <livewire:consultation-form :patient="$selectedPatient" wire:key="consultation-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
-                </div>
-                <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-            @elseif($action === 'reglement')
-                <div wire:loading.remove wire:target="setAction">
-                    <livewire:reglement-facture :selectedPatient="$selectedPatient" wire:key="reglement-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
-                </div>
-                <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-            @elseif($action === 'rendezvous')
-                <div wire:loading.remove wire:target="setAction">
-                    <livewire:create-rendez-vous :patient="$selectedPatient" wire:key="rdv-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
-                </div>
-                <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                </div>
-            @endif
-        </div>
+                 <div class="mt-8">
+             @if($action === 'consultation')
+                 <div wire:loading.remove wire:target="setAction">
+                     <livewire:consultation-form :patient="$selectedPatient" wire:key="consultation-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
+                 </div>
+                 <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
+                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                 </div>
+             @elseif($action === 'reglement')
+                 <div wire:loading.remove wire:target="setAction">
+                     <livewire:reglement-facture :selectedPatient="$selectedPatient" wire:key="reglement-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
+                 </div>
+                 <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
+                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                 </div>
+             @elseif($action === 'rendezvous')
+                 <div wire:loading.remove wire:target="setAction">
+                     <livewire:create-rendez-vous :patient="$selectedPatient" wire:key="rdv-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
+                 </div>
+                 <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
+                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                 </div>
+             @elseif($action === 'dossier')
+                 <div wire:loading.remove wire:target="setAction">
+                     <livewire:dossier-medical :patient="$selectedPatient" wire:key="dossier-{{ $selectedPatient['ID'] ?? 'new' }}" lazy />
+                 </div>
+                 <div wire:loading wire:target="setAction" class="flex justify-center items-center py-8">
+                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                 </div>
+             @endif
+         </div>
 
         <!-- Composant HistoriquePaiement toujours présent -->
         <livewire:historique-paiement wire:key="historique-paiement" lazy />
@@ -502,5 +544,7 @@
             if (closeBtn) closeBtn.click();
         }
     });
+    
+
 </script>
 @endpush

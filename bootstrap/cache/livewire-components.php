@@ -16,6 +16,7 @@
   'medecin-paiement-stats' => 'App\\Http\\Livewire\\MedecinPaiementStats',
   'patient-manager' => 'App\\Http\\Livewire\\PatientManager',
   'patient-search' => 'App\\Http\\Livewire\\PatientSearch',
+  'rdv-reminders' => 'App\\Http\\Livewire\\RdvReminders',
   'reglement-facture' => 'App\\Http\\Livewire\\ReglementFacture',
   'rendez-vous-manager' => 'App\\Http\\Livewire\\RendezVousManager',
   'statistiques-manager' => 'App\\Http\\Livewire\\StatistiquesManager',
