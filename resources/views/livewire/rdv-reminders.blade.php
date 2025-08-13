@@ -72,8 +72,114 @@
         <div class="px-6 py-4 border-b border-gray-200 bg-primary">
             <h3 class="text-lg font-medium text-white">Rendez-vous à rappeler</h3>
         </div>
-        <div class="overflow-x-auto">
-            @if($rendezVous->count() > 0)
+        
+        @if($rendezVous->count() > 0)
+            <!-- Version mobile - Cartes -->
+            <div class="block lg:hidden space-y-3 p-4">
+                @foreach($rendezVous as $rdv)
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                        <!-- En-tête de la carte -->
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="text-center">
+                                    @if($rdv->OrdreRDV)
+                                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
+                                            {{ str_pad($rdv->OrdreRDV, 2, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-gray-500 rounded-full min-w-[2rem]">
+                                            {{ str_pad($rdv->IDRdv, 2, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 text-base">{{ $rdv->patient->Nom ?? 'Patient inconnu' }}</h4>
+                                    <p class="text-sm text-gray-500">Dr. {{ $rdv->medecin->Nom ?? 'Non assigné' }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
+                                </div>
+                                <div class="text-lg font-bold text-blue-600">
+                                    {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Informations du RDV -->
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Acte prévu</span>
+                                <p class="text-sm font-medium text-gray-900 truncate" title="{{ $rdv->ActePrevu ?: 'Consultation' }}">{{ $rdv->ActePrevu ?: 'Consultation' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Téléphone</span>
+                                <p class="text-sm font-medium text-gray-900">{{ $rdv->patient->Telephone1 ?? 'N/A' }}</p>
+                                @if($rdv->patient->Telephone2)
+                                    <p class="text-xs text-gray-500">{{ $rdv->patient->Telephone2 }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <!-- Statut -->
+                        <div class="flex items-center justify-between mb-3">
+                            @if($rdv->rdvConfirmer === 'Rappel envoyé')
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800" title="Rappel déjà envoyé">
+                                    <i class="fas fa-bell mr-1"></i>
+                                    Rappelé
+                                </span>
+                            @else
+                                @php
+                                    $statusColors = [
+                                        'En Attente' => 'bg-yellow-100 text-yellow-800',
+                                        'Confirmé' => 'bg-green-100 text-green-800',
+                                        'En cours' => 'bg-blue-100 text-blue-800',
+                                        'Terminé' => 'bg-gray-100 text-gray-800',
+                                        'Annulé' => 'bg-red-100 text-red-800'
+                                    ];
+                                    $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
+                                @endphp
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
+                                    {{ $rdv->rdvConfirmer }}
+                                </span>
+                            @endif
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex justify-center pt-2 border-t border-gray-100">
+                            @if($rdv->patient && $rdv->patient->Telephone1)
+                                @php
+                                    $isRelance = $rdv->rdvConfirmer === 'Rappel envoyé';
+                                    $buttonText = $isRelance ? 'Relancer' : 'Rappeler';
+                                    $buttonColor = $isRelance ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
+                                @endphp
+                                <button wire:click="sendReminder({{ $rdv->IDRdv }})"
+                                        wire:loading.attr="disabled"
+                                        wire:loading.class="opacity-50 cursor-not-allowed"
+                                        class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors touch-friendly">
+                                    <i class="fab fa-whatsapp mr-2"></i>
+                                    <span wire:loading.remove wire:target="sendReminder({{ $rdv->IDRdv }})">
+                                        {{ $buttonText }}
+                                    </span>
+                                    <span wire:loading wire:target="sendReminder({{ $rdv->IDRdv }})" class="flex items-center">
+                                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        Envoi...
+                                    </span>
+                                </button>
+                            @else
+                                <span class="text-red-600 text-sm flex items-center justify-center w-full">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    Pas de téléphone
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Version desktop - Table -->
+            <div class="hidden lg:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -124,19 +230,19 @@
                                             Rappelé
                                         </span>
                                     @else
-                                    @php
-                                        $statusColors = [
-                                            'En Attente' => 'bg-yellow-100 text-yellow-800',
-                                            'Confirmé' => 'bg-green-100 text-green-800',
-                                            'En cours' => 'bg-blue-100 text-blue-800',
-                                            'Terminé' => 'bg-gray-100 text-gray-800',
-                                            'Annulé' => 'bg-red-100 text-red-800'
-                                        ];
-                                        $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
-                                    @endphp
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
-                                        {{ $rdv->rdvConfirmer }}
-                                    </span>
+                                        @php
+                                            $statusColors = [
+                                                'En Attente' => 'bg-yellow-100 text-yellow-800',
+                                                'Confirmé' => 'bg-green-100 text-green-800',
+                                                'En cours' => 'bg-blue-100 text-blue-800',
+                                                'Terminé' => 'bg-gray-100 text-gray-800',
+                                                'Annulé' => 'bg-red-100 text-red-800'
+                                            ];
+                                            $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
+                                        @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
+                                            {{ $rdv->rdvConfirmer }}
+                                        </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -176,14 +282,13 @@
                         @endforeach
                     </tbody>
                 </table>
-            @else
-                <tr>
-                    <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                        Aucun rendez-vous à rappeler
-                    </td>
-                </tr>
-            @endif
-        </div>
+            </div>
+        @else
+            <div class="p-8 text-center">
+                <i class="fas fa-bell-slash text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-500 text-lg">Aucun rendez-vous à rappeler</p>
+            </div>
+        @endif
 
         <!-- Pagination -->
         <div class="px-6 py-4 border-t border-gray-200">
