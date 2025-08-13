@@ -179,15 +179,15 @@
                     <nav class="flex space-x-4 sm:space-x-8 px-4 sm:px-6 overflow-x-auto" aria-label="Tabs">
                         <button wire:click="$set('activeRdvTab', 'create')" 
                             class="tab-button py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap {{ $activeRdvTab === 'create' ? 'border-white text-white active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}"
-                            style="{{ $activeRdvTab === 'create' ? 'background-color: #1e3a8a !important;' : '' }}">
-                            <i class="fas fa-plus mr-1 sm:mr-2"></i>
+                            style="{{ $activeRdvTab === 'create' ? 'background-color: #1e3a8a !important; color: white !important;' : '' }}">
+                            <i class="fas fa-plus mr-1 sm:mr-2" style="{{ $activeRdvTab === 'create' ? 'color: white !important;' : '' }}"></i>
                             <span class="hidden xs:inline">Gestion RDV</span>
                             <span class="xs:hidden">RDV</span>
                         </button>
                         <button wire:click="$set('activeRdvTab', 'reminders')" 
                             class="tab-button py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap {{ $activeRdvTab === 'reminders' ? 'border-white text-white active' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} relative"
-                            style="{{ $activeRdvTab === 'reminders' ? 'background-color: #1e3a8a !important;' : '' }}">
-                            <i class="fas fa-bell mr-1 sm:mr-2"></i>
+                            style="{{ $activeRdvTab === 'reminders' ? 'background-color: #1e3a8a !important; color: white !important;' : '' }}">
+                            <i class="fas fa-bell mr-1 sm:mr-2" style="{{ $activeRdvTab === 'reminders' ? 'color: white !important;' : '' }}"></i>
                             <span class="hidden xs:inline">Rappels RDV</span>
                             <span class="xs:hidden">Rappels</span>
                             @if($rdvRemindersCount > 0)

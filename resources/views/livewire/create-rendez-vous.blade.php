@@ -132,89 +132,205 @@
     @endif
 
     <!-- Liste des rendez-vous -->
-        <div class="mt-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
-                <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Liste des rendez-vous</h3>
-                @if(!empty($selectedRdvIds))
-                    <button wire:click="openBulkEditModal" class="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
-                        <i class="fas fa-edit"></i>
-                        <span class="hidden xs:inline">Modifier en masse</span>
-                        <span class="xs:hidden">Modifier</span>
-                        <span class="bg-white text-blue-600 rounded-full px-2 py-0.5 text-xs font-bold">{{ count($selectedRdvIds) }}</span>
-                    </button>
-                @endif
+    <div class="mt-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Liste des rendez-vous</h3>
+            @if(!empty($selectedRdvIds))
+                <button wire:click="openBulkEditModal" class="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
+                    <i class="fas fa-edit"></i>
+                    <span class="hidden xs:inline">Modifier en masse</span>
+                    <span class="xs:hidden">Modifier</span>
+                    <span class="bg-white text-blue-600 rounded-full px-2 py-0.5 text-xs font-bold">{{ count($selectedRdvIds) }}</span>
+                </button>
+            @endif
         </div>
 
-            <div class="table-responsive overflow-x-auto bg-white rounded-lg shadow">
+        <!-- Version mobile - Cartes -->
+        <div class="block lg:hidden space-y-3">
+            @forelse($rendezVous as $rdv)
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                    <!-- En-tête de la carte -->
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900 text-base">{{ $rdv->patient->Nom ?? 'N/A' }}</h4>
+                                @if(!empty($rdv->patient->Telephone1))
+                                    <p class="text-sm text-gray-500">{{ $rdv->patient->Telephone1 }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-gray-900">
+                                {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
+                            </div>
+                            <div class="text-lg font-bold text-blue-600">
+                                {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informations du RDV -->
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase tracking-wide">Médecin</span>
+                            <p class="text-sm font-medium text-gray-900">Dr. {{ $rdv->medecin->Nom ?? 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase tracking-wide">Acte</span>
+                            <p class="text-sm font-medium text-gray-900 truncate" title="{{ $rdv->ActePrevu }}">{{ $rdv->ActePrevu }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Statut -->
+                    <div class="flex items-center justify-between mb-3">
+                        @php
+                            switch($rdv->rdvConfirmer) {
+                                case 'En Attente':
+                                case 'En attente':
+                                    $statusClass = 'bg-yellow-100 text-yellow-800';
+                                    $statusIcon = 'fas fa-clock';
+                                    $statusText = 'En Attente';
+                                    break;
+                                case 'confirmé':
+                                case 'Confirmé':
+                                    $statusClass = 'bg-blue-100 text-blue-800';
+                                    $statusIcon = 'fas fa-user-check';
+                                    $statusText = 'Présent';
+                                    break;
+                                case 'En cours':
+                                    $statusClass = 'bg-green-100 text-green-800';
+                                    $statusIcon = 'fas fa-user-md';
+                                    $statusText = 'En cours';
+                                    break;
+                                case 'terminé':
+                                case 'Terminé':
+                                    $statusClass = 'bg-gray-100 text-gray-800';
+                                    $statusIcon = 'fas fa-check-double';
+                                    $statusText = 'Terminé';
+                                    break;
+                                case 'annulé':
+                                case 'Annulé':
+                                    $statusClass = 'bg-red-100 text-red-800';
+                                    $statusIcon = 'fas fa-times';
+                                    $statusText = 'Annulé';
+                                    break;
+                                case 'Consultation':
+                                    $statusClass = 'bg-purple-100 text-purple-800';
+                                    $statusIcon = 'fas fa-stethoscope';
+                                    $statusText = 'Consultation';
+                                    break;
+                                default:
+                                    $statusClass = 'bg-yellow-100 text-yellow-800';
+                                    $statusIcon = 'fas fa-clock';
+                                    $statusText = 'En Attente';
+                                    break;
+                            }
+                        @endphp
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
+                            <i class="{{ $statusIcon }} mr-1"></i>
+                            {{ $statusText }}
+                        </span>
+                    </div>
+
+                    <!-- Actions -->
+                    @if($canManageRdv)
+                        <div class="flex flex-wrap gap-1 pt-2 border-t border-gray-100">
+                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Confirmé')" class="flex-1 inline-flex items-center justify-center px-2 py-1.5 rounded bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 touch-friendly" title="Patient présent au cabinet">
+                                <i class="fas fa-user-check mr-1"></i>
+                                Présent
+                            </button>
+                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'En cours')" class="flex-1 inline-flex items-center justify-center px-2 py-1.5 rounded bg-green-500 text-white text-xs font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 touch-friendly" title="Avec le médecin">
+                                <i class="fas fa-user-md mr-1"></i>
+                                En cours
+                            </button>
+                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Terminé')" class="flex-1 inline-flex items-center justify-center px-2 py-1.5 rounded bg-gray-500 text-white text-xs font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 touch-friendly" title="Terminé">
+                                <i class="fas fa-check-double mr-1"></i>
+                                Terminé
+                            </button>
+                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Annulé')" class="flex-1 inline-flex items-center justify-center px-2 py-1.5 rounded bg-red-500 text-white text-xs font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 touch-friendly" title="Annulé">
+                                <i class="fas fa-times mr-1"></i>
+                                Annulé
+                            </button>
+                        </div>
+                    @else
+                        <div class="pt-2 border-t border-gray-100">
+                            <span class="text-gray-400 text-xs">Lecture seule</span>
+                        </div>
+                    @endif
+                </div>
+            @empty
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                    <i class="fas fa-calendar-times text-gray-400 text-4xl mb-4"></i>
+                    <p class="text-gray-500 text-lg">Aucun rendez-vous à venir</p>
+                </div>
+            @endforelse
+        </div>
+
+        <!-- Version desktop - Table -->
+        <div class="hidden lg:block table-responsive overflow-x-auto bg-white rounded-lg shadow">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-center">
-                                <input type="checkbox" wire:model="selectAll" wire:click="toggleSelectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden sm:inline">Patient</span>
-                                <span class="sm:hidden">Pat.</span>
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden sm:inline">Médecin</span>
-                                <span class="sm:hidden">Méd.</span>
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden xs:inline">Date</span>
-                                <span class="xs:hidden">D.</span>
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden xs:inline">Heure</span>
-                                <span class="xs:hidden">H.</span>
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden sm:inline">Acte prévu</span>
-                                <span class="sm:hidden">Acte</span>
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden sm:inline">Statut</span>
-                                <span class="sm:hidden">Stat.</span>
-                            </th>
-                            <th scope="col" class="px-3 sm:px-6 py-3 text-center text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
-                                <span class="hidden sm:inline">Actions</span>
-                                <span class="sm:hidden">Act.</span>
-                            </th>
+                        <th scope="col" class="px-6 py-3 text-center">
+                            <input type="checkbox" wire:model="selectAll" wire:click="toggleSelectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Patient
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Médecin
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Heure
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Acte prévu
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Statut
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($rendezVous as $rdv)
                         <tr class="hover:bg-gray-50">
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-center">
-                                    <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                                </td>
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm sm:text-base font-medium text-gray-900">
-                                        {{ $rdv->patient->Nom ?? 'N/A' }}
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ $rdv->patient->Nom ?? 'N/A' }}
+                                </div>
+                                @if(!empty($rdv->patient->Telephone1))
+                                    <div class="text-sm text-gray-500">
+                                        {{ $rdv->patient->Telephone1 }}
                                     </div>
-                                    @if(!empty($rdv->patient->Telephone1))
-                                        <div class="text-xs sm:text-sm text-gray-500">
-                                            {{ $rdv->patient->Telephone1 }}
-                                        </div>
-                                    @endif
-                                </td>
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm sm:text-base text-gray-900">
-                                        Dr. {{ $rdv->medecin->Nom ?? 'N/A' }}
-                                    </div>
-                                </td>
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm sm:text-base text-gray-900">
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">
+                                    Dr. {{ $rdv->medecin->Nom ?? 'N/A' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
                             </td>
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm sm:text-base text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
                             </td>
-                                <td class="px-3 sm:px-6 py-4">
-                                    <div class="text-sm sm:text-base text-gray-900 max-w-xs truncate" title="{{ $rdv->ActePrevu }}">
-                                {{ $rdv->ActePrevu }}
-                                    </div>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $rdv->ActePrevu }}">
+                                    {{ $rdv->ActePrevu }}
+                                </div>
                             </td>
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     switch($rdv->rdvConfirmer) {
                                         case 'En Attente':
@@ -252,61 +368,54 @@
                                     }
                                 @endphp
                                 
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
                                     <i class="{{ $statusIcon }} mr-1"></i>
                                     @switch($rdv->rdvConfirmer)
                                         @case('En Attente')
                                         @case('En attente')
-                                                <span class="hidden sm:inline">En Attente</span>
-                                                <span class="sm:hidden">Att.</span>
+                                            En Attente
                                             @break
                                         @case('confirmé')
                                         @case('Confirmé')
-                                                <span class="hidden sm:inline">Présent au cabinet</span>
-                                                <span class="sm:hidden">Présent</span>
+                                            Présent au cabinet
                                             @break
                                         @case('En cours')
-                                                <span class="hidden sm:inline">Avec le médecin</span>
-                                                <span class="sm:hidden">En cours</span>
+                                            Avec le médecin
                                             @break
                                         @case('terminé')
                                         @case('Terminé')
-                                                <span class="hidden sm:inline">Terminé</span>
-                                                <span class="sm:hidden">Term.</span>
+                                            Terminé
                                             @break
                                         @case('annulé')
                                         @case('Annulé')
-                                                <span class="hidden sm:inline">Annulé</span>
-                                                <span class="sm:hidden">Ann.</span>
+                                            Annulé
                                             @break
                                         @case('Consultation')
-                                                <span class="hidden sm:inline">Consultation</span>
-                                                <span class="sm:hidden">Cons.</span>
+                                            Consultation
                                             @break
                                         @default
-                                                <span class="hidden sm:inline">En Attente</span>
-                                                <span class="sm:hidden">Att.</span>
+                                            En Attente
                                     @endswitch
                                 </span>
                             </td>
-                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-center">
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
                                 @if($canManageRdv)
-                                        <div class="flex flex-col sm:flex-row gap-1 sm:space-x-1">
-                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Confirmé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 touch-friendly" title="Patient présent au cabinet">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Confirmé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 touch-friendly" title="Patient présent au cabinet">
                                             <i class="fas fa-user-check"></i>
-                                                <span class="hidden sm:inline ml-1">Présent</span>
+                                            <span class="ml-1">Présent</span>
                                         </button>
-                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'En cours')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-green-500 text-white text-xs font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 touch-friendly" title="Avec le médecin">
+                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'En cours')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-green-500 text-white text-xs font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 touch-friendly" title="Avec le médecin">
                                             <i class="fas fa-user-md"></i>
-                                                <span class="hidden sm:inline ml-1">En cours</span>
+                                            <span class="ml-1">En cours</span>
                                         </button>
-                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Terminé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-gray-500 text-white text-xs font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 touch-friendly" title="Terminé">
+                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Terminé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-gray-500 text-white text-xs font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 touch-friendly" title="Terminé">
                                             <i class="fas fa-check-double"></i>
-                                                <span class="hidden sm:inline ml-1">Terminé</span>
+                                            <span class="ml-1">Terminé</span>
                                         </button>
-                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Annulé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-red-500 text-white text-xs font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 touch-friendly" title="Annulé">
+                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Annulé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-red-500 text-white text-xs font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 touch-friendly" title="Annulé">
                                             <i class="fas fa-times"></i>
-                                                <span class="hidden sm:inline ml-1">Annulé</span>
+                                            <span class="ml-1">Annulé</span>
                                         </button>
                                     </div>
                                 @else
@@ -316,7 +425,7 @@
                         </tr>
                     @empty
                         <tr>
-                                <td colspan="9" class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            <td colspan="8" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                 Aucun rendez-vous à venir
                             </td>
                         </tr>
@@ -326,7 +435,7 @@
         </div>
 
         <!-- Pagination -->
-            <div class="px-3 sm:px-6 py-4 border-t border-gray-200">
+        <div class="px-3 sm:px-6 py-4 border-t border-gray-200">
             {{ $rendezVous->links() }}
         </div>
     </div>

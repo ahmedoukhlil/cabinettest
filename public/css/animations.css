@@ -1384,3 +1384,20 @@
     transform: scale(1.02);
     transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
+
+/* Styles pour les onglets actifs */
+.tab-button.active {
+    background-color: #1e3a8a !important;
+    color: white !important;
+    border-color: white !important;
+}
+
+.tab-button.active i,
+.tab-button.active span {
+    color: white !important;
+}
+
+.tab-button.active:hover {
+    background-color: #1e40af !important;
+    color: white !important;
+}
