@@ -61,7 +61,11 @@
             <!-- Date du rendez-vous -->
             <div>
                 <label for="date_rdv" class="block text-sm font-medium text-gray-700">Date</label>
-                <input type="date" wire:model="date_rdv" id="date_rdv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <input type="date" 
+                       wire:model="date_rdv" 
+                       id="date_rdv" 
+                       min="{{ date('Y-m-d') }}"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('date_rdv') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
@@ -108,6 +112,25 @@
         </div>
     </form>
 
+    <!-- Bouton de gestion groupée -->
+    @if($selectedRdvIds && count($selectedRdvIds) > 0)
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-check-circle text-blue-600 text-lg"></i>
+                    <span class="text-blue-800 font-medium">
+                        {{ count($selectedRdvIds) }} rendez-vous sélectionné(s)
+                    </span>
+                </div>
+                <button wire:click="openBulkEditModal" 
+                        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                    <i class="fas fa-edit mr-2"></i>
+                    Modifier en masse
+                </button>
+            </div>
+        </div>
+    @endif
+
     <!-- Liste des rendez-vous -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200 bg-primary">
@@ -117,6 +140,12 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th scope="col" class="px-3 py-3 text-center">
+                            <input type="checkbox" 
+                                   wire:model="selectAll" 
+                                   wire:click="toggleSelectAll"
+                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                         <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure</th>
@@ -130,6 +159,12 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($rendezVous as $rdv)
                         <tr class="hover:bg-gray-50">
+                            <td class="px-3 py-4 whitespace-nowrap text-center">
+                                <input type="checkbox" 
+                                       wire:model="selectedRdvIds" 
+                                       value="{{ $rdv->IDRdv }}"
+                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
                             </td>
@@ -227,7 +262,6 @@
                                     @endswitch
                                 </span>
                             </td>
-                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 @if($canManageRdv)
                                     <div class="flex space-x-1">
@@ -251,7 +285,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                 Aucun rendez-vous à venir
                             </td>
                         </tr>
@@ -265,6 +299,140 @@
             {{ $rendezVous->links() }}
         </div>
     </div>
+
+    <!-- Modal de modification groupée -->
+    @if($showBulkEditModal)
+        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-0 relative modal-container animate-modal-fade-in">
+                <!-- Header du modal -->
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
+                    <div class="flex items-center">
+                        <i class="fas fa-edit header-icon"></i>
+                        <h2 class="text-xl font-bold text-primary">Modification groupée des rendez-vous</h2>
+                    </div>
+                    <button wire:click="closeBulkEditModal" class="text-gray-500 hover:text-primary text-2xl flex items-center gap-2 modal-close-button fixed top-4 right-4 z-20 bg-white rounded-full p-2 shadow-lg animate-close-button-appear">
+                        <i class="fas fa-times"></i> <span class="text-base font-medium">Fermer</span>
+                    </button>
+                </div>
+                
+                <!-- Contenu du modal -->
+                <div class="p-6 modal-body pt-16">
+                    <div class="mb-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                                <span class="text-blue-800 text-sm">
+                                    {{ count($selectedRdvIds) }} rendez-vous sélectionné(s) pour modification
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form wire:submit.prevent="updateBulkRdv">
+                        <!-- Nouvelle date -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar mr-2"></i>
+                                Nouvelle date de rendez-vous
+                            </label>
+                            <input type="date" 
+                                   wire:model="bulkEditData.newDate" 
+                                   min="{{ date('Y-m-d') }}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   required>
+                        </div>
+
+                        <!-- Heure de début -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-clock mr-2"></i>
+                                Heure de début
+                            </label>
+                            <input type="time" 
+                                   wire:model="bulkEditData.startTime" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   required>
+                        </div>
+
+                        <!-- Intervalle entre les rendez-vous -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-stopwatch mr-2"></i>
+                                Intervalle entre les rendez-vous
+                            </label>
+                            <select wire:model="bulkEditData.interval" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="15">15 minutes</option>
+                                <option value="20">20 minutes</option>
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">1 heure</option>
+                            </select>
+                        </div>
+
+                        <!-- Aperçu des horaires -->
+                        @if($bulkEditData['newDate'] && $bulkEditData['startTime'])
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-list mr-2"></i>
+                                    Aperçu des horaires et ordre
+                                </label>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-40 overflow-y-auto">
+                                    @php
+                                        $currentTime = \Carbon\Carbon::parse($bulkEditData['newDate'] . ' ' . $bulkEditData['startTime']);
+                                        $interval = (int)($bulkEditData['interval'] ?? 15);
+                                        $lastOrderNumber = \App\Models\Rendezvou::whereDate('dtPrevuRDV', $bulkEditData['newDate'])
+                                            ->where('fkidcabinet', Auth::user()->fkidcabinet)
+                                            ->max('OrdreRDV') ?? 0;
+                                        $orderNumber = 1;
+                                    @endphp
+                                    @foreach($selectedRdvIds as $index => $rdvId)
+                                        <div class="flex items-center justify-between py-1 {{ $index > 0 ? 'border-t border-gray-200' : '' }}">
+                                            <div class="flex items-center gap-3">
+                                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
+                                                    {{ str_pad($lastOrderNumber + $orderNumber, 2, '0', STR_PAD_LEFT) }}
+                                                </span>
+                                                <span class="text-sm text-gray-600">RDV #{{ $rdvId }}</span>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-900">
+                                                {{ $currentTime->format('H:i') }}
+                                            </span>
+                                        </div>
+                                        @php
+                                            $currentTime->addMinutes($interval);
+                                            $orderNumber++;
+                                        @endphp
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Boutons d'action -->
+                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                            <button type="button" 
+                                    wire:click="closeBulkEditModal"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Annuler
+                            </button>
+                            <button type="submit" 
+                                    wire:loading.attr="disabled"
+                                    wire:loading.class="opacity-50 cursor-not-allowed"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <span wire:loading.remove wire:target="updateBulkRdv">
+                                    <i class="fas fa-save mr-2"></i>
+                                    Mettre à jour
+                                </span>
+                                <span wire:loading wire:target="updateBulkRdv" class="flex items-center">
+                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Mise à jour...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 
          <!-- Messages de notification -->
      @if (session()->has('message'))

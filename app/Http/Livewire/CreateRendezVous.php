@@ -43,10 +43,20 @@ class CreateRendezVous extends Component
     // Propriété pour empêcher la fermeture du modal
     public $keepModalOpen = true;
 
+    // Propriétés pour la gestion groupée
+    public $selectedRdvIds = [];
+    public $selectAll = false;
+    public $showBulkEditModal = false;
+    public $bulkEditData = [
+        'newDate' => '',
+        'startTime' => '',
+        'interval' => 15
+    ];
+
     protected $rules = [
         'patient_id' => 'required',
         'medecin_id' => 'required',
-        'date_rdv' => 'required|date',
+        'date_rdv' => 'required|date|after_or_equal:today',
         'heure_rdv' => 'required',
         'acte_prevu' => 'required|min:3',
         'rdv_confirmer' => 'required'
@@ -57,6 +67,7 @@ class CreateRendezVous extends Component
         'medecin_id.required' => 'Le médecin est requis',
         'date_rdv.required' => 'La date est requise',
         'date_rdv.date' => 'La date n\'est pas valide',
+        'date_rdv.after_or_equal' => 'La date ne peut pas être antérieure à aujourd\'hui',
         'heure_rdv.required' => 'L\'heure est requise',
         'acte_prevu.required' => 'L\'acte prévu est requis',
         'acte_prevu.min' => 'L\'acte prévu doit contenir au moins 3 caractères',
@@ -134,6 +145,159 @@ class CreateRendezVous extends Component
         }
     }
 
+    // Méthodes pour la gestion des cases à cocher
+    public function toggleSelectAll()
+    {
+        if ($this->selectAll) {
+            // Sélectionner tous les RDV de la page courante
+            $this->selectedRdvIds = $this->getCurrentPageRdvIds();
+        } else {
+            // Désélectionner tous
+            $this->selectedRdvIds = [];
+        }
+    }
+
+    public function updatedSelectedRdvIds()
+    {
+        // Mettre à jour l'état de "sélectionner tout"
+        $currentPageIds = $this->getCurrentPageRdvIds();
+        $this->selectAll = !empty($currentPageIds) && 
+                          count(array_intersect($this->selectedRdvIds, $currentPageIds)) === count($currentPageIds);
+    }
+
+    protected function getCurrentPageRdvIds()
+    {
+        $query = Rendezvou::select('IDRdv')
+            ->orderBy('dtPrevuRDV', 'desc')
+            ->orderBy('HeureRdv', 'desc');
+
+        // Appliquer les mêmes filtres que dans render()
+        if ($this->medecin_id) {
+            $query->where('fkidMedecin', $this->medecin_id);
+        }
+        if ($this->date_rdv) {
+            $query->whereDate('dtPrevuRDV', $this->date_rdv);
+        }
+        if ($this->isDocteur) {
+            $query->where('fkidMedecin', Auth::user()->fkidmedecin);
+        }
+
+        return $query->pluck('IDRdv')->toArray();
+    }
+
+    // Méthodes pour le modal de modification groupée
+    public function openBulkEditModal()
+    {
+        if (empty($this->selectedRdvIds)) {
+            session()->flash('error', 'Veuillez sélectionner au moins un rendez-vous.');
+            return;
+        }
+
+        // Initialiser les données par défaut
+        $this->bulkEditData = [
+            'newDate' => now()->addDay()->format('Y-m-d'),
+            'startTime' => '09:00',
+            'interval' => 15
+        ];
+
+        $this->showBulkEditModal = true;
+    }
+
+    public function closeBulkEditModal()
+    {
+        $this->showBulkEditModal = false;
+        $this->bulkEditData = [
+            'newDate' => '',
+            'startTime' => '',
+            'interval' => 15
+        ];
+    }
+
+    public function updateBulkRdv()
+    {
+        // Validation
+        if (empty($this->selectedRdvIds)) {
+            session()->flash('error', 'Aucun rendez-vous sélectionné.');
+            return;
+        }
+
+        if (empty($this->bulkEditData['newDate']) || empty($this->bulkEditData['startTime'])) {
+            session()->flash('error', 'Veuillez remplir tous les champs obligatoires.');
+            return;
+        }
+
+        // Validation de la date
+        $selectedDate = Carbon::parse($this->bulkEditData['newDate']);
+        $today = Carbon::today();
+        
+        if ($selectedDate->lt($today)) {
+            session()->flash('error', 'La date ne peut pas être antérieure à aujourd\'hui.');
+            return;
+        }
+
+        try {
+            // Utiliser une transaction pour garantir la cohérence
+            \DB::beginTransaction();
+            
+            $currentTime = Carbon::parse($this->bulkEditData['newDate'] . ' ' . $this->bulkEditData['startTime']);
+            $interval = (int)($this->bulkEditData['interval'] ?? 15);
+            $updatedCount = 0;
+            $orderNumber = 1; // Commencer à 1 pour les nouveaux RDV
+
+            // Récupérer le dernier numéro d'ordre existant pour cette date et ce médecin
+            $lastOrderNumber = Rendezvou::whereDate('dtPrevuRDV', $this->bulkEditData['newDate'])
+                ->where('fkidcabinet', Auth::user()->fkidcabinet)
+                ->max('OrdreRDV') ?? 0;
+
+            foreach ($this->selectedRdvIds as $rdvId) {
+                $rdv = Rendezvou::find($rdvId);
+                
+                if ($rdv && $rdv->fkidcabinet == Auth::user()->fkidcabinet) {
+                    // Vérifier les permissions
+                    if ($this->isDocteur && !$this->canViewAllRdv && $rdv->fkidMedecin != Auth::user()->fkidmedecin) {
+                        continue; // Ignorer les RDV d'autres médecins
+                    }
+
+                    // Calculer le nouveau numéro d'ordre
+                    $newOrderNumber = $lastOrderNumber + $orderNumber;
+
+                    $rdv->update([
+                        'dtPrevuRDV' => $currentTime->format('Y-m-d'),
+                        'HeureRdv' => $currentTime->format('H:i:s'),
+                        'rdvConfirmer' => 'En Attente', // Réinitialiser le statut
+                        'OrdreRDV' => $newOrderNumber // Attribuer le nouveau numéro d'ordre
+                    ]);
+
+                    $updatedCount++;
+                    $orderNumber++;
+                    $currentTime->addMinutes($interval);
+                }
+            }
+
+            \DB::commit();
+
+            if ($updatedCount > 0) {
+                session()->flash('message', "{$updatedCount} rendez-vous mis à jour avec succès.");
+                
+                // Vider la sélection
+                $this->selectedRdvIds = [];
+                $this->selectAll = false;
+                
+                // Fermer le modal
+                $this->closeBulkEditModal();
+                
+                // Rafraîchir la page
+                $this->resetPage();
+            } else {
+                session()->flash('error', 'Aucun rendez-vous n\'a pu être mis à jour.');
+            }
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            session()->flash('error', 'Erreur lors de la mise à jour: ' . $e->getMessage());
+        }
+    }
+
     public function createRendezVous()
     {
         $this->validate();
@@ -190,11 +354,13 @@ class CreateRendezVous extends Component
     public function updatedDateRdv($value)
     {
         $this->resetPage();
+        $this->selectedRdvIds = []; // Réinitialiser la sélection lors du changement de filtre
     }
 
     public function updatedMedecinId($value)
     {
         $this->resetPage();
+        $this->selectedRdvIds = []; // Réinitialiser la sélection lors du changement de filtre
     }
 
     // Suppression de la logique de recherche dupliquée - maintenant gérée par le composant PatientSearch

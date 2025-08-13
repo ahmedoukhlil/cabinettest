@@ -10,6 +10,7 @@ use App\Models\Medecin;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\QrCodeHelper;
+use Illuminate\Support\Facades\Cache;
 
 class RdvReminders extends Component
 {
@@ -28,6 +29,9 @@ class RdvReminders extends Component
 
     // Propriétés pour les médecins
     public $medecins = [];
+
+    // Propriété pour suivre les rappels envoyés
+    public $sentReminders = [];
 
     protected $listeners = [
         'refreshReminders' => '$refresh'
@@ -52,10 +56,17 @@ class RdvReminders extends Component
 
     protected function loadMedecins()
     {
-        $this->medecins = Medecin::select('idMedecin', 'Nom')
-            ->where('Masquer', 0)
-            ->orderBy('Nom')
-            ->get();
+        $this->medecins = Cache::remember('medecins_for_reminders_' . Auth::user()->fkidcabinet, 1800, function () {
+            $query = Medecin::select('idMedecin', 'Nom')
+                ->orderBy('Nom');
+            
+            // Filtrer par cabinet si l'utilisateur n'est pas admin
+            if (!Auth::user()->isDocteurProprietaire()) {
+                $query->where('fkidcabinet', Auth::user()->fkidcabinet);
+            }
+            
+            return $query->get();
+        });
     }
 
     public function sendReminder($rdvId)
@@ -96,12 +107,23 @@ class RdvReminders extends Component
                 'rdvTime' => Carbon::parse($rdv->HeureRdv)->format('H:i')
             ]);
 
-            // Marquer le rappel comme envoyé (optionnel)
+            // Marquer le rappel comme envoyé
             $rdv->update([
                 'rdvConfirmer' => 'Rappel envoyé'
             ]);
 
-            session()->flash('success', 'Rappel WhatsApp envoyé pour ' . $rdv->patient->Prenom . ' ' . $rdv->patient->Nom);
+            // Vérifier si c'est un relancement (le statut était déjà "Rappel envoyé")
+            $wasAlreadySent = $rdv->getOriginal('rdvConfirmer') === 'Rappel envoyé';
+            
+            // Ajouter à la liste des rappels envoyés dans cette session
+            $this->sentReminders[$rdvId] = true;
+
+            // Déterminer le message de succès selon si c'est un premier rappel ou un relancement
+            $successMessage = $wasAlreadySent ? 
+                'Relance WhatsApp envoyée pour ' . $rdv->patient->Prenom . ' ' . $rdv->patient->Nom :
+                'Rappel WhatsApp envoyé pour ' . $rdv->patient->Prenom . ' ' . $rdv->patient->Nom;
+            
+            session()->flash('success', $successMessage);
             
             // Rafraîchir le compteur de rappels
             $this->emit('refreshReminders');
@@ -109,6 +131,15 @@ class RdvReminders extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de l\'envoi du rappel: ' . $e->getMessage());
         }
+    }
+
+    // Méthode pour vérifier si un rappel a été envoyé
+    public function isReminderSent($rdvId)
+    {
+        return isset($this->sentReminders[$rdvId]) || 
+               Rendezvou::where('IDRdv', $rdvId)
+                        ->where('rdvConfirmer', 'Rappel envoyé')
+                        ->exists();
     }
 
     protected function generateReminderMessage($rdv)
@@ -173,10 +204,16 @@ class RdvReminders extends Component
 
     public function render()
     {
-        $query = Rendezvou::with(['patient', 'medecin'])
-            ->where('rdvConfirmer', '!=', 'Terminé')
-            ->where('rdvConfirmer', '!=', 'Annulé')
-            ->where('rdvConfirmer', '!=', 'Rappel envoyé'); // Exclure les RDV qui ont déjà reçu un rappel
+        $query = Rendezvou::with([
+            'patient:id,ID,Nom,Prenom,Telephone1,Telephone2',
+            'medecin:idMedecin,Nom'
+        ])
+        ->select([
+            'IDRdv', 'dtPrevuRDV', 'HeureRdv', 'OrdreRDV', 
+            'ActePrevu', 'rdvConfirmer', 'fkidPatient', 'fkidMedecin', 'fkidcabinet'
+        ])
+        ->where('rdvConfirmer', '!=', 'Terminé')
+        ->where('rdvConfirmer', '!=', 'Annulé');
 
         // Filtrer par date
         if ($this->dateFilter) {
@@ -196,20 +233,23 @@ class RdvReminders extends Component
         // Filtrer par cabinet
         $query->where('fkidcabinet', Auth::user()->fkidcabinet);
 
-        // Recherche par patient
+        // Recherche par patient - optimisée avec index
         if ($this->searchPatient) {
-            $query->whereHas('patient', function($q) {
-                $q->where('Nom', 'like', '%' . $this->searchPatient . '%')
-                  ->orWhere('Prenom', 'like', '%' . $this->searchPatient . '%')
-                  ->orWhere('Telephone1', 'like', '%' . $this->searchPatient . '%');
+            $searchTerm = '%' . $this->searchPatient . '%';
+            $query->whereHas('patient', function($q) use ($searchTerm) {
+                $q->where(function($subQuery) use ($searchTerm) {
+                    $subQuery->where('Nom', 'like', $searchTerm)
+                             ->orWhere('Prenom', 'like', $searchTerm)
+                             ->orWhere('Telephone1', 'like', $searchTerm);
+                });
             });
         }
 
-        // Trier par date et heure
+        // Trier par date et heure avec index
         $query->orderBy('dtPrevuRDV', 'asc')
               ->orderBy('HeureRdv', 'asc');
 
-        $rendezVous = $query->paginate(10);
+        $rendezVous = $query->paginate(15); // Augmenter légèrement pour réduire les requêtes
 
         return view('livewire.rdv-reminders', [
             'rendezVous' => $rendezVous

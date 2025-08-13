@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Animations CSS -->
+    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
     @livewireStyles
     <style>
         .text-primary { color: #1e3a8a !important; }
@@ -22,6 +24,114 @@
         /* Masquer les spinners globaux de Livewire */
         [wire\:loading], [wire\:loading\.delay], [wire\:loading\.inline-block], [wire\:loading\.inline] {
             display: none !important;
+        }
+
+        /* Animations personnalisées pour les transitions de menu */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOutUp {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(30, 58, 138, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(30, 58, 138, 0.6);
+            }
+        }
+
+        /* Classes d'animation utilitaires */
+        .animate-slide-in-down {
+            animation: slideInDown 0.7s ease-out;
+        }
+
+        .animate-slide-out-up {
+            animation: slideOutUp 0.5s ease-in;
+        }
+
+        .animate-fade-in-scale {
+            animation: fadeInScale 0.6s ease-out;
+        }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        /* Transitions fluides pour les boutons */
+        .menu-button {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .menu-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Effet de ripple pour les boutons */
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Optimisations pour les transitions Livewire */
+        .livewire-transition {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Amélioration des performances de rendu */
+        .gpu-accelerated {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000px;
         }
     </style>
 </head>

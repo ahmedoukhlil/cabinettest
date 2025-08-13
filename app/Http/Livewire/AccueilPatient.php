@@ -120,9 +120,10 @@ class AccueilPatient extends Component
     private function loadCachedData()
     {
         $this->medecins = Cache::remember(self::CACHE_KEY_DOCTORS, self::CACHE_TTL, function () {
-            $query = User::whereHas('typeuser', function ($query) {
-                $query->whereIn('Libelle', ['Docteur Propriétaire', 'Docteur']);
-            })->where('ismasquer', 0);
+            $query = User::select(['Iduser', 'NomComplet', 'fkidmedecin', 'fkidcabinet'])
+                ->whereHas('typeuser', function ($query) {
+                    $query->whereIn('Libelle', ['Docteur Propriétaire', 'Docteur']);
+                })->where('ismasquer', 0);
 
             if ($this->isDocteur) {
                 $query->where('Iduser', Auth::id());
@@ -132,20 +133,21 @@ class AccueilPatient extends Component
         });
 
         $this->assureurs = Cache::remember(self::CACHE_KEY_ASSUREURS, self::CACHE_TTL, function () {
-            return Assureur::all();
+            return Assureur::select(['IDAssureur', 'LibAssurance', 'TauxdePEC', 'SeuilDevis'])->get();
         });
 
         $this->typesPaiement = Cache::remember(self::CACHE_KEY_PAYMENT_TYPES, self::CACHE_TTL, function () {
-            return RefTypePaiement::all();
+            return RefTypePaiement::select(['idtypepaie', 'LibPaie'])->get();
         });
     }
 
     private function preloadActes()
     {
         return Cache::remember(self::CACHE_KEY_ACTES, self::CACHE_TTL, function () {
-            return Acte::where('Masquer', 0)
-                      ->orderBy('nordre')
-                      ->get();
+            return Acte::select(['ID', 'Acte', 'PrixRef', 'nordre', 'Masquer'])
+                       ->where('Masquer', 0)
+                       ->orderBy('nordre')
+                       ->get();
         });
     }
 
@@ -401,6 +403,10 @@ class AccueilPatient extends Component
         if ($this->showCabinetMenu) {
             $this->closeAllSections();
             $this->showCabinetMenu = true;
+            // Ajouter un délai pour l'animation
+            $this->dispatchBrowserEvent('menu-opened', ['menu' => 'cabinet']);
+        } else {
+            $this->dispatchBrowserEvent('menu-closed', ['menu' => 'cabinet']);
         }
     }
 
@@ -415,25 +421,34 @@ class AccueilPatient extends Component
         if ($this->showPatientMenu) {
             $this->closeAllSections();
             $this->showPatientMenu = true;
+            // Ajouter un délai pour l'animation
+            $this->dispatchBrowserEvent('menu-opened', ['menu' => 'patient']);
+        } else {
+            $this->dispatchBrowserEvent('menu-closed', ['menu' => 'patient']);
         }
     }
 
     public function calculateRdvRemindersCount()
     {
         try {
-            $query = \App\Models\Rendezvou::where('rdvConfirmer', '!=', 'Terminé')
-                ->where('rdvConfirmer', '!=', 'Annulé')
-                ->where('rdvConfirmer', '!=', 'Rappel envoyé') // Exclure les RDV qui ont déjà reçu un rappel
-                ->where('fkidcabinet', Auth::user()->fkidcabinet);
+            // Utiliser le cache pour le compteur de rappels (5 minutes)
+            $cacheKey = 'rdv_reminders_count_' . Auth::id() . '_' . now()->format('Y-m-d');
+            
+            $this->rdvRemindersCount = Cache::remember($cacheKey, 300, function () {
+                $query = \App\Models\Rendezvou::select('IDRdv')
+                    ->where('rdvConfirmer', '!=', 'Terminé')
+                    ->where('rdvConfirmer', '!=', 'Annulé')
+                    ->where('fkidcabinet', Auth::user()->fkidcabinet);
 
-            // Si c'est un docteur simple, ne compter que ses rendez-vous
-            if ($this->isDocteur && !$this->canViewAllRdv) {
-                $query->where('fkidMedecin', Auth::user()->fkidmedecin);
-            }
+                // Si c'est un docteur simple, ne compter que ses rendez-vous
+                if ($this->isDocteur && !$this->canViewAllRdv) {
+                    $query->where('fkidMedecin', Auth::user()->fkidmedecin);
+                }
 
-            // Compter les RDV de demain par défaut
-            $tomorrow = now()->addDay()->format('Y-m-d');
-            $this->rdvRemindersCount = $query->whereDate('dtPrevuRDV', $tomorrow)->count();
+                // Compter les RDV de demain par défaut
+                $tomorrow = now()->addDay()->format('Y-m-d');
+                return $query->whereDate('dtPrevuRDV', $tomorrow)->count();
+            });
         } catch (\Exception $e) {
             $this->rdvRemindersCount = 0;
         }
