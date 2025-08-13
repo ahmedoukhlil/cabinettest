@@ -1,28 +1,28 @@
-<div class="space-y-6">
-    <div class="p-6 rounded-xl bg-primary text-white shadow-lg z-30 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div class="space-y-4 sm:space-y-6">
+    <div class="p-4 sm:p-6 rounded-xl bg-primary text-white shadow-lg z-30 flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
         <div>
-        <h2 class="text-2xl font-bold">Nouveau Rendez-vous</h2>
-        <p class="text-primary-light mt-1">Planifiez un nouveau rendez-vous pour le patient sélectionné</p>
+        <h2 class="text-xl sm:text-2xl font-bold">Nouveau Rendez-vous</h2>
+        <p class="text-primary-light mt-1 text-sm sm:text-base">Planifiez un nouveau rendez-vous pour le patient sélectionné</p>
         </div>
         <div class="flex items-center gap-2 mt-4 md:mt-0">
-            <span class="text-lg font-semibold">Rdv aujourd'hui :</span>
-            <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white text-primary font-bold text-lg shadow">{{ $totalRdvJour }}</span>
+            <span class="text-base sm:text-lg font-semibold">Rdv aujourd'hui :</span>
+            <span class="inline-flex items-center justify-center px-2 sm:px-3 py-1 rounded-full bg-white text-primary font-bold text-base sm:text-lg shadow">{{ $totalRdvJour }}</span>
         </div>
     </div>
 
     <!-- Debug: selectedPatient = {{ var_dump($selectedPatient) }} -->
     <!-- Patient sélectionné -->
     @if($selectedPatient)
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div class="flex items-center justify-between">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="flex items-center">
-                    <i class="fas fa-user text-blue-600 mr-3"></i>
+                    <i class="fas fa-user text-blue-600 mr-2 sm:mr-3"></i>
                     <div>
-                        <p class="text-sm text-blue-600 font-medium">Patient sélectionné</p>
-                        <p class="text-lg font-semibold text-gray-900">{{ $selectedPatient['Nom'] ?? '' }} {{ $selectedPatient['Prenom'] ?? '' }}</p>
+                        <p class="text-xs sm:text-sm text-blue-600 font-medium">Patient sélectionné</p>
+                        <p class="text-base sm:text-lg font-semibold text-gray-900">{{ $selectedPatient['Nom'] ?? '' }} {{ $selectedPatient['Prenom'] ?? '' }}</p>
                     </div>
                 </div>
-                <button type="button" wire:click="handlePatientCleared" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                <button type="button" wire:click="handlePatientCleared" class="text-red-600 hover:text-red-800 text-sm font-medium self-start sm:self-auto">
                     <i class="fas fa-times mr-1"></i>Changer
                 </button>
             </div>
@@ -30,10 +30,10 @@
     @endif
 
     <!-- Formulaire de création -->
-    <form wire:submit.prevent="createRendezVous" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <form wire:submit.prevent="createRendezVous" class="space-y-4 sm:space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 form-grid">
             <!-- Recherche de patient -->
-            <div class="space-y-2">
+            <div class="space-y-2 sm:col-span-1 lg:col-span-1">
                 <label class="block text-sm font-medium text-gray-700">
                     Rechercher un patient
                     <span class="text-xs text-gray-500 ml-1">(Alt+P)</span>
@@ -54,7 +54,7 @@
                 </select>
                 @error('medecin_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 @if($isDocteur)
-                    <p class="mt-1 text-sm text-gray-500">Vous ne pouvez créer des rendez-vous que pour vous-même</p>
+                    <p class="mt-1 text-xs sm:text-sm text-gray-500">Vous ne pouvez créer des rendez-vous que pour vous-même</p>
                 @endif
             </div>
 
@@ -77,7 +77,7 @@
             </div>
 
             <!-- Acte prévu -->
-            <div>
+            <div class="sm:col-span-2 lg:col-span-1">
                 <label for="acte_prevu" class="block text-sm font-medium text-gray-700">Acte prévu</label>
                 <input type="text" wire:model="acte_prevu" id="acte_prevu" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ex: Consultation, Détartrage...">
                 @error('acte_prevu') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -101,7 +101,7 @@
             <button type="submit" 
                     wire:loading.attr="disabled" 
                     wire:loading.class="opacity-50 cursor-not-allowed"
-                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    class="inline-flex items-center px-3 sm:px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button">
                 <i class="fas fa-plus mr-2"></i>
                 <span wire:loading.remove wire:target="createRendezVous">Créer le rendez-vous</span>
                 <span wire:loading wire:target="createRendezVous" class="flex items-center">
@@ -114,16 +114,16 @@
 
     <!-- Bouton de gestion groupée -->
     @if($selectedRdvIds && count($selectedRdvIds) > 0)
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <i class="fas fa-check-circle text-blue-600 text-lg"></i>
-                    <span class="text-blue-800 font-medium">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <i class="fas fa-check-circle text-blue-600 text-base sm:text-lg"></i>
+                    <span class="text-blue-800 font-medium text-sm sm:text-base">
                         {{ count($selectedRdvIds) }} rendez-vous sélectionné(s)
                     </span>
                 </div>
                 <button wire:click="openBulkEditModal" 
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                        class="inline-flex items-center px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors touch-friendly-button">
                     <i class="fas fa-edit mr-2"></i>
                     Modifier en masse
                 </button>
@@ -132,70 +132,90 @@
     @endif
 
     <!-- Liste des rendez-vous -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div class="px-6 py-4 border-b border-gray-200 bg-primary">
-            <h3 class="text-lg font-medium text-white">Liste des rendez-vous</h3>
+        <div class="mt-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Liste des rendez-vous</h3>
+                @if(!empty($selectedRdvIds))
+                    <button wire:click="openBulkEditModal" class="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <i class="fas fa-edit"></i>
+                        <span class="hidden xs:inline">Modifier en masse</span>
+                        <span class="xs:hidden">Modifier</span>
+                        <span class="bg-white text-blue-600 rounded-full px-2 py-0.5 text-xs font-bold">{{ count($selectedRdvIds) }}</span>
+                    </button>
+                @endif
         </div>
-        <div class="overflow-x-auto">
+
+            <div class="table-responsive overflow-x-auto bg-white rounded-lg shadow">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-3 py-3 text-center">
-                            <input type="checkbox" 
-                                   wire:model="selectAll" 
-                                   wire:click="toggleSelectAll"
-                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médecin</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acte prévu</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-center">
+                                <input type="checkbox" wire:model="selectAll" wire:click="toggleSelectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden sm:inline">Patient</span>
+                                <span class="sm:hidden">Pat.</span>
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden sm:inline">Médecin</span>
+                                <span class="sm:hidden">Méd.</span>
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden xs:inline">Date</span>
+                                <span class="xs:hidden">D.</span>
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden xs:inline">Heure</span>
+                                <span class="xs:hidden">H.</span>
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden sm:inline">Acte prévu</span>
+                                <span class="sm:hidden">Acte</span>
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden sm:inline">Statut</span>
+                                <span class="sm:hidden">Stat.</span>
+                            </th>
+                            <th scope="col" class="px-3 sm:px-6 py-3 text-center text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                <span class="hidden sm:inline">Actions</span>
+                                <span class="sm:hidden">Act.</span>
+                            </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($rendezVous as $rdv)
                         <tr class="hover:bg-gray-50">
-                            <td class="px-3 py-4 whitespace-nowrap text-center">
-                                <input type="checkbox" 
-                                       wire:model="selectedRdvIds" 
-                                       value="{{ $rdv->IDRdv }}"
-                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-center">
+                                    <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                </td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm sm:text-base font-medium text-gray-900">
+                                        {{ $rdv->patient->Nom ?? 'N/A' }}
+                                    </div>
+                                    @if(!empty($rdv->patient->Telephone1))
+                                        <div class="text-xs sm:text-sm text-gray-500">
+                                            {{ $rdv->patient->Telephone1 }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm sm:text-base text-gray-900">
+                                        Dr. {{ $rdv->medecin->Nom ?? 'N/A' }}
+                                    </div>
+                                </td>
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm sm:text-base text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                @if($rdv->OrdreRDV)
-                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
-                                        {{ str_pad($rdv->OrdreRDV, 2, '0', STR_PAD_LEFT) }}
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-gray-500 rounded-full min-w-[2rem]">
-                                        {{ str_pad($rdv->IDRdv, 2, '0', STR_PAD_LEFT) }}
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm sm:text-base text-gray-900">
                                 {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $rdv->patient->Prenom ?? 'Patient inconnu' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                Dr. {{ $rdv->medecin->Nom ?? 'Non assigné' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td class="px-3 sm:px-6 py-4">
+                                    <div class="text-sm sm:text-base text-gray-900 max-w-xs truncate" title="{{ $rdv->ActePrevu }}">
                                 {{ $rdv->ActePrevu }}
+                                    </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $statusClass = 'bg-yellow-100 text-yellow-800';
-                                    $statusIcon = 'fas fa-clock';
-                                    
                                     switch($rdv->rdvConfirmer) {
                                         case 'En Attente':
                                         case 'En attente':
@@ -232,50 +252,61 @@
                                     }
                                 @endphp
                                 
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusClass }}">
                                     <i class="{{ $statusIcon }} mr-1"></i>
                                     @switch($rdv->rdvConfirmer)
                                         @case('En Attente')
                                         @case('En attente')
-                                            En Attente
+                                                <span class="hidden sm:inline">En Attente</span>
+                                                <span class="sm:hidden">Att.</span>
                                             @break
                                         @case('confirmé')
                                         @case('Confirmé')
-                                            Présent au cabinet
+                                                <span class="hidden sm:inline">Présent au cabinet</span>
+                                                <span class="sm:hidden">Présent</span>
                                             @break
                                         @case('En cours')
-                                            Avec le médecin
+                                                <span class="hidden sm:inline">Avec le médecin</span>
+                                                <span class="sm:hidden">En cours</span>
                                             @break
                                         @case('terminé')
                                         @case('Terminé')
-                                            Terminé
+                                                <span class="hidden sm:inline">Terminé</span>
+                                                <span class="sm:hidden">Term.</span>
                                             @break
                                         @case('annulé')
                                         @case('Annulé')
-                                            Annulé
+                                                <span class="hidden sm:inline">Annulé</span>
+                                                <span class="sm:hidden">Ann.</span>
                                             @break
                                         @case('Consultation')
-                                            Consultation
+                                                <span class="hidden sm:inline">Consultation</span>
+                                                <span class="sm:hidden">Cons.</span>
                                             @break
                                         @default
-                                            En Attente
+                                                <span class="hidden sm:inline">En Attente</span>
+                                                <span class="sm:hidden">Att.</span>
                                     @endswitch
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <td class="px-3 sm:px-6 py-4 whitespace-nowrap text-center">
                                 @if($canManageRdv)
-                                    <div class="flex space-x-1">
-                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Confirmé')" class="inline-flex items-center px-2 py-1 rounded bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400" title="Patient présent au cabinet">
+                                        <div class="flex flex-col sm:flex-row gap-1 sm:space-x-1">
+                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Confirmé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 touch-friendly" title="Patient présent au cabinet">
                                             <i class="fas fa-user-check"></i>
+                                                <span class="hidden sm:inline ml-1">Présent</span>
                                         </button>
-                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'En cours')" class="inline-flex items-center px-2 py-1 rounded bg-green-500 text-white text-xs font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400" title="Avec le médecin">
+                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'En cours')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-green-500 text-white text-xs font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 touch-friendly" title="Avec le médecin">
                                             <i class="fas fa-user-md"></i>
+                                                <span class="hidden sm:inline ml-1">En cours</span>
                                         </button>
-                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Terminé')" class="inline-flex items-center px-2 py-1 rounded bg-gray-500 text-white text-xs font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400" title="Terminé">
+                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Terminé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-gray-500 text-white text-xs font-semibold hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 touch-friendly" title="Terminé">
                                             <i class="fas fa-check-double"></i>
+                                                <span class="hidden sm:inline ml-1">Terminé</span>
                                         </button>
-                                        <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Annulé')" class="inline-flex items-center px-2 py-1 rounded bg-red-500 text-white text-xs font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" title="Annulé">
+                                            <button type="button" wire:click="changerStatutRendezVous({{ $rdv->IDRdv }}, 'Annulé')" class="inline-flex items-center justify-center px-2 py-1 rounded bg-red-500 text-white text-xs font-semibold hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 touch-friendly" title="Annulé">
                                             <i class="fas fa-times"></i>
+                                                <span class="hidden sm:inline ml-1">Annulé</span>
                                         </button>
                                     </div>
                                 @else
@@ -285,7 +316,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                <td colspan="9" class="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                                 Aucun rendez-vous à venir
                             </td>
                         </tr>
@@ -295,140 +326,149 @@
         </div>
 
         <!-- Pagination -->
-        <div class="px-6 py-4 border-t border-gray-200">
+            <div class="px-3 sm:px-6 py-4 border-t border-gray-200">
             {{ $rendezVous->links() }}
         </div>
     </div>
 
     <!-- Modal de modification groupée -->
     @if($showBulkEditModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-0 relative modal-container animate-modal-fade-in">
-                <!-- Header du modal -->
-                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10">
-                    <div class="flex items-center">
-                        <i class="fas fa-edit header-icon"></i>
-                        <h2 class="text-xl font-bold text-primary">Modification groupée des rendez-vous</h2>
-                    </div>
-                    <button wire:click="closeBulkEditModal" class="text-gray-500 hover:text-primary text-2xl flex items-center gap-2 modal-close-button fixed top-4 right-4 z-20 bg-white rounded-full p-2 shadow-lg animate-close-button-appear">
-                        <i class="fas fa-times"></i> <span class="text-base font-medium">Fermer</span>
-                    </button>
+        <div class="fixed inset-0 z-50 overflow-y-auto modal-backdrop animate-backdrop-fade-in" 
+             x-data="{ show: true }" 
+             x-show="show" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75 backdrop-blur-sm"></div>
                 </div>
-                
-                <!-- Contenu du modal -->
-                <div class="p-6 modal-body pt-16">
-                    <div class="mb-6">
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                                <span class="text-blue-800 text-sm">
-                                    {{ count($selectedRdvIds) }} rendez-vous sélectionné(s) pour modification
-                                </span>
-                            </div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-2xl modal-content animate-modal-fade-in"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95 translate-y-4"
+                     x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 transform scale-95 translate-y-4">
+                    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <i class="fas fa-edit header-icon text-white text-lg sm:text-xl"></i>
+                            <h2 class="text-lg sm:text-xl font-bold text-white">Modification groupée des rendez-vous</h2>
                         </div>
+                        <button wire:click="closeBulkEditModal" 
+                                class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
+                            <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
+                        </button>
                     </div>
-
-                    <form wire:submit.prevent="updateBulkRdv">
-                        <!-- Nouvelle date -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-calendar mr-2"></i>
-                                Nouvelle date de rendez-vous
-                            </label>
-                            <input type="date" 
-                                   wire:model="bulkEditData.newDate" 
-                                   min="{{ date('Y-m-d') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   required>
-                        </div>
-
-                        <!-- Heure de début -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-clock mr-2"></i>
-                                Heure de début
-                            </label>
-                            <input type="time" 
-                                   wire:model="bulkEditData.startTime" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                   required>
-                        </div>
-
-                        <!-- Intervalle entre les rendez-vous -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-stopwatch mr-2"></i>
-                                Intervalle entre les rendez-vous
-                            </label>
-                            <select wire:model="bulkEditData.interval" 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="15">15 minutes</option>
-                                <option value="20">20 minutes</option>
-                                <option value="30">30 minutes</option>
-                                <option value="45">45 minutes</option>
-                                <option value="60">1 heure</option>
-                            </select>
-                        </div>
-
-                        <!-- Aperçu des horaires -->
-                        @if($bulkEditData['newDate'] && $bulkEditData['startTime'])
-                            <div class="mb-6">
+                    
+                    <div class="px-3 sm:px-4 md:px-6 pt-4 sm:pt-5 pb-4 sm:pb-4 modal-body pt-12 sm:pt-16 animate-modal-content-slide-in">
+                        <form wire:submit.prevent="updateBulkRdv" class="space-y-4 sm:space-y-6">
+                            <!-- Nouvelle date -->
+                            <div class="mb-4 animate-speed-fade-in" style="animation-delay: 0.1s;">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-list mr-2"></i>
-                                    Aperçu des horaires et ordre
+                                    <i class="fas fa-calendar mr-2 text-blue-600"></i>
+                                    Nouvelle date de rendez-vous
                                 </label>
-                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-40 overflow-y-auto">
-                                    @php
-                                        $currentTime = \Carbon\Carbon::parse($bulkEditData['newDate'] . ' ' . $bulkEditData['startTime']);
-                                        $interval = (int)($bulkEditData['interval'] ?? 15);
-                                        $lastOrderNumber = \App\Models\Rendezvou::whereDate('dtPrevuRDV', $bulkEditData['newDate'])
-                                            ->where('fkidcabinet', Auth::user()->fkidcabinet)
-                                            ->max('OrdreRDV') ?? 0;
-                                        $orderNumber = 1;
-                                    @endphp
-                                    @foreach($selectedRdvIds as $index => $rdvId)
-                                        <div class="flex items-center justify-between py-1 {{ $index > 0 ? 'border-t border-gray-200' : '' }}">
-                                            <div class="flex items-center gap-3">
-                                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
-                                                    {{ str_pad($lastOrderNumber + $orderNumber, 2, '0', STR_PAD_LEFT) }}
-                                                </span>
-                                                <span class="text-sm text-gray-600">RDV #{{ $rdvId }}</span>
-                                            </div>
-                                            <span class="text-sm font-medium text-gray-900">
-                                                {{ $currentTime->format('H:i') }}
-                                            </span>
-                                        </div>
-                                        @php
-                                            $currentTime->addMinutes($interval);
-                                            $orderNumber++;
-                                        @endphp
-                                    @endforeach
-                                </div>
+                                <input type="date" 
+                                       wire:model="bulkEditData.newDate" 
+                                       min="{{ date('Y-m-d') }}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 speed-transition-fast speed-focus"
+                                       required>
                             </div>
-                        @endif
 
-                        <!-- Boutons d'action -->
-                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
-                            <button type="button" 
-                                    wire:click="closeBulkEditModal"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Annuler
-                            </button>
-                            <button type="submit" 
-                                    wire:loading.attr="disabled"
-                                    wire:loading.class="opacity-50 cursor-not-allowed"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <span wire:loading.remove wire:target="updateBulkRdv">
-                                    <i class="fas fa-save mr-2"></i>
-                                    Mettre à jour
-                                </span>
-                                <span wire:loading wire:target="updateBulkRdv" class="flex items-center">
-                                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                    Mise à jour...
-                                </span>
-                            </button>
-                        </div>
-                    </form>
+                            <!-- Heure de début -->
+                            <div class="mb-4 animate-speed-fade-in" style="animation-delay: 0.2s;">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-clock mr-2 text-blue-600"></i>
+                                    Heure de début
+                                </label>
+                                <input type="time" 
+                                       wire:model="bulkEditData.startTime" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 speed-transition-fast speed-focus"
+                                       required>
+                            </div>
+
+                            <!-- Intervalle entre les rendez-vous -->
+                            <div class="mb-4 animate-speed-fade-in" style="animation-delay: 0.3s;">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-stopwatch mr-2 text-blue-600"></i>
+                                    Intervalle entre les rendez-vous (minutes)
+                                </label>
+                                <select wire:model="bulkEditData.interval" 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 speed-transition-fast speed-focus">
+                                    <option value="15">15 minutes</option>
+                                    <option value="20">20 minutes</option>
+                                    <option value="30">30 minutes</option>
+                                    <option value="45">45 minutes</option>
+                                    <option value="60">1 heure</option>
+                                </select>
+                            </div>
+
+                            <!-- Aperçu des horaires -->
+                            @if($bulkEditData['newDate'] && $bulkEditData['startTime'])
+                                <div class="mb-4 sm:mb-6 animate-speed-fade-in" style="animation-delay: 0.4s;">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-list mr-2 text-blue-600"></i>
+                                        Aperçu des horaires et ordre
+                                    </label>
+                                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4 max-h-32 sm:max-h-40 overflow-y-auto speed-transition-fast">
+                                        @php
+                                            $currentTime = \Carbon\Carbon::parse($bulkEditData['newDate'] . ' ' . $bulkEditData['startTime']);
+                                            $interval = (int)($bulkEditData['interval'] ?? 15);
+                                            $lastOrderNumber = \App\Models\Rendezvou::whereDate('dtPrevuRDV', $bulkEditData['newDate'])
+                                                ->where('fkidcabinet', Auth::user()->fkidcabinet)
+                                                ->max('OrdreRDV') ?? 0;
+                                            $orderNumber = 1;
+                                        @endphp
+                                        @foreach($selectedRdvIds as $index => $rdvId)
+                                            <div class="flex items-center justify-between py-1 {{ $index > 0 ? 'border-t border-gray-200' : '' }} animate-speed-slide-in" style="animation-delay: {{ 0.5 + ($index * 0.1) }}s;">
+                                                <div class="flex items-center gap-2 sm:gap-3">
+                                                    <span class="inline-flex items-center justify-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[1.5rem] sm:min-w-[2rem] animate-speed-pulse">
+                                                        {{ str_pad($lastOrderNumber + $orderNumber, 2, '0', STR_PAD_LEFT) }}
+                                                    </span>
+                                                    <span class="text-xs sm:text-sm text-gray-600">RDV #{{ $rdvId }}</span>
+                                                </div>
+                                                <span class="text-xs sm:text-sm font-medium text-gray-900">
+                                                    {{ $currentTime->format('H:i') }}
+                                                </span>
+                                            </div>
+                                            @php
+                                                $currentTime->addMinutes($interval);
+                                                $orderNumber++;
+                                            @endphp
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Boutons d'action -->
+                            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-gray-200 animate-speed-fade-in" style="animation-delay: 0.6s;">
+                                <button type="button" 
+                                        wire:click="closeBulkEditModal"
+                                        class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button speed-transition-fast hover:scale-105">
+                                    <i class="fas fa-times mr-2"></i>
+                                    Annuler
+                                </button>
+                                <button type="submit" 
+                                        wire:loading.attr="disabled"
+                                        wire:loading.class="opacity-50 cursor-not-allowed"
+                                        class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button speed-transition-fast hover:scale-105 speed-glow">
+                                    <span wire:loading.remove wire:target="updateBulkRdv">
+                                        <i class="fas fa-save mr-2"></i>
+                                        Mettre à jour
+                                    </span>
+                                    <span wire:loading wire:target="updateBulkRdv" class="flex items-center">
+                                        <div class="animate-speed-loading rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        Mise à jour...
+                                    </span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -436,11 +476,11 @@
 
          <!-- Messages de notification -->
      @if (session()->has('message'))
-         <div class="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
+        <div class="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-3 sm:px-4 py-2 sm:py-3 rounded shadow-lg text-sm sm:text-base">
              {{ session('message') }}
              @if($showPrintButton)
                  <div class="mt-2">
-                     <button wire:click="printRendezVous" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                    <button wire:click="printRendezVous" class="inline-flex items-center px-2 sm:px-3 py-1 bg-blue-600 text-white text-xs sm:text-sm rounded hover:bg-blue-700 touch-friendly-button">
                          <i class="fas fa-print mr-1"></i>
                          Imprimer le reçu
                      </button>
@@ -450,7 +490,7 @@
      @endif
 
      @if (session()->has('error'))
-         <div class="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg">
+        <div class="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded shadow-lg text-sm sm:text-base">
              {{ session('error') }}
          </div>
      @endif
@@ -476,66 +516,88 @@
             e.stopPropagation();
         }
     });
-    
-    // Raccourcis clavier pour accélérer la navigation
-    document.addEventListener('keydown', function(e) {
-        // Seulement si le modal est ouvert
-        if (!document.querySelector('.modal-content')) return;
-        
-        // Alt + P : Focus sur la recherche de patient
-        if (e.altKey && e.key === 'p') {
-            e.preventDefault();
-            const patientSearch = document.querySelector('input[placeholder*="patient"]');
-            if (patientSearch) patientSearch.focus();
+
+    // Amélioration de l'ouverture du modal de modification RDV
+    document.addEventListener('livewire:load', function() {
+        // Écouter l'ouverture du modal de modification groupée
+        Livewire.hook('message.processed', (message, component) => {
+            if (message.updateQueue.some(update => update.payload && update.payload.showBulkEditModal)) {
+                // Modal de modification groupée ouvert
+                setTimeout(() => {
+                    // Ajouter des effets visuels supplémentaires
+                    const modal = document.querySelector('.modal-content');
+                    if (modal) {
+                        modal.classList.add('animate-speed-zoom');
+                        
+                        // Effet de focus sur le premier champ
+                        const firstInput = modal.querySelector('input[type="date"]');
+                        if (firstInput) {
+                            setTimeout(() => {
+                                firstInput.focus();
+                                firstInput.classList.add('speed-focus');
+                            }, 400);
+                        }
+                        
+                        // Animation des éléments du formulaire
+                        const formElements = modal.querySelectorAll('.animate-speed-fade-in');
+                        formElements.forEach((element, index) => {
+                            element.style.animationDelay = `${0.1 + (index * 0.1)}s`;
+                        });
+                    }
+                }, 100);
+            }
+        });
+
+        // Amélioration de la fermeture du modal
+        Livewire.hook('message.processed', (message, component) => {
+            if (message.updateQueue.some(update => update.payload && update.payload.showBulkEditModal === false)) {
+                // Modal de modification groupée fermé
+                const modal = document.querySelector('.modal-content');
+                if (modal) {
+                    modal.classList.add('animate-modal-fade-out');
+                }
+            }
+        });
+    });
+
+    // Effet de pulsation pour les numéros d'ordre
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    const orderNumbers = document.querySelectorAll('.animate-speed-pulse');
+                    orderNumbers.forEach(number => {
+                        number.addEventListener('mouseenter', function() {
+                            this.style.transform = 'scale(1.2)';
+                            this.style.transition = 'transform 0.2s ease';
+                        });
+                        
+                        number.addEventListener('mouseleave', function() {
+                            this.style.transform = 'scale(1)';
+                        });
+                    });
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+
+    // Amélioration des transitions de focus
+    document.addEventListener('focusin', function(e) {
+        if (e.target.classList.contains('speed-focus')) {
+            e.target.style.transform = 'scale(1.02)';
+            e.target.style.boxShadow = '0 0 0 3px rgba(30, 58, 138, 0.3)';
         }
-        
-        // Alt + M : Focus sur la sélection du médecin
-        if (e.altKey && e.key === 'm') {
-            e.preventDefault();
-            const medecinSelect = document.getElementById('medecin_id');
-            if (medecinSelect) medecinSelect.focus();
-        }
-        
-        // Alt + D : Focus sur la date
-        if (e.altKey && e.key === 'd') {
-            e.preventDefault();
-            const dateInput = document.getElementById('date_rdv');
-            if (dateInput) dateInput.focus();
-        }
-        
-        // Alt + H : Focus sur l'heure
-        if (e.altKey && e.key === 'h') {
-            e.preventDefault();
-            const heureInput = document.getElementById('heure_rdv');
-            if (heureInput) heureInput.focus();
-        }
-        
-        // Alt + A : Focus sur l'acte prévu
-        if (e.altKey && e.key === 'a') {
-            e.preventDefault();
-            const acteInput = document.getElementById('acte_prevu');
-            if (acteInput) acteInput.focus();
-        }
-        
-        // Alt + S : Focus sur le statut
-        if (e.altKey && e.key === 's') {
-            e.preventDefault();
-            const statutSelect = document.getElementById('rdv_confirmer');
-            if (statutSelect) statutSelect.focus();
-        }
-        
-        // Ctrl + Enter : Soumettre le formulaire
-        if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            const submitBtn = document.querySelector('button[type="submit"]');
-            if (submitBtn) submitBtn.click();
-        }
-        
-        // Échap : Fermer le modal
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            const closeBtn = document.querySelector('button[wire\\:click*="closeCreateRdvModal"]');
-            if (closeBtn) closeBtn.click();
+    });
+
+    document.addEventListener('focusout', function(e) {
+        if (e.target.classList.contains('speed-focus')) {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = '';
         }
     });
 </script>

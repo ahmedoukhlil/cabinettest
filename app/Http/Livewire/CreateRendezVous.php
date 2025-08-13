@@ -482,7 +482,7 @@ class CreateRendezVous extends Component
     public function render()
     {
         $query = Rendezvou::query()
-            ->with(['patient:id,ID,Nom,Prenom', 'medecin:idMedecin,Nom']) // Charger seulement les champs nécessaires
+            ->with(['patient:ID,Nom,Telephone1', 'medecin:idMedecin,Nom']) // Retirer Prenom
             ->orderBy('dtPrevuRDV', 'desc')
             ->orderBy('HeureRdv', 'desc');
 

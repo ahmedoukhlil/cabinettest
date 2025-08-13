@@ -212,7 +212,7 @@ class RdvReminders extends Component
             'IDRdv', 'dtPrevuRDV', 'HeureRdv', 'OrdreRDV', 
             'ActePrevu', 'rdvConfirmer', 'fkidPatient', 'fkidMedecin', 'fkidcabinet'
         ])
-        ->where('rdvConfirmer', '!=', 'Terminé')
+            ->where('rdvConfirmer', '!=', 'Terminé')
         ->where('rdvConfirmer', '!=', 'Annulé');
 
         // Filtrer par date

@@ -5,19 +5,65 @@
         <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">{{ session('message') }}</div>
     @endif
 
-    <!-- Filtres et bouton nouveau -->
-    <div class="mb-4 flex items-center gap-4">
-        <label class="font-semibold">Filtrer par assureur :</label>
-        <select wire:model="selectedAssureur" class="rounded border border-black border-gray-300">
-            <option value="">Tous</option>
-            @foreach($assureurs as $assureur)
-                <option value="{{ $assureur->IDAssureur ?? $assureur->ID }}">{{ $assureur->LibAssurance }}</option>
-            @endforeach
-        </select>
-        <div class="flex-1">
-            <input type="text" wire:model="search" placeholder="Rechercher un acte..." class="w-full rounded border-gray-300">
+    <!-- Formulaire d'ajout d'acte -->
+    <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+        <h3 class="text-lg font-semibold text-green-800 mb-4">Ajouter un acte</h3>
+        <form wire:submit.prevent="save" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div>
+                <label for="acteNom" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'acte *</label>
+                <input type="text" wire:model.defer="acteNom" id="acteNom" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                       placeholder="Nom de l'acte">
+                @error('acteNom') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label for="montant" class="block text-sm font-medium text-gray-700 mb-1">Prix de référence *</label>
+                <input type="number" step="0.01" wire:model.defer="montant" id="montant" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                       placeholder="0.00">
+                @error('montant') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label for="assureurId" class="block text-sm font-medium text-gray-700 mb-1">Assureur *</label>
+                <select wire:model.defer="assureurId" id="assureurId" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    <option value="">Sélectionner un assureur</option>
+                    @foreach($assureurs as $assureur)
+                        <option value="{{ $assureur->IDAssureur ?? $assureur->ID }}">{{ $assureur->LibAssurance }}</option>
+                    @endforeach
+                </select>
+                @error('assureurId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                    Enregistrer
+                </button>
+            </div>
+        </form>
+        <!-- Champ nom arabe (optionnel) -->
+        <div class="mt-4">
+            <label for="acteArab" class="block text-sm font-medium text-gray-700 mb-1">Nom arabe (optionnel)</label>
+            <input type="text" wire:model.defer="acteArab" id="acteArab" 
+                   class="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                   placeholder="Nom arabe de l'acte">
         </div>
-        <button wire:click="openModal" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark">+ Nouveau acte</button>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="mb-4 flex flex-col md:flex-row items-center gap-4">
+        <div class="flex items-center gap-2">
+            <label class="font-semibold text-sm">Filtrer par assureur :</label>
+            <select wire:model="selectedAssureur" class="rounded border border-gray-300 px-3 py-2">
+                <option value="">Tous</option>
+                @foreach($assureurs as $assureur)
+                    <option value="{{ $assureur->IDAssureur ?? $assureur->ID }}">{{ $assureur->LibAssurance }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="flex-1">
+            <input type="text" wire:model="search" placeholder="Rechercher un acte..." 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+        </div>
     </div>
 
     <!-- Tableau des actes -->
@@ -48,8 +94,10 @@
                                 {{ $acte->assureur->LibAssurance ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <button wire:click="openModal({{ $acte->ID }})" class="text-indigo-600 hover:text-indigo-900 mr-3">Modifier</button>
-                                <button wire:click="confirmDelete({{ $acte->ID }})" class="text-red-600 hover:text-red-900">Supprimer</button>
+                                <button wire:click="openModal({{ $acte->ID }})" 
+                                        class="text-blue-600 hover:text-blue-800 mr-3">Modifier</button>
+                                <button wire:click="confirmDelete({{ $acte->ID }})" 
+                                        class="text-red-600 hover:text-red-800">Supprimer</button>
                             </td>
                         </tr>
                     @empty
@@ -65,12 +113,12 @@
         </div>
     </div>
 
-    <!-- Modal création/édition -->
+    <!-- Modal édition (pour modification uniquement) -->
     @if($showModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-8 relative">
                 <div class="bg-primary text-white p-4 rounded-t-lg -mt-8 -mx-8 mb-6">
-                    <h2 class="text-xl font-bold">{{ $acteId ? 'Modifier' : 'Nouvel' }} acte</h2>
+                    <h2 class="text-xl font-bold">Modifier un acte</h2>
                 </div>
                 <button wire:click="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
                 <form wire:submit.prevent="save">

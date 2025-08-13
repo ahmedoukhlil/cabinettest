@@ -67,7 +67,7 @@
         </div>
     </div>
 
-    <!-- Liste des rendez-vous -->
+        <!-- Liste des rendez-vous -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200 bg-primary">
             <h3 class="text-lg font-medium text-white">Rendez-vous à rappeler</h3>
@@ -124,19 +124,19 @@
                                             Rappelé
                                         </span>
                                     @else
-                                        @php
-                                            $statusColors = [
-                                                'En Attente' => 'bg-yellow-100 text-yellow-800',
-                                                'Confirmé' => 'bg-green-100 text-green-800',
-                                                'En cours' => 'bg-blue-100 text-blue-800',
-                                                'Terminé' => 'bg-gray-100 text-gray-800',
-                                                'Annulé' => 'bg-red-100 text-red-800'
-                                            ];
-                                            $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
-                                        @endphp
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
-                                            {{ $rdv->rdvConfirmer }}
-                                        </span>
+                                    @php
+                                        $statusColors = [
+                                            'En Attente' => 'bg-yellow-100 text-yellow-800',
+                                            'Confirmé' => 'bg-green-100 text-green-800',
+                                            'En cours' => 'bg-blue-100 text-blue-800',
+                                            'Terminé' => 'bg-gray-100 text-gray-800',
+                                            'Annulé' => 'bg-red-100 text-red-800'
+                                        ];
+                                        $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
+                                    @endphp
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
+                                        {{ $rdv->rdvConfirmer }}
+                                    </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -199,23 +199,23 @@
     
     // Optimisation du chargement des événements
     document.addEventListener('DOMContentLoaded', function() {
-        // Écouter l'événement d'ouverture de WhatsApp
-        window.addEventListener('open-whatsapp-reminder', function(e) {
-            if (e.detail && e.detail.url) {
-                // Fermer l'onglet précédent s'il existe
-                if (whatsappWindow && !whatsappWindow.closed) {
-                    whatsappWindow.close();
-                }
-                
-                // Ouvrir WhatsApp dans un nouvel onglet
-                whatsappWindow = window.open(e.detail.url, '_blank');
-                
-                // Afficher une notification (optionnel)
-                if (e.detail.patientName) {
-                    console.log('Rappel envoyé pour:', e.detail.patientName, 'le', e.detail.rdvDate, 'à', e.detail.rdvTime);
-                }
+    // Écouter l'événement d'ouverture de WhatsApp
+    window.addEventListener('open-whatsapp-reminder', function(e) {
+        if (e.detail && e.detail.url) {
+            // Fermer l'onglet précédent s'il existe
+            if (whatsappWindow && !whatsappWindow.closed) {
+                whatsappWindow.close();
             }
-        });
+            
+            // Ouvrir WhatsApp dans un nouvel onglet
+            whatsappWindow = window.open(e.detail.url, '_blank');
+            
+            // Afficher une notification (optionnel)
+            if (e.detail.patientName) {
+                console.log('Rappel envoyé pour:', e.detail.patientName, 'le', e.detail.rdvDate, 'à', e.detail.rdvTime);
+            }
+        }
+    });
     });
 
     // Optimisation du debounce pour la recherche
