@@ -130,28 +130,51 @@
 
     <!-- Modal de création/édition -->
     @if($showModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-stretch justify-center min-h-screen px-0 pt-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 z-50 overflow-y-auto modal-backdrop animate-backdrop-fade-in" 
+         x-data="{ show: true }" 
+         x-show="show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                <div class="absolute inset-0 bg-gray-500 opacity-75 backdrop-blur-sm"></div>
             </div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl border border-gray-300 transform transition-all sm:my-8 sm:align-middle max-w-lg w-full">
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle max-w-2xl w-full modal-content animate-modal-fade-in"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 transform scale-95 translate-y-4">
                 <form wire:submit.prevent="save">
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">
-                                {{ $patientId ? 'Modifier le patient' : 'Nouveau patient' }}
-                            </h3>
+                    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <i class="fas fa-user-plus header-icon text-white text-lg sm:text-xl"></i>
+                            <h2 class="text-lg sm:text-xl font-bold text-white">{{ $patientId ? 'Modifier le patient' : 'Nouveau patient' }}</h2>
                         </div>
-                        <div class="space-y-4">
+                        <button wire:click="closeModal" 
+                                class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
+                            <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
+                        </button>
+                    </div>
+                    
+                    <div class="px-3 sm:px-4 md:px-6 pt-4 sm:pt-5 pb-4 sm:pb-4 modal-body pt-12 sm:pt-16 animate-modal-content-slide-in">
+                        <div class="space-y-4 sm:space-y-6">
                             <!-- Informations personnelles -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h4 class="text-sm font-medium text-gray-700 mb-3">Informations personnelles</h4>
+                            <div class="bg-gray-50 p-4 rounded-lg animate-speed-fade-in" style="animation-delay: 0.1s;">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                                    <i class="fas fa-user mr-2 text-blue-600"></i>
+                                    Informations personnelles
+                                </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label for="identifiantPatient" class="block text-sm font-medium text-gray-700">N° Fiche</label>
-                                        <input type="number" wire:model.defer="identifiantPatient" id="identifiantPatient" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" @if(!$patientId) disabled @endif>
+                                        <input type="number" wire:model.defer="identifiantPatient" id="identifiantPatient" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" @if(!$patientId) disabled @endif>
                                         @error('identifiantPatient') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                         @if(!$patientId)
                                             <p class="text-xs text-gray-500">Le N° Fiche est généré automatiquement à la création.</p>
@@ -159,7 +182,7 @@
                                     </div>
                                     <div>
                                         <label for="nom" class="block text-sm font-medium text-gray-700">Nom *</label>
-                                        <input type="text" wire:model.defer="nom" id="nom" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" placeholder="Entrez le nom du patient">
+                                        <input type="text" wire:model.defer="nom" id="nom" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" placeholder="Entrez le nom du patient">
                                         @error('nom') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
@@ -167,12 +190,12 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                     <div>
                                         <label for="nni" class="block text-sm font-medium text-gray-700">NNI</label>
-                                        <input type="text" wire:model.defer="nni" id="nni" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" placeholder="Numéro d'identité national">
+                                        <input type="text" wire:model.defer="nni" id="nni" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" placeholder="Numéro d'identité national">
                                         @error('nni') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label for="genre" class="block text-sm font-medium text-gray-700">Genre</label>
-                                        <select wire:model.defer="genre" id="genre" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500">
+                                        <select wire:model.defer="genre" id="genre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus">
                                             <option value="">Sélectionner</option>
                                             <option value="H">Homme (H)</option>
                                             <option value="F">Femme (F)</option>
@@ -184,12 +207,12 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                     <div>
                                         <label for="dateNaissance" class="block text-sm font-medium text-gray-700">Date de naissance</label>
-                                        <input type="date" wire:model.defer="dateNaissance" id="dateNaissance" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500">
+                                        <input type="date" wire:model.defer="dateNaissance" id="dateNaissance" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus">
                                         @error('dateNaissance') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label for="telephone1" class="block text-sm font-medium text-gray-700">Téléphone principal *</label>
-                                        <input type="tel" wire:model.defer="telephone1" id="telephone1" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" placeholder="Ex: +222 12345678">
+                                        <input type="tel" wire:model.defer="telephone1" id="telephone1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" placeholder="Ex: +222 12345678">
                                         @error('telephone1') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
@@ -197,28 +220,28 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                     <div>
                                         <label for="telephone2" class="block text-sm font-medium text-gray-700">Téléphone secondaire</label>
-                                        <input type="tel" wire:model.defer="telephone2" id="telephone2" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" placeholder="Ex: +222 12345678">
+                                        <input type="tel" wire:model.defer="telephone2" id="telephone2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" placeholder="Ex: +222 12345678">
                                         @error('telephone2') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label for="adresse" class="block text-sm font-medium text-gray-700">Adresse</label>
-                                        <textarea wire:model.defer="adresse" id="adresse" rows="2" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" placeholder="Adresse complète du patient"></textarea>
+                                        <textarea wire:model.defer="adresse" id="adresse" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" placeholder="Adresse complète du patient"></textarea>
                                         @error('adresse') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
 
                                 <div class="mt-4">
                                     <label class="flex items-center space-x-2">
-                                        <input type="checkbox" wire:model="isAssured" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                        <input type="checkbox" wire:model="isAssured" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 speed-transition-fast">
                                         <span class="text-sm text-gray-700">Patient assuré</span>
                                     </label>
                                 </div>
 
                                 @if($isAssured)
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 animate-speed-fade-in" style="animation-delay: 0.2s;">
                                     <div>
                                         <label for="assureur" class="block text-sm font-medium text-gray-700">Assureur *</label>
-                                        <select wire:model="assureur" id="assureur" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500">
+                                        <select wire:model="assureur" id="assureur" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus">
                                             <option value="">Sélectionner un assureur</option>
                                             @foreach($assureurs as $assureur)
                                                 <option value="{{ $assureur->IDAssureur }}">{{ $assureur->LibAssurance }}</option>
@@ -228,7 +251,7 @@
                                     </div>
                                     <div>
                                         <label for="identifiantAssurance" class="block text-sm font-medium text-gray-700">Identifiant Assurance *</label>
-                                        <input type="text" wire:model="identifiantAssurance" id="identifiantAssurance" class="mt-1 block w-full rounded-md border-2 border-blue-400 shadow-sm focus:border-blue-600 focus:ring-blue-500" placeholder="Numéro d'assuré">
+                                        <input type="text" wire:model="identifiantAssurance" id="identifiantAssurance" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 speed-transition-fast speed-focus" placeholder="Numéro d'assuré">
                                         @error('identifiantAssurance') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
@@ -236,23 +259,40 @@
                             </div>
 
                             <!-- Statut du patient -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <h4 class="text-sm font-medium text-gray-700 mb-3">Statut du patient</h4>
+                            <div class="bg-gray-50 p-4 rounded-lg animate-speed-fade-in" style="animation-delay: 0.3s;">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                                    <i class="fas fa-toggle-on mr-2 text-blue-600"></i>
+                                    Statut du patient
+                                </h4>
                                 <div>
                                     <label class="flex items-center space-x-2">
-                                        <input type="checkbox" wire:model.defer="isActive" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                        <input type="checkbox" wire:model.defer="isActive" class="form-checkbox h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 speed-transition-fast">
                                         <span class="text-sm text-gray-700">Patient actif</span>
                                     </label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Enregistrer
-                        </button>
-                        <button type="button" wire:click="closeModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    
+                    <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 animate-speed-fade-in" style="animation-delay: 0.4s;">
+                        <button type="button" 
+                                wire:click="closeModal"
+                                class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button speed-transition-fast hover:scale-105">
+                            <i class="fas fa-times mr-2"></i>
                             Annuler
+                        </button>
+                        <button type="submit" 
+                                wire:loading.attr="disabled"
+                                wire:loading.class="opacity-50 cursor-not-allowed"
+                                class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button speed-transition-fast hover:scale-105 speed-glow">
+                            <span wire:loading.remove wire:target="save">
+                                <i class="fas fa-save mr-2"></i>
+                                Enregistrer
+                            </span>
+                            <span wire:loading wire:target="save" class="flex items-center">
+                                <div class="animate-speed-loading rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Enregistrement...
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -263,68 +303,89 @@
 
     <!-- Modal d'historique des paiements -->
     @if($showPaymentHistoryModal)
-    <div class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 z-50 overflow-y-auto modal-backdrop animate-backdrop-fade-in" 
+         x-data="{ show: true }" 
+         x-show="show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                <div class="absolute inset-0 bg-gray-500 opacity-75 backdrop-blur-sm"></div>
             </div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
-                                Historique des paiements
-                            </h3>
-                            
-                            @if($paymentHistory->isEmpty())
-                                <div class="text-center py-4">
-                                    <i class="fas fa-info-circle text-gray-400 text-4xl mb-2"></i>
-                                    <p class="text-gray-500">Aucun paiement enregistré pour ce patient</p>
-                                </div>
-                            @else
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médecin</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200">
-                                            @foreach($paymentHistory as $payment)
-                                                <tr>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        {{ \Carbon\Carbon::parse($payment->dateoper)->format('d/m/Y H:i') }}
-                                                    </td>
-                                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                                        {{ $payment->designation }}
-                                                    </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        {{ number_format($payment->MontantOperation, 0, ',', ' ') }} MRU
-                                                    </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap">
-                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $payment->entreEspece ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                                            {{ $payment->entreEspece ? 'Entrée' : 'Sortie' }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                        {{ $payment->medecin }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                        </div>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-content animate-modal-fade-in"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform scale-95 translate-y-4"
+                 x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 transform scale-95 translate-y-4">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <i class="fas fa-money-bill-wave header-icon text-white text-lg sm:text-xl"></i>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">Historique des paiements</h2>
                     </div>
+                    <button wire:click="closePaymentHistoryModal" 
+                            class="text-white hover:text-red-200 text-xl sm:text-2xl flex items-center gap-1 sm:gap-2 modal-close-button fixed top-2 sm:top-4 right-2 sm:right-4 z-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1 sm:p-2 shadow-lg animate-close-button-appear touch-friendly speed-transition-fast hover:bg-opacity-30">
+                        <i class="fas fa-times"></i> <span class="text-sm sm:text-base font-medium hidden sm:inline">Fermer</span>
+                    </button>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" wire:click="closePaymentHistoryModal" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                
+                <div class="px-3 sm:px-4 md:px-6 pt-4 sm:pt-5 pb-4 sm:pb-4 modal-body pt-12 sm:pt-16 animate-modal-content-slide-in">
+                    @if($paymentHistory->isEmpty())
+                        <div class="text-center py-8 animate-speed-fade-in" style="animation-delay: 0.1s;">
+                            <i class="fas fa-info-circle text-gray-400 text-4xl mb-4"></i>
+                            <p class="text-gray-500 text-lg">Aucun paiement enregistré pour ce patient</p>
+                        </div>
+                    @else
+                        <div class="overflow-x-auto animate-speed-fade-in" style="animation-delay: 0.1s;">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Médecin</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($paymentHistory as $index => $payment)
+                                        <tr class="animate-speed-slide-in" style="animation-delay: {{ 0.2 + ($index * 0.05) }}s;">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {{ \Carbon\Carbon::parse($payment->dateoper)->format('d/m/Y H:i') }}
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-900">
+                                                {{ $payment->designation }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                                                {{ number_format($payment->MontantOperation, 0, ',', ' ') }} MRU
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $payment->entreEspece ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} animate-speed-pulse">
+                                                    {{ $payment->entreEspece ? 'Entrée' : 'Sortie' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                {{ $payment->medecin }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+                
+                <div class="flex justify-end px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 animate-speed-fade-in" style="animation-delay: 0.3s;">
+                    <button type="button" 
+                            wire:click="closePaymentHistoryModal" 
+                            class="px-3 sm:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button speed-transition-fast hover:scale-105">
+                        <i class="fas fa-times mr-2"></i>
                         Fermer
                     </button>
                 </div>
