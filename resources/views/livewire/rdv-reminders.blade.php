@@ -68,13 +68,13 @@
         </div>
     </div>
 
-    <!-- Liste des rendez-vous -->
+        <!-- Liste des rendez-vous -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200 bg-primary">
             <h3 class="text-lg font-medium text-white">Rendez-vous à rappeler</h3>
         </div>
         
-        @if($rendezVous->count() > 0)
+            @if($rendezVous->count() > 0)
             <!-- Version mobile - Cartes -->
             <div class="block lg:hidden space-y-3 p-4">
                 @foreach($rendezVous as $rdv)
@@ -155,7 +155,7 @@
                                     $buttonText = $isRelance ? 'Relancer' : 'Rappeler';
                                     $buttonColor = $isRelance ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
                                 @endphp
-                                <button onclick="sendWhatsAppReminder({{ $rdv->IDRdv }}, '{{ $rdv->patient->Nom }}', '{{ $rdv->patient->Telephone1 }}', '{{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}', '{{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}', '{{ $rdv->medecin->Nom ?? 'Non assigné' }}', '{{ $rdv->ActePrevu ?: 'Consultation' }}', {{ $isRelance ? 'true' : 'false' }})"
+                                <button onclick="sendWhatsAppReminder({{ $rdv->IDRdv }}, '{{ $rdv->patient->Nom }}', '{{ $rdv->patient->Telephone1 }}', '{{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}', '{{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}', '{{ $rdv->medecin->Nom ?? 'Non assigné' }}', '{{ $rdv->ActePrevu ?: 'Consultation' }}', {{ $isRelance ? 'true' : 'false' }}, {{ $rdv->patient->ID }}, {{ $rdv->fkidMedecin }})"
                                         class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors touch-friendly"
                                         id="reminder-btn-{{ $rdv->IDRdv }}">
                                     <i class="fab fa-whatsapp mr-2"></i>
@@ -195,7 +195,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                                                 @foreach($rendezVous as $rdv)
+                        @foreach($rendezVous as $rdv)
                              <tr class="hover:bg-gray-50" data-rdv-id="{{ $rdv->IDRdv }}">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
@@ -223,28 +223,28 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $rdv->ActePrevu ?: 'Consultation' }}
                                 </td>
-                                                                 <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-4 whitespace-nowrap">
                                      @if($rdv->rdvConfirmer === 'Rappel envoyé')
                                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 status-badge" title="Rappel déjà envoyé">
                                              <i class="fas fa-bell mr-1"></i>
                                              Rappelé
                                          </span>
                                      @else
-                                         @php
-                                             $statusColors = [
-                                                 'En Attente' => 'bg-yellow-100 text-yellow-800',
-                                                 'Confirmé' => 'bg-green-100 text-green-800',
-                                                 'En cours' => 'bg-blue-100 text-blue-800',
-                                                 'Terminé' => 'bg-gray-100 text-gray-800',
-                                                 'Annulé' => 'bg-red-100 text-red-800'
-                                             ];
-                                             $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
-                                         @endphp
+                                    @php
+                                        $statusColors = [
+                                            'En Attente' => 'bg-yellow-100 text-yellow-800',
+                                            'Confirmé' => 'bg-green-100 text-green-800',
+                                            'En cours' => 'bg-blue-100 text-blue-800',
+                                            'Terminé' => 'bg-gray-100 text-gray-800',
+                                            'Annulé' => 'bg-red-100 text-red-800'
+                                        ];
+                                        $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
+                                    @endphp
                                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }} status-badge">
-                                             {{ $rdv->rdvConfirmer }}
-                                         </span>
+                                        {{ $rdv->rdvConfirmer }}
+                                    </span>
                                      @endif
-                                 </td>
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $rdv->patient->Telephone1 ?? 'N/A' }}
                                     @if($rdv->patient->Telephone2)
@@ -258,18 +258,18 @@
                                             $buttonText = $isRelance ? 'Relancer' : 'Rappeler';
                                             $buttonColor = $isRelance ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
                                         @endphp
-                                                                                 <button onclick="sendWhatsAppReminder({{ $rdv->IDRdv }}, '{{ $rdv->patient->Nom }}', '{{ $rdv->patient->Telephone1 }}', '{{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}', '{{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}', '{{ $rdv->medecin->Nom ?? 'Non assigné' }}', '{{ $rdv->ActePrevu ?: 'Consultation' }}', {{ $isRelance ? 'true' : 'false' }})"
+                                                                                 <button onclick="sendWhatsAppReminder({{ $rdv->IDRdv }}, '{{ $rdv->patient->Nom }}', '{{ $rdv->patient->Telephone1 }}', '{{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}', '{{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}', '{{ $rdv->medecin->Nom ?? 'Non assigné' }}', '{{ $rdv->ActePrevu ?: 'Consultation' }}', {{ $isRelance ? 'true' : 'false' }}, {{ $rdv->patient->ID }}, {{ $rdv->fkidMedecin }})"
                                                  class="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
                                                  id="reminder-btn-desktop-{{ $rdv->IDRdv }}">
-                                             <i class="fab fa-whatsapp mr-1"></i>
+                                            <i class="fab fa-whatsapp mr-1"></i>
                                              <span id="btn-text-desktop-{{ $rdv->IDRdv }}">
                                                  {{ $buttonText }}
-                                             </span>
+                                            </span>
                                              <span class="flex items-center" id="btn-loading-desktop-{{ $rdv->IDRdv }}" style="display: none;">
-                                                 <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                                                 Envoi...
-                                             </span>
-                                         </button>
+                                                <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                                Envoi...
+                                            </span>
+                                        </button>
                                     @else
                                         <span class="text-red-600 text-xs">
                                             <i class="fas fa-exclamation-triangle mr-1"></i>
@@ -282,12 +282,12 @@
                     </tbody>
                 </table>
             </div>
-        @else
+            @else
             <div class="p-8 text-center">
                 <i class="fas fa-bell-slash text-gray-400 text-4xl mb-4"></i>
                 <p class="text-gray-500 text-lg">Aucun rendez-vous à rappeler</p>
             </div>
-        @endif
+            @endif
 
         <!-- Pagination -->
         <div class="px-6 py-4 border-t border-gray-200">
@@ -297,10 +297,26 @@
 </div>
 
 <script>
-        // Fonction pour envoyer un rappel WhatsApp - accessible globalement
-    window.sendWhatsAppReminder = function(rdvId, patientName, phoneNumber, rdvDate, rdvTime, medecinName, actePrevu, isRelance) {
+    // Fonction pour créer un short URL avec TinyURL API
+    async function createShortUrl(longUrl) {
+        try {
+            const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+            if (response.ok) {
+                return await response.text();
+            } else {
+                console.error('❌ Erreur lors de la création du short URL');
+                return longUrl; // Fallback vers l'URL longue
+            }
+        } catch (error) {
+            console.error('❌ Erreur réseau lors de la création du short URL:', error);
+            return longUrl; // Fallback vers l'URL longue
+        }
+    }
+
+    // Fonction pour envoyer un rappel WhatsApp - accessible globalement
+    window.sendWhatsAppReminder = async function(rdvId, patientName, phoneNumber, rdvDate, rdvTime, medecinName, actePrevu, isRelance, patientId, medecinId) {
         console.log('🧪 Envoi rappel WhatsApp démarré...');
-        console.log('📋 Détails:', { rdvId, patientName, phoneNumber, rdvDate, rdvTime, medecinName, actePrevu, isRelance });
+        console.log('📋 Détails:', { rdvId, patientName, phoneNumber, rdvDate, rdvTime, medecinName, actePrevu, isRelance, patientId, medecinId });
         
         // Désactiver le bouton et afficher le loading
         const button = document.getElementById(`reminder-btn-${rdvId}`) || document.getElementById(`reminder-btn-desktop-${rdvId}`);
@@ -331,8 +347,15 @@
         const action = isRelance ? 'Relance' : 'Rappel';
         const actionAr = isRelance ? 'تذكير' : 'تذكير';
         
-        // Lien de suivi de la file d'attente (à adapter selon votre URL)
-        const queueUrl = `${window.location.origin}/queue/${rdvId}`;
+        // Générer le token pour le lien de suivi de la file d'attente
+        const tokenData = `${patientId}|${rdvDate}|${medecinId}`;
+        const longUrl = `${window.location.origin}/patient/rendez-vous/${btoa(tokenData)}`;
+        console.log('🔗 Token généré:', tokenData);
+        console.log('🔗 URL longue:', longUrl);
+        
+        // Créer un short URL avec TinyURL API
+        const shortUrl = await createShortUrl(longUrl);
+        console.log('🔗 URL courte:', shortUrl);
         
         const message = `مرحبا ${patientName}،
 
@@ -342,7 +365,7 @@ ${actionAr} موعدك الطبي:
 👨‍⚕️ الطبيب: د. ${medecinName}
 🏥 العملية: ${actePrevu}
 
-🔗 رابط متابعة الطابور: ${queueUrl}
+🔗 رابط متابعة موعدك: ${shortUrl}
 
 ---
 Bonjour ${patientName},
@@ -353,7 +376,7 @@ ${action} de votre rendez-vous :
 👨‍⚕️ Médecin : Dr. ${medecinName}
 🏥 Acte : ${actePrevu}
 
-🔗 Lien de suivi de la file d'attente : ${queueUrl}
+🔗 Lien de suivi de votre rendez-vous : ${shortUrl}
 
 Merci de confirmer votre présence.`;
         

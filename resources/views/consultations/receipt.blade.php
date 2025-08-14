@@ -662,8 +662,24 @@ window.openWhatsApp = function(url, successCallback) {
     }
 };
 
+// Fonction pour créer un short URL avec TinyURL API
+async function createShortUrl(longUrl) {
+    try {
+        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+        if (response.ok) {
+            return await response.text();
+        } else {
+            console.error('❌ Erreur lors de la création du short URL');
+            return longUrl; // Fallback vers l'URL longue
+        }
+    } catch (error) {
+        console.error('❌ Erreur réseau lors de la création du short URL:', error);
+        return longUrl; // Fallback vers l'URL longue
+    }
+}
+
 // FONCTIONS WHATSAPP
-function envoyerConfirmationWhatsApp() {
+async function envoyerConfirmationWhatsApp() {
     if (!verifierTelephone()) {
         return;
     }
@@ -742,6 +758,11 @@ function envoyerConfirmationWhatsApp() {
     
     const lienSuivi = "{{ $patientUrl }}";
     
+    // Créer un short URL pour le lien de suivi
+    const shortUrl = await createShortUrl(lienSuivi);
+    console.log('🔗 URL longue:', lienSuivi);
+    console.log('🔗 URL courte:', shortUrl);
+    
     // Debug des données
     console.log('=== DEBUG CONSULTATION ===');
     console.log('Heure:', heureConsultation);
@@ -753,7 +774,7 @@ function envoyerConfirmationWhatsApp() {
     const phoneClean = telephone.replace(/[\s\-\(\)]/g, '');
     
     // Message bilingue avec format de rendez-vous
-    const message = construireMessageBilingue(nomPatient, dateConsultation, heureConsultation, medecin, ordreConsultation, numeroFacture, lienSuivi);
+    const message = construireMessageBilingue(nomPatient, dateConsultation, heureConsultation, medecin, ordreConsultation, numeroFacture, shortUrl);
     
     // Créer le lien WhatsApp Web
     const whatsappWebUrl = `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;

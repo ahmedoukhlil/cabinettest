@@ -119,7 +119,7 @@
         </div>
     </form>
 
-         <!-- Liste des rendez-vous -->
+    <!-- Liste des rendez-vous -->
     <div class="mt-6">
                  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
              <div class="flex items-center gap-3">
@@ -303,14 +303,14 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($rendezVous as $rdv)
-                                                 <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50">
                              <td class="px-6 py-4 whitespace-nowrap text-center">
                                  <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                             </td>
-                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                 <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
                                      {{ str_pad($rdv->OrdreRDV ?? 0, 2, '0', STR_PAD_LEFT) }}
-                                 </span>
+                                    </span>
                              </td>
                              <td class="px-6 py-4 whitespace-nowrap">
                                  <div class="text-sm font-medium text-gray-900">
@@ -320,8 +320,8 @@
                                      <div class="text-sm text-gray-500">
                                          {{ $rdv->patient->Telephone1 }}
                                      </div>
-                                 @endif
-                             </td>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
                                     Dr. {{ $rdv->medecin->Nom ?? 'N/A' }}
@@ -335,7 +335,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-900 max-w-xs truncate" title="{{ $rdv->ActePrevu }}">
-                                    {{ $rdv->ActePrevu }}
+                                {{ $rdv->ActePrevu }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -431,12 +431,12 @@
                                 @endif
                             </td>
                         </tr>
-                                         @empty
-                         <tr>
+                    @empty
+                        <tr>
                              <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                 Aucun rendez-vous à venir
-                             </td>
-                         </tr>
+                                Aucun rendez-vous à venir
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -620,7 +620,7 @@
             e.stopPropagation();
         }
     });
-
+    
     // Amélioration de l'ouverture du modal de modification RDV
     document.addEventListener('livewire:load', function() {
         // Débogage du formulaire de modification groupée
