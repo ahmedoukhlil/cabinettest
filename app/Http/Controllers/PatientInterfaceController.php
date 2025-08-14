@@ -70,15 +70,12 @@ class PatientInterfaceController extends Controller
                 // Afficher la file d'attente seulement si le rendez-vous est aujourd'hui
                 if ($estAujourdhui) {
                     // Récupérer TOUS les rendez-vous de la journée pour le médecin (y compris terminés)
-                $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
-                    ->where('fkidMedecin', $prochainRdv->fkidMedecin)
+                    $rendezVousMedecinJournee = Rendezvou::with(['patient', 'medecin'])
+                        ->where('fkidMedecin', $prochainRdv->fkidMedecin)
                         ->whereDate('dtPrevuRDV', $dateToken)
-                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
-                    ->orderBy('OrdreRDV', 'asc')
-                    ->get();
-                
-
-
+                        ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
+                        ->orderBy('OrdreRDV', 'asc')
+                        ->get();
                 }
             }
 
@@ -90,34 +87,30 @@ class PatientInterfaceController extends Controller
             $patientsAvantMoi = 0;
 
             if ($prochainRdv && $estAujourdhui) {
-                // Récupérer tous les rendez-vous du même médecin pour la même date (seulement si c'est aujourd'hui)
-                $fileAttente = Rendezvou::with(['patient', 'medecin'])
-                    ->where('fkidMedecin', $prochainRdv->fkidMedecin)
-                    ->where('dtPrevuRDV', $prochainRdv->dtPrevuRDV)
-                    ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé', 'Terminé', 'terminé'])
-                    ->orderBy('OrdreRDV', 'asc')
-                    ->get();
-
                 // Utiliser directement l'ordreRDV du patient comme position
                 $positionPatient = $prochainRdv->OrdreRDV;
                 
                 // Calculer le nombre de patients avant ce patient dans la file d'attente
-                $patientsAvantMoi = $fileAttente->filter(function($rdv) use ($prochainRdv) {
+                // Utiliser $rendezVousMedecinJournee qui contient tous les RDV (sauf annulés)
+                $patientsAvantMoi = $rendezVousMedecinJournee->filter(function($rdv) use ($prochainRdv) {
                     return $rdv->OrdreRDV < $prochainRdv->OrdreRDV && 
-                           !in_array($rdv->rdvConfirmer, ['Terminé', 'terminé', 'Annulé', 'annulé']);
+                           !in_array($rdv->rdvConfirmer, ['Terminé', 'terminé']);
                 })->count();
                 
                 // Estimer le temps d'attente basé sur les patients réellement en attente
                 $tempsAttenteEstime = $patientsAvantMoi * 15; // 15 minutes par patient en moyenne
 
                 // Trouver le patient en cours de traitement
-                $patientEnCours = $fileAttente->first(function($rdv) {
+                $patientEnCours = $rendezVousMedecinJournee->first(function($rdv) {
                     return $rdv->rdvConfirmer == 'En cours';
                 });
 
                 if ($patientEnCours) {
                     $positionPatientEnCours = $patientEnCours->OrdreRDV;
                 }
+                
+                // $fileAttente est maintenant identique à $rendezVousMedecinJournee pour la cohérence
+                $fileAttente = $rendezVousMedecinJournee;
             }
 
             return view('patient.rendez-vous', compact(

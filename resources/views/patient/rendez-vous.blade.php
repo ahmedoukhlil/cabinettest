@@ -236,9 +236,9 @@
                                             <span class="inline-flex items-center justify-center w-8 h-8 {{ $isCurrentPatient ? 'current-patient' : ($isEnCours ? 'bg-green-500 text-white' : 'other-patient') }} text-sm font-bold rounded-full ml-3">
                                                 {{ $rdv->OrdreRDV ?? ($index + 1) }}
                                             </span>
-                                            @if($isCurrentPatient)
-                                                <span class="text-sm text-blue-600 font-medium">أنت</span>
-                                                                                         @elseif($isEnCours)
+                                                                                        @if($isCurrentPatient)
+                                                <span class="text-sm text-blue-600 font-medium">{{ $rdv->patient->Nom ?? 'أنت' }}</span>
+                                            @elseif($isEnCours)
                                                 <span class="text-sm text-green-600 font-medium">مع الطبيب</span>
                                             @else
                                                 <span class="text-sm text-gray-500">مريض مخفي</span>
