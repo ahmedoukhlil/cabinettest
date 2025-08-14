@@ -587,6 +587,81 @@ function updatePageFormat() {
     elements.container.classList.toggle('a5', isA5);
 }
 
+// Fonction globale WhatsApp pour cette page
+if (typeof window.whatsappWindow === 'undefined') {
+    window.whatsappWindow = null;
+}
+
+// Fonction globale pour ouvrir WhatsApp de manière centralisée
+window.openWhatsApp = function(url, successCallback) {
+    console.log('🔗 URL WhatsApp:', url);
+    
+    try {
+        // Vérifier si un onglet WhatsApp est déjà ouvert
+        if (window.whatsappWindow && !window.whatsappWindow.closed) {
+            console.log('🔄 Onglet WhatsApp déjà ouvert, focus sur l\'onglet existant');
+            window.whatsappWindow.focus();
+            
+            // Mettre à jour l'URL de l'onglet existant
+            window.whatsappWindow.location.href = url;
+            
+            // Appeler le callback de succès
+            if (successCallback) successCallback();
+            return;
+        }
+        
+        // Ouvrir WhatsApp dans un nouvel onglet
+        console.log('🟠 Tentative d\'ouverture WhatsApp dans un nouvel onglet...');
+        window.whatsappWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        
+        if (window.whatsappWindow) {
+            console.log('✅ WhatsApp ouvert avec succès dans un nouvel onglet');
+            window.whatsappWindow.focus();
+            
+            // Appeler le callback de succès
+            if (successCallback) successCallback();
+        } else {
+            console.error('❌ Impossible d\'ouvrir WhatsApp - popup bloqué');
+            
+            // Fallback : essayer d'ouvrir dans un nouvel onglet avec des paramètres différents
+            console.log('🔄 Tentative de fallback avec paramètres différents...');
+            window.whatsappWindow = window.open(url, '_blank');
+            
+            if (window.whatsappWindow) {
+                console.log('✅ WhatsApp ouvert avec fallback');
+                window.whatsappWindow.focus();
+                if (successCallback) successCallback();
+            } else {
+                console.error('❌ Fallback échoué - copier le lien');
+                
+                // Dernier recours : copier le lien dans le presse-papiers
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(function() {
+                        alert('Lien WhatsApp copié dans le presse-papiers. Veuillez l\'ouvrir manuellement.');
+                        if (successCallback) successCallback();
+                    });
+                } else {
+                    alert('Impossible d\'ouvrir WhatsApp automatiquement. Veuillez copier ce lien: ' + url);
+                    if (successCallback) successCallback();
+                }
+            }
+        }
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'ouverture de WhatsApp:', error);
+        
+        // Fallback : copier le lien dans le presse-papiers
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function() {
+                alert('Lien WhatsApp copié dans le presse-papiers. Veuillez l\'ouvrir manuellement.');
+                if (successCallback) successCallback();
+            });
+        } else {
+            alert('Impossible d\'ouvrir WhatsApp automatiquement. Veuillez copier ce lien: ' + url);
+            if (successCallback) successCallback();
+        }
+    }
+};
+
 // FONCTIONS WHATSAPP
 function envoyerConfirmationWhatsApp() {
     if (!verifierTelephone()) {
