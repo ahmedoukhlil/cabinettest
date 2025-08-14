@@ -71,8 +71,15 @@
 
             <!-- Heure du rendez-vous -->
             <div>
-                <label for="heure_rdv" class="block text-sm font-medium text-gray-700">Heure</label>
-                <input type="time" wire:model="heure_rdv" id="heure_rdv" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="heure_rdv" class="block text-sm font-medium text-gray-700">
+                    Heure 
+                    <span class="text-xs text-gray-500 ml-1">(Créneaux de 10 min)</span>
+                </label>
+                <input type="time" 
+                       wire:model="heure_rdv" 
+                       id="heure_rdv" 
+                       step="600"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('heure_rdv') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
 
@@ -112,63 +119,56 @@
         </div>
     </form>
 
-    <!-- Bouton de gestion groupée -->
-    @if($selectedRdvIds && count($selectedRdvIds) > 0)
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <i class="fas fa-check-circle text-blue-600 text-base sm:text-lg"></i>
-                    <span class="text-blue-800 font-medium text-sm sm:text-base">
-                        {{ count($selectedRdvIds) }} rendez-vous sélectionné(s)
-                    </span>
-                </div>
-                <button wire:click="openBulkEditModal" 
-                        class="inline-flex items-center px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors touch-friendly-button">
-                    <i class="fas fa-edit mr-2"></i>
-                    Modifier en masse
-                </button>
-            </div>
-        </div>
-    @endif
-
-    <!-- Liste des rendez-vous -->
+         <!-- Liste des rendez-vous -->
     <div class="mt-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
-            <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Liste des rendez-vous</h3>
-            @if(!empty($selectedRdvIds))
-                <button wire:click="openBulkEditModal" class="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
-                    <i class="fas fa-edit"></i>
-                    <span class="hidden xs:inline">Modifier en masse</span>
-                    <span class="xs:hidden">Modifier</span>
-                    <span class="bg-white text-blue-600 rounded-full px-2 py-0.5 text-xs font-bold">{{ count($selectedRdvIds) }}</span>
-                </button>
-            @endif
-        </div>
+                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+             <div class="flex items-center gap-3">
+                 <h3 class="text-lg sm:text-xl font-semibold text-gray-900">Liste des rendez-vous</h3>
+                 @if(!empty($selectedRdvIds))
+                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                         <i class="fas fa-check-circle mr-1"></i>
+                         {{ count($selectedRdvIds) }} sélectionné(s)
+                     </span>
+                 @endif
+             </div>
+             @if(!empty($selectedRdvIds))
+                 <button wire:click="openBulkEditModal" class="w-full sm:w-auto px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2 text-sm sm:text-base">
+                     <i class="fas fa-edit"></i>
+                     <span class="hidden xs:inline">Modifier en masse</span>
+                     <span class="xs:hidden">Modifier</span>
+                 </button>
+             @endif
+         </div>
 
         <!-- Version mobile - Cartes -->
         <div class="block lg:hidden space-y-3">
             @forelse($rendezVous as $rdv)
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                    <!-- En-tête de la carte -->
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            <div class="flex-1">
-                                <h4 class="font-semibold text-gray-900 text-base">{{ $rdv->patient->Nom ?? 'N/A' }}</h4>
-                                @if(!empty($rdv->patient->Telephone1))
-                                    <p class="text-sm text-gray-500">{{ $rdv->patient->Telephone1 }}</p>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-sm font-medium text-gray-900">
-                                {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
-                            </div>
-                            <div class="text-lg font-bold text-blue-600">
-                                {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
-                            </div>
-                        </div>
-                    </div>
+                                         <!-- En-tête de la carte -->
+                     <div class="flex items-start justify-between mb-3">
+                         <div class="flex items-center gap-3">
+                             <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                             <div class="flex-1">
+                                 <div class="flex items-center gap-2 mb-1">
+                                     <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[1.5rem]">
+                                         {{ str_pad($rdv->OrdreRDV ?? 0, 2, '0', STR_PAD_LEFT) }}
+                                     </span>
+                                     <h4 class="font-semibold text-gray-900 text-base">{{ $rdv->patient->Nom ?? 'N/A' }}</h4>
+                                 </div>
+                                 @if(!empty($rdv->patient->Telephone1))
+                                     <p class="text-sm text-gray-500">{{ $rdv->patient->Telephone1 }}</p>
+                                 @endif
+                             </div>
+                         </div>
+                         <div class="text-right">
+                             <div class="text-sm font-medium text-gray-900">
+                                 {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
+                             </div>
+                             <div class="text-lg font-bold text-blue-600">
+                                 {{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}
+                             </div>
+                         </div>
+                     </div>
 
                     <!-- Informations du RDV -->
                     <div class="grid grid-cols-2 gap-3 mb-3">
@@ -272,12 +272,15 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-center">
-                            <input type="checkbox" wire:model="selectAll" wire:click="toggleSelectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
-                            Patient
-                        </th>
+                                                 <th scope="col" class="px-6 py-3 text-center">
+                             <input type="checkbox" wire:model="selectAll" wire:click="toggleSelectAll" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                         </th>
+                         <th scope="col" class="px-6 py-3 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
+                             Ordre
+                         </th>
+                         <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                             Patient
+                         </th>
                         <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                             Médecin
                         </th>
@@ -300,20 +303,25 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($rendezVous as $rdv)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $rdv->patient->Nom ?? 'N/A' }}
-                                </div>
-                                @if(!empty($rdv->patient->Telephone1))
-                                    <div class="text-sm text-gray-500">
-                                        {{ $rdv->patient->Telephone1 }}
-                                    </div>
-                                @endif
-                            </td>
+                                                 <tr class="hover:bg-gray-50">
+                             <td class="px-6 py-4 whitespace-nowrap text-center">
+                                 <input type="checkbox" wire:model="selectedRdvIds" value="{{ $rdv->IDRdv }}" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                             </td>
+                             <td class="px-6 py-4 whitespace-nowrap text-center">
+                                 <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-blue-600 rounded-full min-w-[2rem]">
+                                     {{ str_pad($rdv->OrdreRDV ?? 0, 2, '0', STR_PAD_LEFT) }}
+                                 </span>
+                             </td>
+                             <td class="px-6 py-4 whitespace-nowrap">
+                                 <div class="text-sm font-medium text-gray-900">
+                                     {{ $rdv->patient->Nom ?? 'N/A' }}
+                                 </div>
+                                 @if(!empty($rdv->patient->Telephone1))
+                                     <div class="text-sm text-gray-500">
+                                         {{ $rdv->patient->Telephone1 }}
+                                     </div>
+                                 @endif
+                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900">
                                     Dr. {{ $rdv->medecin->Nom ?? 'N/A' }}
@@ -423,12 +431,12 @@
                                 @endif
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                Aucun rendez-vous à venir
-                            </td>
-                        </tr>
+                                         @empty
+                         <tr>
+                             <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                 Aucun rendez-vous à venir
+                             </td>
+                         </tr>
                     @endforelse
                 </tbody>
             </table>

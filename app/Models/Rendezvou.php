@@ -154,8 +154,8 @@ class Rendezvou extends Model
         // Convertir la date et l'heure en datetime
         $dateTimeRdv = Carbon::parse($date . ' ' . $heure);
         
-        // Définir la durée d'un rendez-vous (par défaut 30 minutes)
-        $dureeRdv = 30; // minutes
+        // Définir la durée d'un rendez-vous (10 minutes)
+        $dureeRdv = 10; // minutes
         
         // Calculer l'heure de fin du rendez-vous
         $heureFin = $dateTimeRdv->copy()->addMinutes($dureeRdv);
@@ -199,7 +199,7 @@ class Rendezvou extends Model
         // Heures de travail (8h-18h)
         $heureDebut = 8;
         $heureFin = 18;
-        $dureeCreneau = 30; // minutes
+        $dureeCreneau = 10; // minutes (créneaux de 10 minutes)
         
         $creneauxDisponibles = [];
         
@@ -215,5 +215,37 @@ class Rendezvou extends Model
         }
         
         return $creneauxDisponibles;
+    }
+
+    /**
+     * Propose le prochain créneau disponible après le dernier rendez-vous
+     * @param int $medecinId ID du médecin
+     * @param string $date Date (Y-m-d)
+     * @return string|null Heure proposée ou null si aucun créneau disponible
+     */
+    public static function getProchainCreneauPropose($medecinId, $date)
+    {
+        // Récupérer le dernier rendez-vous du médecin pour cette date
+        $dernierRdv = self::where('fkidMedecin', $medecinId)
+            ->whereDate('dtPrevuRDV', $date)
+            ->whereNotIn('rdvConfirmer', ['Annulé', 'annulé'])
+            ->where('fkidcabinet', Auth::user()->fkidcabinet)
+            ->orderBy('HeureRdv', 'desc')
+            ->first();
+
+        if (!$dernierRdv || !$dernierRdv->HeureRdv) {
+            // Aucun RDV existant, proposer 8h00
+            return '08:00';
+        }
+
+        // Calculer le prochain créneau (10 minutes après la fin du dernier RDV)
+        $heureFinDernierRdv = Carbon::parse($dernierRdv->HeureRdv)->addMinutes(10);
+        
+        // Vérifier que l'heure proposée est dans les heures de travail
+        if ($heureFinDernierRdv->hour >= 18) {
+            return null; // Plus de créneaux disponibles aujourd'hui
+        }
+
+        return $heureFinDernierRdv->format('H:i');
     }
 } 

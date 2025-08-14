@@ -14,11 +14,7 @@
                 <span class="inline-flex items-center justify-center px-2 py-1 rounded-full bg-red-500 text-white font-bold text-sm shadow">
                     {{ $rendezVous->total() }}
                 </span>
-                <!-- Bouton de test temporaire -->
-                <button onclick="testWhatsApp()" class="ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors">
-                    <i class="fab fa-whatsapp mr-1"></i>
-                    Test WhatsApp
-                </button>
+
             </div>
         </div>
     </div>
@@ -424,15 +420,7 @@ Merci de confirmer votre présence.`;
         }, 3000);
     }
     
-         // Fonction de test WhatsApp - accessible globalement
-     window.testWhatsApp = function() {
-         console.log('🧪 Test WhatsApp démarré...');
-         const testUrl = 'https://wa.me/22212345678?text=Test%20WhatsApp';
-         console.log('🔗 URL de test:', testUrl);
-         
-         // Utiliser la fonction globale pour ouvrir WhatsApp
-         window.openWhatsApp(testUrl);
-     }
+
     
 
     

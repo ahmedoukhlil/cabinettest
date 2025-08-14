@@ -124,6 +124,11 @@ class CreateRendezVous extends Component
         // Initialiser la date et l'heure par défaut
         $this->date_rdv = now()->format('Y-m-d');
         $this->heure_rdv = now()->format('H:i');
+        
+        // Proposer le prochain créneau disponible si un médecin est sélectionné
+        if ($this->medecin_id) {
+            $this->proposerProchainCreneau();
+        }
     }
 
     protected function initializePermissions()
@@ -361,12 +366,22 @@ class CreateRendezVous extends Component
     {
         $this->resetPage();
         $this->selectedRdvIds = []; // Réinitialiser la sélection lors du changement de filtre
+        
+        // Proposer le prochain créneau disponible quand la date change
+        if ($this->medecin_id) {
+            $this->proposerProchainCreneau();
+        }
     }
 
     public function updatedMedecinId($value)
     {
         $this->resetPage();
         $this->selectedRdvIds = []; // Réinitialiser la sélection lors du changement de filtre
+        
+        // Proposer le prochain créneau disponible quand le médecin change
+        if ($value) {
+            $this->proposerProchainCreneau();
+        }
     }
 
     // Suppression de la logique de recherche dupliquée - maintenant gérée par le composant PatientSearch
@@ -513,5 +528,21 @@ class CreateRendezVous extends Component
             'rendezVous' => $rendezVous,
             'totalRdvJour' => $this->totalRdvJour,
         ])->layout('layouts.app');
+    }
+
+    /**
+     * Propose automatiquement le prochain créneau disponible
+     */
+    public function proposerProchainCreneau()
+    {
+        if (!$this->medecin_id || !$this->date_rdv) {
+            return;
+        }
+
+        $prochainCreneau = Rendezvou::getProchainCreneauPropose($this->medecin_id, $this->date_rdv);
+        
+        if ($prochainCreneau) {
+            $this->heure_rdv = $prochainCreneau;
+        }
     }
 }

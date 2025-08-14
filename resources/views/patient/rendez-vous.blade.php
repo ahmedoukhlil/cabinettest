@@ -226,7 +226,7 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach($rendezVousMedecinJournee as $index => $rdv)
                                 @php
-                                    $isCurrentPatient = $rdv->fkidPatient == $patient->IDPatient;
+                                    $isCurrentPatient = $rdv->fkidPatient == $patient->ID;
                                     $isEnCours = $rdv->rdvConfirmer == 'En cours';
                                     $rowClass = $isCurrentPatient ? 'bg-blue-50 border-l-4 border-blue-500' : ($isEnCours ? 'bg-green-50 border-l-4 border-green-500' : 'hover:bg-gray-50');
                                 @endphp
