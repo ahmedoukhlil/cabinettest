@@ -331,9 +331,35 @@
             cleanPhone = '222' + cleanPhone;
         }
         
-        // Générer le message
+        // Générer le message en arabe et français
         const action = isRelance ? 'Relance' : 'Rappel';
-        const message = `Bonjour ${patientName},\n\n${action} de votre rendez-vous :\n📅 Date : ${rdvDate}\n🕐 Heure : ${rdvTime}\n👨‍⚕️ Médecin : Dr. ${medecinName}\n🏥 Acte : ${actePrevu}\n\nMerci de confirmer votre présence.`;
+        const actionAr = isRelance ? 'تذكير' : 'تذكير';
+        
+        // Lien de suivi de la file d'attente (à adapter selon votre URL)
+        const queueUrl = `${window.location.origin}/queue/${rdvId}`;
+        
+        const message = `مرحبا ${patientName}،
+
+${actionAr} موعدك الطبي:
+📅 التاريخ: ${rdvDate}
+🕐 الوقت: ${rdvTime}
+👨‍⚕️ الطبيب: د. ${medecinName}
+🏥 العملية: ${actePrevu}
+
+🔗 رابط متابعة الطابور: ${queueUrl}
+
+---
+Bonjour ${patientName},
+
+${action} de votre rendez-vous :
+📅 Date : ${rdvDate}
+🕐 Heure : ${rdvTime}
+👨‍⚕️ Médecin : Dr. ${medecinName}
+🏥 Acte : ${actePrevu}
+
+🔗 Lien de suivi de la file d'attente : ${queueUrl}
+
+Merci de confirmer votre présence.`;
         
         // Créer l'URL WhatsApp
         const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;

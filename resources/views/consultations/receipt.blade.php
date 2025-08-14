@@ -170,11 +170,59 @@
             }
         }
         
-        /* Responsive */
+        /* Responsive Design Complet */
+        @media (max-width: 1200px) {
+            .a4 { width: 95%; margin: 10px auto; }
+            .a5 { width: 90%; margin: 10px auto; }
+        }
+        
         @media (max-width: 768px) {
+            .a4, .a5 { 
+                width: 100%; 
+                margin: 5px; 
+                padding: 10px; 
+                min-height: auto;
+            }
+            
+            .facture-title { 
+                font-size: 18px; 
+                margin-bottom: 20px; 
+                letter-spacing: 1px;
+            }
+            
+            .bloc-patient-table td { 
+                font-size: 11px; 
+                padding: 1px 4px; 
+            }
+            
+            .details-table th, 
+            .details-table td { 
+                font-size: 10px; 
+                padding: 4px 6px; 
+            }
+            
+            .totaux-table td { 
+                font-size: 10px; 
+                padding: 4px 6px; 
+            }
+            
+            .montant-lettres { 
+                font-size: 10px; 
+                margin-top: 12px; 
+            }
+            
+            .ordre-rdv {
+                font-size: 12px;
+                padding: 6px 12px;
+                min-width: 70px;
+                margin: 10px auto;
+            }
+            
             .print-controls {
                 flex-direction: column;
                 align-items: stretch;
+                margin: 10px 0;
+                gap: 8px;
             }
             
             .print-controls select,
@@ -182,6 +230,201 @@
             .whatsapp-btn {
                 width: 100%;
                 margin-bottom: 5px;
+                padding: 10px 12px;
+                font-size: 16px;
+            }
+            
+            .signature-block {
+                margin-top: 30px;
+                margin-bottom: 30px;
+                padding-right: 10px;
+            }
+            
+            .signature-title {
+                margin-bottom: 20px;
+                font-size: 11px;
+            }
+            
+            .signature-name {
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .a4, .a5 { 
+                padding: 5px; 
+                margin: 2px;
+            }
+            
+            .facture-title { 
+                font-size: 16px; 
+                margin-bottom: 15px; 
+                letter-spacing: 0.5px;
+            }
+            
+            .bloc-patient-table td { 
+                font-size: 10px; 
+                padding: 1px 2px; 
+            }
+            
+            .bloc-patient-table .label { 
+                width: 70px; 
+            }
+            
+            .details-table th, 
+            .details-table td { 
+                font-size: 9px; 
+                padding: 3px 4px; 
+            }
+            
+            .totaux-table { 
+                width: 100%; 
+            }
+            
+            .totaux-table td { 
+                font-size: 9px; 
+                padding: 3px 4px; 
+            }
+            
+            .montant-lettres { 
+                font-size: 9px; 
+                margin-top: 10px; 
+            }
+            
+            .ordre-rdv {
+                font-size: 11px;
+                padding: 5px 10px;
+                min-width: 60px;
+                margin: 8px auto;
+            }
+            
+            .print-controls {
+                margin: 8px 0;
+                gap: 6px;
+            }
+            
+            .print-controls select,
+            .print-controls button,
+            .whatsapp-btn {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+            
+            .signature-block {
+                margin-top: 25px;
+                margin-bottom: 25px;
+                padding-right: 5px;
+            }
+            
+            .signature-title {
+                margin-bottom: 15px;
+                font-size: 10px;
+            }
+            
+            .signature-name {
+                font-size: 10px;
+            }
+            
+            /* QR Code responsive */
+            .qr-code-container {
+                transform: scale(0.8);
+                transform-origin: bottom left;
+            }
+            
+            .qr-code-container div {
+                max-width: 80px !important;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .facture-title { 
+                font-size: 14px; 
+                margin-bottom: 12px; 
+            }
+            
+            .bloc-patient-table td { 
+                font-size: 9px; 
+                padding: 1px; 
+            }
+            
+            .details-table th, 
+            .details-table td { 
+                font-size: 8px; 
+                padding: 2px 3px; 
+            }
+            
+            .totaux-table td { 
+                font-size: 8px; 
+                padding: 2px 3px; 
+            }
+            
+            .montant-lettres { 
+                font-size: 8px; 
+                margin-top: 8px; 
+            }
+            
+            .ordre-rdv {
+                font-size: 10px;
+                padding: 4px 8px;
+                min-width: 50px;
+                margin: 6px auto;
+            }
+            
+            .print-controls select,
+            .print-controls button,
+            .whatsapp-btn {
+                padding: 10px 6px;
+                font-size: 12px;
+            }
+            
+            .signature-block {
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .signature-title {
+                margin-bottom: 12px;
+                font-size: 9px;
+            }
+            
+            .signature-name {
+                font-size: 9px;
+            }
+            
+            /* QR Code très petit */
+            .qr-code-container {
+                transform: scale(0.7);
+            }
+            
+            .qr-code-container div {
+                max-width: 70px !important;
+            }
+        }
+        
+        /* Orientation paysage sur mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .a4, .a5 { 
+                width: 95%; 
+                margin: 5px auto; 
+            }
+            
+            .facture-title { 
+                font-size: 14px; 
+                margin-bottom: 10px; 
+            }
+            
+            .print-controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .print-controls select,
+            .print-controls button,
+            .whatsapp-btn {
+                width: auto;
+                min-width: 120px;
+                margin: 2px;
             }
         }
     </style>
