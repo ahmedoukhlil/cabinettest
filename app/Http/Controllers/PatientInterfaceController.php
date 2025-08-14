@@ -27,6 +27,10 @@ class PatientInterfaceController extends Controller
             // Extraire la date et l'ID du médecin du token
             $dateToken = $this->getDateFromToken($token);
             $medecinIdFromToken = $this->getMedecinIdFromToken($token);
+            
+            // Debug pour voir les dates
+            \Log::info('Date Token: ' . $dateToken);
+            \Log::info('Date Aujourd\'hui: ' . now()->format('Y-m-d'));
 
             $patient = Patient::find($patientId);
             
@@ -67,11 +71,22 @@ class PatientInterfaceController extends Controller
             $messageContrainte = null;
             
             if ($prochainRdv) {
-                // Comparer les dates
+                // Comparer les dates - s'assurer que les deux sont au même format
                 $dateRdv = $prochainRdv->dtPrevuRDV;
-                $estAujourdhui = ($dateRdv === $dateAujourdhui);
-                $estFutur = ($dateRdv > $dateAujourdhui);
-                $estPasse = ($dateRdv < $dateAujourdhui);
+                $dateRdvFormatted = is_string($dateRdv) ? $dateRdv : $dateRdv->format('Y-m-d');
+                
+                // Debug pour voir les valeurs
+                \Log::info('Date RDV: ' . $dateRdvFormatted);
+                \Log::info('Date Aujourd\'hui: ' . $dateAujourdhui);
+                
+                $estAujourdhui = ($dateRdvFormatted === $dateAujourdhui);
+                $estFutur = ($dateRdvFormatted > $dateAujourdhui);
+                $estPasse = ($dateRdvFormatted < $dateAujourdhui);
+                
+                // Debug pour voir les résultats
+                \Log::info('Est Aujourd\'hui: ' . ($estAujourdhui ? 'true' : 'false'));
+                \Log::info('Est Futur: ' . ($estFutur ? 'true' : 'false'));
+                \Log::info('Est Passé: ' . ($estPasse ? 'true' : 'false'));
                 
                 // Définir les messages selon la date
                 if ($estFutur) {

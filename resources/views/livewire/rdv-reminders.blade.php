@@ -354,9 +354,15 @@
         @endphp
         
         // Utiliser le même format que les confirmations RDV
-        const tokenData = `${patientId}|${rdvDate}|${medecinId}`;
+        // Convertir la date du format d/m/Y vers Y-m-d pour le token
+        const dateParts = rdvDate.split('/');
+        const rdvDateFormatted = `${dateParts[2]}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
+        
+        const tokenData = `${patientId}|${rdvDateFormatted}|${medecinId}`;
         const base64Token = btoa(tokenData);
         const longUrl = `${window.location.origin}/patient/rendez-vous/${base64Token}`;
+        console.log('🔗 Date originale:', rdvDate);
+        console.log('🔗 Date formatée:', rdvDateFormatted);
         console.log('🔗 Token généré:', tokenData);
         console.log('🔗 URL longue:', longUrl);
         
