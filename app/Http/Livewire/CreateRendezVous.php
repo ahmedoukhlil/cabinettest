@@ -215,6 +215,12 @@ class CreateRendezVous extends Component
 
     public function updateBulkRdv()
     {
+        // Débogage
+        \Log::info('updateBulkRdv appelée', [
+            'selectedRdvIds' => $this->selectedRdvIds,
+            'bulkEditData' => $this->bulkEditData
+        ]);
+        
         // Validation
         if (empty($this->selectedRdvIds)) {
             session()->flash('error', 'Aucun rendez-vous sélectionné.');

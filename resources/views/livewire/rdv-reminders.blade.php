@@ -14,6 +14,11 @@
                 <span class="inline-flex items-center justify-center px-2 py-1 rounded-full bg-red-500 text-white font-bold text-sm shadow">
                     {{ $rendezVous->total() }}
                 </span>
+                <!-- Bouton de test temporaire -->
+                <button onclick="testWhatsApp()" class="ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors">
+                    <i class="fab fa-whatsapp mr-1"></i>
+                    Test WhatsApp
+                </button>
             </div>
         </div>
     </div>
@@ -67,7 +72,7 @@
         </div>
     </div>
 
-        <!-- Liste des rendez-vous -->
+    <!-- Liste des rendez-vous -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-200 bg-primary">
             <h3 class="text-lg font-medium text-white">Rendez-vous à rappeler</h3>
@@ -77,9 +82,9 @@
             <!-- Version mobile - Cartes -->
             <div class="block lg:hidden space-y-3 p-4">
                 @foreach($rendezVous as $rdv)
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                        <!-- En-tête de la carte -->
-                        <div class="flex items-start justify-between mb-3">
+                                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow" data-rdv-id="{{ $rdv->IDRdv }}">
+                         <!-- En-tête de la carte -->
+                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div class="text-center">
                                     @if($rdv->OrdreRDV)
@@ -124,26 +129,26 @@
                         
                         <!-- Statut -->
                         <div class="flex items-center justify-between mb-3">
-                            @if($rdv->rdvConfirmer === 'Rappel envoyé')
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800" title="Rappel déjà envoyé">
-                                    <i class="fas fa-bell mr-1"></i>
-                                    Rappelé
-                                </span>
-                            @else
-                                @php
-                                    $statusColors = [
-                                        'En Attente' => 'bg-yellow-100 text-yellow-800',
-                                        'Confirmé' => 'bg-green-100 text-green-800',
-                                        'En cours' => 'bg-blue-100 text-blue-800',
-                                        'Terminé' => 'bg-gray-100 text-gray-800',
-                                        'Annulé' => 'bg-red-100 text-red-800'
-                                    ];
-                                    $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
-                                @endphp
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
-                                    {{ $rdv->rdvConfirmer }}
-                                </span>
-                            @endif
+                                                         @if($rdv->rdvConfirmer === 'Rappel envoyé')
+                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 status-badge" title="Rappel déjà envoyé">
+                                     <i class="fas fa-bell mr-1"></i>
+                                     Rappelé
+                                 </span>
+                             @else
+                                 @php
+                                     $statusColors = [
+                                         'En Attente' => 'bg-yellow-100 text-yellow-800',
+                                         'Confirmé' => 'bg-green-100 text-green-800',
+                                         'En cours' => 'bg-blue-100 text-blue-800',
+                                         'Terminé' => 'bg-gray-100 text-gray-800',
+                                         'Annulé' => 'bg-red-100 text-red-800'
+                                     ];
+                                     $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
+                                 @endphp
+                                 <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusColor }} status-badge">
+                                     {{ $rdv->rdvConfirmer }}
+                                 </span>
+                             @endif
                         </div>
                         
                         <!-- Actions -->
@@ -154,15 +159,14 @@
                                     $buttonText = $isRelance ? 'Relancer' : 'Rappeler';
                                     $buttonColor = $isRelance ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
                                 @endphp
-                                <button wire:click="sendReminder({{ $rdv->IDRdv }})"
-                                        wire:loading.attr="disabled"
-                                        wire:loading.class="opacity-50 cursor-not-allowed"
-                                        class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors touch-friendly">
+                                <button onclick="sendWhatsAppReminder({{ $rdv->IDRdv }}, '{{ $rdv->patient->Nom }}', '{{ $rdv->patient->Telephone1 }}', '{{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}', '{{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}', '{{ $rdv->medecin->Nom ?? 'Non assigné' }}', '{{ $rdv->ActePrevu ?: 'Consultation' }}', {{ $isRelance ? 'true' : 'false' }})"
+                                        class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors touch-friendly"
+                                        id="reminder-btn-{{ $rdv->IDRdv }}">
                                     <i class="fab fa-whatsapp mr-2"></i>
-                                    <span wire:loading.remove wire:target="sendReminder({{ $rdv->IDRdv }})">
+                                    <span id="btn-text-{{ $rdv->IDRdv }}">
                                         {{ $buttonText }}
                                     </span>
-                                    <span wire:loading wire:target="sendReminder({{ $rdv->IDRdv }})" class="flex items-center">
+                                    <span class="flex items-center" id="btn-loading-{{ $rdv->IDRdv }}" style="display: none;">
                                         <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                         Envoi...
                                     </span>
@@ -195,8 +199,8 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($rendezVous as $rdv)
-                            <tr class="hover:bg-gray-50">
+                                                 @foreach($rendezVous as $rdv)
+                             <tr class="hover:bg-gray-50" data-rdv-id="{{ $rdv->IDRdv }}">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}
                                 </td>
@@ -223,28 +227,28 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $rdv->ActePrevu ?: 'Consultation' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($rdv->rdvConfirmer === 'Rappel envoyé')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800" title="Rappel déjà envoyé">
-                                            <i class="fas fa-bell mr-1"></i>
-                                            Rappelé
-                                        </span>
-                                    @else
-                                        @php
-                                            $statusColors = [
-                                                'En Attente' => 'bg-yellow-100 text-yellow-800',
-                                                'Confirmé' => 'bg-green-100 text-green-800',
-                                                'En cours' => 'bg-blue-100 text-blue-800',
-                                                'Terminé' => 'bg-gray-100 text-gray-800',
-                                                'Annulé' => 'bg-red-100 text-red-800'
-                                            ];
-                                            $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
-                                        @endphp
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
-                                            {{ $rdv->rdvConfirmer }}
-                                        </span>
-                                    @endif
-                                </td>
+                                                                 <td class="px-6 py-4 whitespace-nowrap">
+                                     @if($rdv->rdvConfirmer === 'Rappel envoyé')
+                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 status-badge" title="Rappel déjà envoyé">
+                                             <i class="fas fa-bell mr-1"></i>
+                                             Rappelé
+                                         </span>
+                                     @else
+                                         @php
+                                             $statusColors = [
+                                                 'En Attente' => 'bg-yellow-100 text-yellow-800',
+                                                 'Confirmé' => 'bg-green-100 text-green-800',
+                                                 'En cours' => 'bg-blue-100 text-blue-800',
+                                                 'Terminé' => 'bg-gray-100 text-gray-800',
+                                                 'Annulé' => 'bg-red-100 text-red-800'
+                                             ];
+                                             $statusColor = $statusColors[$rdv->rdvConfirmer] ?? 'bg-gray-100 text-gray-800';
+                                         @endphp
+                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $statusColor }} status-badge">
+                                             {{ $rdv->rdvConfirmer }}
+                                         </span>
+                                     @endif
+                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $rdv->patient->Telephone1 ?? 'N/A' }}
                                     @if($rdv->patient->Telephone2)
@@ -258,19 +262,18 @@
                                             $buttonText = $isRelance ? 'Relancer' : 'Rappeler';
                                             $buttonColor = $isRelance ? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500' : 'bg-green-600 hover:bg-green-700 focus:ring-green-500';
                                         @endphp
-                                        <button wire:click="sendReminder({{ $rdv->IDRdv }})"
-                                                wire:loading.attr="disabled"
-                                                wire:loading.class="opacity-50 cursor-not-allowed"
-                                                class="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors">
-                                            <i class="fab fa-whatsapp mr-1"></i>
-                                            <span wire:loading.remove wire:target="sendReminder({{ $rdv->IDRdv }})">
-                                                {{ $buttonText }}
-                                            </span>
-                                            <span wire:loading wire:target="sendReminder({{ $rdv->IDRdv }})" class="flex items-center">
-                                                <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                                                Envoi...
-                                            </span>
-                                        </button>
+                                                                                 <button onclick="sendWhatsAppReminder({{ $rdv->IDRdv }}, '{{ $rdv->patient->Nom }}', '{{ $rdv->patient->Telephone1 }}', '{{ \Carbon\Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y') }}', '{{ \Carbon\Carbon::parse($rdv->HeureRdv)->format('H:i') }}', '{{ $rdv->medecin->Nom ?? 'Non assigné' }}', '{{ $rdv->ActePrevu ?: 'Consultation' }}', {{ $isRelance ? 'true' : 'false' }})"
+                                                 class="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded text-white {{ $buttonColor }} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors"
+                                                 id="reminder-btn-desktop-{{ $rdv->IDRdv }}">
+                                             <i class="fab fa-whatsapp mr-1"></i>
+                                             <span id="btn-text-desktop-{{ $rdv->IDRdv }}">
+                                                 {{ $buttonText }}
+                                             </span>
+                                             <span class="flex items-center" id="btn-loading-desktop-{{ $rdv->IDRdv }}" style="display: none;">
+                                                 <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                                 Envoi...
+                                             </span>
+                                         </button>
                                     @else
                                         <span class="text-red-600 text-xs">
                                             <i class="fas fa-exclamation-triangle mr-1"></i>
@@ -295,38 +298,142 @@
             {{ $rendezVous->links() }}
         </div>
     </div>
-
 </div>
 
 <script>
-    // Variable pour éviter les doublons
-    let whatsappWindow = null;
-    
-    // Optimisation du chargement des événements
-    document.addEventListener('DOMContentLoaded', function() {
-    // Écouter l'événement d'ouverture de WhatsApp
-    window.addEventListener('open-whatsapp-reminder', function(e) {
-        if (e.detail && e.detail.url) {
-            // Fermer l'onglet précédent s'il existe
-            if (whatsappWindow && !whatsappWindow.closed) {
-                whatsappWindow.close();
-            }
-            
-            // Ouvrir WhatsApp dans un nouvel onglet
-            whatsappWindow = window.open(e.detail.url, '_blank');
-            
-            // Afficher une notification (optionnel)
-            if (e.detail.patientName) {
-                console.log('Rappel envoyé pour:', e.detail.patientName, 'le', e.detail.rdvDate, 'à', e.detail.rdvTime);
-            }
+        // Fonction pour envoyer un rappel WhatsApp - accessible globalement
+    window.sendWhatsAppReminder = function(rdvId, patientName, phoneNumber, rdvDate, rdvTime, medecinName, actePrevu, isRelance) {
+        console.log('🧪 Envoi rappel WhatsApp démarré...');
+        console.log('📋 Détails:', { rdvId, patientName, phoneNumber, rdvDate, rdvTime, medecinName, actePrevu, isRelance });
+        
+        // Désactiver le bouton et afficher le loading
+        const button = document.getElementById(`reminder-btn-${rdvId}`) || document.getElementById(`reminder-btn-desktop-${rdvId}`);
+        const textSpan = document.getElementById(`btn-text-${rdvId}`) || document.getElementById(`btn-text-desktop-${rdvId}`);
+        const loadingSpan = document.getElementById(`btn-loading-${rdvId}`) || document.getElementById(`btn-loading-desktop-${rdvId}`);
+        
+        // Vérifier si le bouton est déjà désactivé (protection contre les clics multiples)
+        if (button && button.disabled) {
+            console.log('⚠️ Bouton déjà désactivé, action ignorée');
+            return;
         }
-    });
-    });
+        
+        if (button) {
+            button.disabled = true;
+            button.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+        
+        if (textSpan) textSpan.style.display = 'none';
+        if (loadingSpan) loadingSpan.style.display = 'flex';
+        
+        // Nettoyer le numéro de téléphone
+        let cleanPhone = phoneNumber.replace(/\D/g, '');
+        if (!cleanPhone.startsWith('222')) {
+            cleanPhone = '222' + cleanPhone;
+        }
+        
+        // Générer le message
+        const action = isRelance ? 'Relance' : 'Rappel';
+        const message = `Bonjour ${patientName},\n\n${action} de votre rendez-vous :\n📅 Date : ${rdvDate}\n🕐 Heure : ${rdvTime}\n👨‍⚕️ Médecin : Dr. ${medecinName}\n🏥 Acte : ${actePrevu}\n\nMerci de confirmer votre présence.`;
+        
+        // Créer l'URL WhatsApp
+        const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+        
+        // Utiliser la fonction globale pour ouvrir WhatsApp
+        window.openWhatsApp(whatsappUrl, function() {
+            window.markReminderAsSent(rdvId, patientName, isRelance);
+        });
+    }
+    
+    // Fonction pour marquer le rappel comme envoyé via Livewire - accessible globalement
+    window.markReminderAsSent = function(rdvId, patientName, isRelance) {
+        console.log('🔄 Mise à jour du statut via Livewire...');
+        
+        // Appeler la méthode Livewire
+        Livewire.call('sendReminder', rdvId).then(() => {
+            console.log('✅ Statut mis à jour avec succès');
+            
+            // Afficher un message de succès
+            window.showSuccessMessage(isRelance ? `Relance envoyée pour ${patientName}` : `Rappel envoyé pour ${patientName}`);
+            
+            // Attendre que Livewire rafraîchisse l'interface, puis mettre à jour manuellement
+            setTimeout(() => {
+                // Forcer un rafraîchissement de la page pour s'assurer que l'interface est à jour
+                window.location.reload();
+            }, 2000);
+            
+        }).catch(error => {
+            console.error('❌ Erreur lors de la mise à jour du statut:', error);
+            
+            // Réactiver le bouton en cas d'erreur
+            const button = document.getElementById(`reminder-btn-${rdvId}`) || document.getElementById(`reminder-btn-desktop-${rdvId}`);
+            const textSpan = document.getElementById(`btn-text-${rdvId}`) || document.getElementById(`btn-text-desktop-${rdvId}`);
+            const loadingSpan = document.getElementById(`btn-loading-${rdvId}`) || document.getElementById(`btn-loading-desktop-${rdvId}`);
+            
+            if (button) {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+            
+            if (textSpan) textSpan.style.display = 'inline';
+            if (loadingSpan) loadingSpan.style.display = 'none';
+            
+            alert('Erreur lors de la mise à jour du statut. Veuillez réessayer.');
+        });
+    }
+    
+    // Fonction pour afficher un message de succès temporaire - accessible globalement
+    window.showSuccessMessage = function(message) {
+        // Créer un élément de notification temporaire
+        const notification = document.createElement('div');
+        notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // Supprimer après 3 secondes
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+    
+         // Fonction de test WhatsApp - accessible globalement
+     window.testWhatsApp = function() {
+         console.log('🧪 Test WhatsApp démarré...');
+         const testUrl = 'https://wa.me/22212345678?text=Test%20WhatsApp';
+         console.log('🔗 URL de test:', testUrl);
+         
+         // Utiliser la fonction globale pour ouvrir WhatsApp
+         window.openWhatsApp(testUrl);
+     }
+    
 
+    
     // Optimisation du debounce pour la recherche
     let searchTimeout;
     function debounceSearch(func, wait) {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(func, wait);
     }
+    
+    // Écouter les événements Livewire pour réactiver les boutons après rafraîchissement
+    document.addEventListener('livewire:load', function () {
+        Livewire.hook('message.processed', (message, component) => {
+            // Réactiver tous les boutons qui étaient en cours de chargement
+            const loadingButtons = document.querySelectorAll('[id^="reminder-btn-"][disabled]');
+            loadingButtons.forEach(button => {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                // Masquer les spinners de chargement
+                const rdvId = button.id.replace('reminder-btn-', '').replace('-desktop', '');
+                const loadingSpan = document.getElementById(`btn-loading-${rdvId}`) || document.getElementById(`btn-loading-desktop-${rdvId}`);
+                const textSpan = document.getElementById(`btn-text-${rdvId}`) || document.getElementById(`btn-text-desktop-${rdvId}`);
+                
+                if (loadingSpan) loadingSpan.style.display = 'none';
+                if (textSpan) textSpan.style.display = 'inline';
+            });
+        });
+    });
 </script>

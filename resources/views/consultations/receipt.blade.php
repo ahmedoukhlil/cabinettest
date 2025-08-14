@@ -440,11 +440,12 @@ function envoyerConfirmationWhatsApp() {
     // Créer le lien WhatsApp Web
     const whatsappWebUrl = `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
     
-    // Ouvrir WhatsApp Web dans un nouvel onglet
-    window.open(whatsappWebUrl, '_blank');
+    console.log('🔗 URL WhatsApp Confirmation Consultation:', whatsappWebUrl);
     
-    // Notification de succès
-    mostrarNotificationSucces();
+    // Utiliser la fonction globale pour ouvrir WhatsApp
+    window.openWhatsApp(whatsappWebUrl, function() {
+        mostrarNotificationSucces();
+    });
 }
 
 function construireMessageBilingue(nom, date, heure, medecin, ordre, numeroFacture, lienSuivi) {

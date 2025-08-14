@@ -32,6 +32,10 @@ class RdvReminders extends Component
 
     // Propriété pour suivre les rappels envoyés
     public $sentReminders = [];
+    
+    // Propriétés pour WhatsApp
+    public $whatsappUrl = '';
+    public $showWhatsAppModal = false;
 
     protected $listeners = [
         'refreshReminders' => '$refresh'
@@ -90,43 +94,33 @@ class RdvReminders extends Component
                 return;
             }
 
-            // Générer le message de rappel
-            $message = $this->generateReminderMessage($rdv);
+            // Vérifier si c'est un relancement (le statut était déjà "Rappel envoyé")
+            $wasAlreadySent = $rdv->rdvConfirmer === 'Rappel envoyé';
             
-            // Nettoyer le numéro de téléphone
-            $phoneNumber = QrCodeHelper::formatPhoneForWhatsApp($rdv->patient->Telephone1);
-            
-            // Créer le lien WhatsApp
-            $whatsappUrl = "https://wa.me/{$phoneNumber}?text=" . urlencode($message);
-            
-            // Ouvrir WhatsApp dans un nouvel onglet
-            $this->dispatchBrowserEvent('open-whatsapp-reminder', [
-                'url' => $whatsappUrl,
-                'patientName' => $rdv->patient->Prenom . ' ' . $rdv->patient->Nom,
-                'rdvDate' => Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y'),
-                'rdvTime' => Carbon::parse($rdv->HeureRdv)->format('H:i')
-            ]);
-
             // Marquer le rappel comme envoyé
             $rdv->update([
                 'rdvConfirmer' => 'Rappel envoyé'
             ]);
-
-            // Vérifier si c'est un relancement (le statut était déjà "Rappel envoyé")
-            $wasAlreadySent = $rdv->getOriginal('rdvConfirmer') === 'Rappel envoyé';
             
             // Ajouter à la liste des rappels envoyés dans cette session
             $this->sentReminders[$rdvId] = true;
 
             // Déterminer le message de succès selon si c'est un premier rappel ou un relancement
             $successMessage = $wasAlreadySent ? 
-                'Relance WhatsApp envoyée pour ' . $rdv->patient->Prenom . ' ' . $rdv->patient->Nom :
-                'Rappel WhatsApp envoyé pour ' . $rdv->patient->Prenom . ' ' . $rdv->patient->Nom;
+                'Relance WhatsApp envoyée pour ' . $rdv->patient->Nom :
+                'Rappel WhatsApp envoyé pour ' . $rdv->patient->Nom;
             
             session()->flash('success', $successMessage);
             
-            // Rafraîchir le compteur de rappels
-            $this->emit('refreshReminders');
+            // Log pour débogage
+            \Log::info('WhatsApp reminder sent', [
+                'rdvId' => $rdvId,
+                'patientName' => $rdv->patient->Nom,
+                'isRelance' => $wasAlreadySent
+            ]);
+            
+            // Forcer le rafraîchissement du composant pour mettre à jour l'interface
+            $this->emit('$refresh');
 
         } catch (\Exception $e) {
             session()->flash('error', 'Erreur lors de l\'envoi du rappel: ' . $e->getMessage());
@@ -144,7 +138,7 @@ class RdvReminders extends Component
 
     protected function generateReminderMessage($rdv)
     {
-        $patientName = $rdv->patient->Prenom . ' ' . $rdv->patient->Nom;
+        $patientName = $rdv->patient->Nom;
         $rdvDate = Carbon::parse($rdv->dtPrevuRDV)->format('d/m/Y');
         $rdvTime = Carbon::parse($rdv->HeureRdv)->format('H:i');
         $medecinName = $rdv->medecin ? 'Dr. ' . $rdv->medecin->Nom : 'le médecin';

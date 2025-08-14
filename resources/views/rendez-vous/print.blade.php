@@ -385,11 +385,12 @@ function envoyerConfirmationRdvWhatsApp() {
     // Créer le lien WhatsApp Web
     const whatsappWebUrl = `https://wa.me/${phoneClean}?text=${encodeURIComponent(message)}`;
     
-    // Ouvrir WhatsApp Web dans un nouvel onglet
-    window.open(whatsappWebUrl, '_blank');
+    console.log('🔗 URL WhatsApp Confirmation RDV:', whatsappWebUrl);
     
-    // Notification de succès
-    mostrarNotificationSuccesRdv();
+    // Utiliser la fonction globale pour ouvrir WhatsApp
+    window.openWhatsApp(whatsappWebUrl, function() {
+        mostrarNotificationSuccesRdv();
+    });
 }
 
 function construireMessageRdvBilingue(nom, date, heure, medecin, ordre, lienSuivi) {

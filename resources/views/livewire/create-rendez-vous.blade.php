@@ -442,27 +442,13 @@
 
     <!-- Modal de modification groupée -->
     @if($showBulkEditModal)
-        <div class="fixed inset-0 z-50 overflow-y-auto modal-backdrop animate-backdrop-fade-in" 
-             x-data="{ show: true }" 
-             x-show="show" 
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0">
+        <div class="fixed inset-0 z-50 overflow-y-auto modal-backdrop animate-backdrop-fade-in">
             <div class="flex items-center justify-center min-h-screen px-2 sm:px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 transition-opacity" aria-hidden="true">
                     <div class="absolute inset-0 bg-gray-500 opacity-75 backdrop-blur-sm"></div>
                 </div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-2xl modal-content animate-modal-fade-in"
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0 transform scale-95 translate-y-4"
-                     x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
-                     x-transition:leave="transition ease-in duration-200"
-                     x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
-                     x-transition:leave-end="opacity-0 transform scale-95 translate-y-4">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-2xl modal-content animate-modal-fade-in">
                     <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-blue-700">
                         <div class="flex items-center gap-2 sm:gap-3">
                             <i class="fas fa-edit header-icon text-white text-lg sm:text-xl"></i>
@@ -475,7 +461,7 @@
                     </div>
                     
                     <div class="px-3 sm:px-4 md:px-6 pt-4 sm:pt-5 pb-4 sm:pb-4 modal-body pt-12 sm:pt-16 animate-modal-content-slide-in">
-                        <form wire:submit.prevent="updateBulkRdv" class="space-y-4 sm:space-y-6">
+                        <div class="space-y-4 sm:space-y-6" id="bulk-edit-form">
                             <!-- Nouvelle date -->
                             <div class="mb-4 animate-speed-fade-in" style="animation-delay: 0.1s;">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -562,7 +548,8 @@
                                     <i class="fas fa-times mr-2"></i>
                                     Annuler
                                 </button>
-                                <button type="submit" 
+                                <button type="button" 
+                                        wire:click="updateBulkRdv"
                                         wire:loading.attr="disabled"
                                         wire:loading.class="opacity-50 cursor-not-allowed"
                                         class="w-full sm:w-auto px-3 sm:px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 touch-friendly-button speed-transition-fast hover:scale-105 speed-glow">
@@ -576,7 +563,7 @@
                                     </span>
                                 </button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -628,6 +615,24 @@
 
     // Amélioration de l'ouverture du modal de modification RDV
     document.addEventListener('livewire:load', function() {
+        // Débogage du formulaire de modification groupée
+        document.addEventListener('submit', function(e) {
+            if (e.target.id === 'bulk-edit-form') {
+                console.log('🔄 Formulaire de modification groupée soumis');
+                console.log('📋 Données du formulaire:', {
+                    newDate: document.querySelector('input[wire\\:model="bulkEditData.newDate"]')?.value,
+                    startTime: document.querySelector('input[wire\\:model="bulkEditData.startTime"]')?.value,
+                    interval: document.querySelector('select[wire\\:model="bulkEditData.interval"]')?.value
+                });
+            }
+        });
+        
+        // Débogage des clics sur le bouton de soumission
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('button[type="submit"]') && e.target.closest('#bulk-edit-form')) {
+                console.log('🔄 Bouton "Mettre à jour" cliqué');
+            }
+        });
         // Écouter l'ouverture du modal de modification groupée
         Livewire.hook('message.processed', (message, component) => {
             if (message.updateQueue.some(update => update.payload && update.payload.showBulkEditModal)) {
