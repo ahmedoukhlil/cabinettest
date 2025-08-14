@@ -168,7 +168,7 @@
                             <i class="fas fa-user-md icon-left"></i>
                             المريض قيد العلاج
                         </h3>
-                        <p class="text-green-700">الرقم: <span class="font-bold">{{ $patientEnCours->ordreRDV ?? $positionPatientEnCours ?? 'غير متوفر' }}</span></p>
+                        <p class="text-green-700">الرقم: <span class="font-bold">{{ $patientEnCours->OrdreRDV ?? $positionPatientEnCours ?? 'غير متوفر' }}</span></p>
                     </div>
                     <div class="text-left">
                                                  <div class="text-2xl font-bold text-green-600">
