@@ -59,13 +59,26 @@ class PatientInterfaceController extends Controller
             $rendezVousMedecinJournee = collect();
             $estAujourdhui = false;
             
+            // Gestion des contraintes temporelles
+            $dateAujourdhui = now()->format('Y-m-d');
+            $estAujourdhui = false;
+            $estFutur = false;
+            $estPasse = false;
+            $messageContrainte = null;
+            
             if ($prochainRdv) {
-                $dateAujourdhui = now()->format('Y-m-d');
+                // Comparer les dates
+                $dateRdv = $prochainRdv->dtPrevuRDV;
+                $estAujourdhui = ($dateRdv === $dateAujourdhui);
+                $estFutur = ($dateRdv > $dateAujourdhui);
+                $estPasse = ($dateRdv < $dateAujourdhui);
                 
-                // Vérifier si la date du token correspond à aujourd'hui
-                $estAujourdhui = ($dateToken === $dateAujourdhui);
-                
-
+                // Définir les messages selon la date
+                if ($estFutur) {
+                    $messageContrainte = 'Attendre le jour de votre RDV';
+                } elseif ($estPasse) {
+                    $messageContrainte = 'Votre RDV a dépassé et le lien est expiré';
+                }
                 
                 // Afficher la file d'attente seulement si le rendez-vous est aujourd'hui
                 if ($estAujourdhui) {
@@ -124,7 +137,10 @@ class PatientInterfaceController extends Controller
                 'patientEnCours',
                 'positionPatientEnCours',
                 'patientsAvantMoi',
-                'estAujourdhui'
+                'estAujourdhui',
+                'estFutur',
+                'estPasse',
+                'messageContrainte'
             ));
             
         } catch (\Exception $e) {

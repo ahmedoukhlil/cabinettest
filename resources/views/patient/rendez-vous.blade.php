@@ -111,22 +111,55 @@
                                  @endif
                              </div>
                          </div>
-                        @else
-                            <!-- موعد في المستقبل -->
-                            <div class="bg-orange-100 border border-orange-300 rounded-lg p-4">
-                                <div class="text-center">
-                                    <i class="fas fa-calendar-alt text-orange-600 text-3xl mb-3"></i>
-                                    <div class="text-orange-800 font-bold text-lg mb-2">انتظر يوم موعدك</div>
-                                    <div class="text-orange-700 text-sm mb-3">
-                                        موعدك مقرر يوم: <strong>{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</strong>
-                                    </div>
-                                    <div class="text-orange-600 text-xs">
-                                        <i class="fas fa-info-circle icon-left"></i>
-                                        ستتمكن من متابعة طابور الانتظار في يوم موعدك فقط
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
+                                                 @elseif($estFutur)
+                             <!-- موعد في المستقبل -->
+                             <div class="bg-orange-100 border border-orange-300 rounded-lg p-4">
+                                 <div class="text-center">
+                                     <i class="fas fa-calendar-alt text-orange-600 text-3xl mb-3"></i>
+                                     <div class="text-orange-800 font-bold text-lg mb-2">انتظر يوم موعدك</div>
+                                     <div class="text-orange-700 text-sm mb-3">
+                                         موعدك مقرر يوم: <strong>{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</strong>
+                                     </div>
+                                     <div class="text-orange-600 text-xs">
+                                         <i class="fas fa-info-circle icon-left"></i>
+                                         ستتمكن من متابعة طابور الانتظار في يوم موعدك فقط
+                                     </div>
+                                     <hr class="my-2 border-orange-300">
+                                     <div class="text-orange-800 font-bold text-lg">Attendre le jour de votre RDV</div>
+                                     <div class="text-orange-700 text-sm">
+                                         Votre rendez-vous est prévu le: <strong>{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</strong>
+                                     </div>
+                                     <div class="text-orange-600 text-xs">
+                                         <i class="fas fa-info-circle icon-left"></i>
+                                         Vous pourrez suivre la file d'attente le jour de votre RDV uniquement
+                                     </div>
+                                 </div>
+                             </div>
+                         @elseif($estPasse)
+                             <!-- موعد منتهي -->
+                             <div class="bg-red-100 border border-red-300 rounded-lg p-4">
+                                 <div class="text-center">
+                                     <i class="fas fa-calendar-times text-red-600 text-3xl mb-3"></i>
+                                     <div class="text-red-800 font-bold text-lg mb-2">موعدك منتهي</div>
+                                     <div class="text-red-700 text-sm mb-3">
+                                         موعدك كان يوم: <strong>{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</strong>
+                                     </div>
+                                     <div class="text-red-600 text-xs">
+                                         <i class="fas fa-exclamation-triangle icon-left"></i>
+                                         الرابط منتهي الصلاحية
+                                     </div>
+                                     <hr class="my-2 border-red-300">
+                                     <div class="text-red-800 font-bold text-lg">Votre RDV a dépassé</div>
+                                     <div class="text-red-700 text-sm">
+                                         Votre rendez-vous était le: <strong>{{ \Carbon\Carbon::parse($prochainRdv->dtPrevuRDV)->format('d/m/Y') }}</strong>
+                                     </div>
+                                     <div class="text-red-600 text-xs">
+                                         <i class="fas fa-exclamation-triangle icon-left"></i>
+                                         Le lien est expiré
+                                     </div>
+                                 </div>
+                             </div>
+                         @endif
                      @else
                          <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4">
                              <div class="text-center">

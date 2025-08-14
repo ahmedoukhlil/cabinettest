@@ -347,9 +347,16 @@
         const action = isRelance ? 'Relance' : 'Rappel';
         const actionAr = isRelance ? 'تذكير' : 'تذكير';
         
-        // Générer le token pour le lien de suivi de la file d'attente
+        // Générer le lien de suivi de la file d'attente (même format que les confirmations RDV)
+        @php
+            // Cette section sera exécutée côté serveur pour générer le token
+            // Le token sera disponible dans le JavaScript via une variable
+        @endphp
+        
+        // Utiliser le même format que les confirmations RDV
         const tokenData = `${patientId}|${rdvDate}|${medecinId}`;
-        const longUrl = `${window.location.origin}/patient/rendez-vous/${btoa(tokenData)}`;
+        const base64Token = btoa(tokenData);
+        const longUrl = `${window.location.origin}/patient/rendez-vous/${base64Token}`;
         console.log('🔗 Token généré:', tokenData);
         console.log('🔗 URL longue:', longUrl);
         

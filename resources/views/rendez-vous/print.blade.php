@@ -699,16 +699,17 @@ async function envoyerConfirmationRdvWhatsApp() {
     console.log('Médecin:', medecin);
     console.log('========================');
     
-    @php
-        try {
-            $token = App\Http\Controllers\PatientInterfaceController::generateToken($rendezVous->fkidPatient, $rendezVous->dtPrevuRDV, $rendezVous->fkidMedecin);
-            $patientUrl = route('patient.rendez-vous', ['token' => $token]);
-        } catch (Exception $e) {
-            $patientUrl = url('/');
-        }
-    @endphp
+    // Générer le token pour le lien de suivi de la file d'attente (même format que les rappels)
+    const tokenData = "{{ $rendezVous->fkidPatient }}|{{ $rendezVous->dtPrevuRDV }}|{{ $rendezVous->fkidMedecin }}";
+    const longUrl = `${window.location.origin}/patient/rendez-vous/${btoa(tokenData)}`;
+    console.log('🔗 Token généré:', tokenData);
+    console.log('🔗 URL longue:', longUrl);
     
-    const lienSuivi = "{{ $patientUrl }}";
+    // Créer un short URL pour le lien de suivi
+    const shortUrl = await createShortUrl(longUrl);
+    console.log('🔗 URL courte:', shortUrl);
+    
+    const lienSuivi = shortUrl;
     
     // Créer un short URL pour le lien de suivi
     const shortUrl = await createShortUrl(lienSuivi);
