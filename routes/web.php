@@ -39,6 +39,26 @@ Route::middleware(['auth'])->group(function () {
         return view('accueil-patient-page');
     })->name('accueil.patient');
 
+    // Route de test pour l'API (maintenant inutile mais gardée pour debug)
+Route::get('/test-api', function () {
+    return view('test-api');
+})->name('test.api');
+
+// Route de démonstration des modaux améliorés
+Route::get('/modal-demo', function () {
+    return view('modal-demo');
+})->name('modal.demo');
+
+// Route de test de synchronisation des animations
+Route::get('/animation-test', function () {
+    return view('animation-test');
+})->name('animation.test');
+
+// Route de test des modaux harmonisés
+Route::get('/test-modals', function () {
+    return view('test-modals');
+})->name('test.modals');
+
     // Routes pour les rendez-vous
     Route::middleware(['permission:rendez-vous.view'])->group(function () {
         Route::get('/rendez-vous', function () {

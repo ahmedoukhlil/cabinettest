@@ -121,14 +121,11 @@ class CreateRendezVous extends Component
             ]]);
         }
         
-        // Initialiser la date et l'heure par défaut
+        // Initialiser la date par défaut à aujourd'hui
         $this->date_rdv = now()->format('Y-m-d');
-        $this->heure_rdv = now()->format('H:i');
         
-        // Proposer le prochain créneau disponible si un médecin est sélectionné
-        if ($this->medecin_id) {
-            $this->proposerProchainCreneau();
-        }
+        // Proposer automatiquement l'heure actuelle + 10 minutes
+        $this->heure_rdv = now()->addMinutes(10)->format('H:i');
     }
 
     protected function initializePermissions()
@@ -367,9 +364,9 @@ class CreateRendezVous extends Component
         $this->resetPage();
         $this->selectedRdvIds = []; // Réinitialiser la sélection lors du changement de filtre
         
-        // Proposer le prochain créneau disponible quand la date change
+        // Proposer automatiquement l'heure actuelle + 10 minutes quand la date change
         if ($this->medecin_id) {
-            $this->proposerProchainCreneau();
+            $this->heure_rdv = now()->addMinutes(10)->format('H:i');
         }
     }
 
@@ -378,9 +375,9 @@ class CreateRendezVous extends Component
         $this->resetPage();
         $this->selectedRdvIds = []; // Réinitialiser la sélection lors du changement de filtre
         
-        // Proposer le prochain créneau disponible quand le médecin change
-        if ($value) {
-            $this->proposerProchainCreneau();
+        // Proposer automatiquement l'heure actuelle + 10 minutes quand le médecin change
+        if ($value && $this->date_rdv) {
+            $this->heure_rdv = now()->addMinutes(10)->format('H:i');
         }
     }
 
@@ -536,6 +533,7 @@ class CreateRendezVous extends Component
     public function proposerProchainCreneau()
     {
         if (!$this->medecin_id || !$this->date_rdv) {
+            session()->flash('error', 'Veuillez d\'abord sélectionner un médecin et une date.');
             return;
         }
 
@@ -543,6 +541,9 @@ class CreateRendezVous extends Component
         
         if ($prochainCreneau) {
             $this->heure_rdv = $prochainCreneau;
+            session()->flash('message', 'Créneau proposé : ' . $prochainCreneau . ' (dernier RDV + 10 min)');
+        } else {
+            session()->flash('error', 'Aucun créneau disponible pour cette date. Tous les créneaux sont occupés.');
         }
     }
 }

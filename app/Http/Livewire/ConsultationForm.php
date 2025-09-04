@@ -162,6 +162,12 @@ class ConsultationForm extends Component
 
     public function handlePatientSelected($patient)
     {
+        // Vérifier que le patient n'est pas null
+        if (!$patient || !is_array($patient)) {
+            \Log::warning('Patient reçu est null ou invalide dans ConsultationForm', ['patient' => $patient]);
+            return;
+        }
+        
         // \Log::info('Patient reçu dans ConsultationForm', $patient); // Suppression du debug
         $this->patient_id = $patient['ID'];
         $this->selectedPatient = $patient;

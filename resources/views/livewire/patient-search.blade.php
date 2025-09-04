@@ -6,104 +6,121 @@
             <option value="identifiant">N° Fiche</option>
         </select>
         <div class="relative flex-1">
-            <div class="flex">
-                <input type="text" 
-                       class="form-control" 
-                       placeholder="Rechercher un patient..."
-                       wire:model.debounce.1000ms="search"
-                       wire:loading.attr="disabled"
-                       wire:target="search">
+            <input 
+                type="text" 
+                wire:model.live.debounce.300ms="search"
+                placeholder="Rechercher un patient..."
+                class="w-full rounded-r-md border-gray-300 focus:border-primary focus:ring-primary sm:text-sm"
+            >
+            
+            <!-- Indicateur de chargement -->
+            <div wire:loading class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
             </div>
-            @if($selectedPatient)
-                <button type="button" 
-                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                        wire:click="clearPatient">
-                    <i class="fas fa-times"></i>
-                </button>
-            @endif
-            @if($isSearching)
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <svg class="animate-spin h-5 w-5 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
-            @endif
         </div>
     </div>
 
+    <!-- Résultats de recherche -->
+    @if($showResults && count($patients) > 0)
+        <div class="mt-2 border border-gray-200 rounded-lg shadow-lg bg-white max-h-60 overflow-y-auto z-50 relative">
+            @foreach($patients as $patient)
+                <div 
+                    wire:click="selectPatient({{ $patient->ID }})"
+                    class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+                >
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-900">
+                                {{ $patient->Nom }}
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                @if($patient->IdentifiantPatient)
+                                    <div class="flex items-center">
+                                        <i class="fas fa-id-card w-4 text-gray-400 mr-2"></i>
+                                        N° Fiche: {{ $patient->IdentifiantPatient }}
+                                    </div>
+                                @endif
+                                @if($patient->Telephone1)
+                                    <div class="flex items-center">
+                                        <i class="fas fa-phone w-4 text-gray-400 mr-2"></i>
+                                        Tel: {{ $patient->Telephone1 }}
+                                    </div>
+                                @endif
+                                @if($patient->Telephone2)
+                                    <div class="flex items-center">
+                                        <i class="fas fa-phone w-4 text-gray-400 mr-2"></i>
+                                        Tel 2: {{ $patient->Telephone2 }}
+                                    </div>
+                                @endif
+                                @if($patient->DtNaissance)
+                                    <div class="flex items-center">
+                                        <i class="fas fa-birthday-cake w-4 text-gray-400 mr-2"></i>
+                                        Né(e) le: {{ \Carbon\Carbon::parse($patient->DtNaissance)->format('d/m/Y') }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="text-primary">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+    <!-- Message "Aucun résultat" -->
+    @if($showResults && count($patients) === 0 && strlen(trim($search)) > 0)
+        <div class="mt-2 p-3 text-center text-gray-500 bg-gray-50 rounded-lg border">
+            Aucun patient trouvé pour "{{ $search }}"
+        </div>
+    @endif
+
     <!-- Patient sélectionné -->
     @if($selectedPatient)
-        <div class="mt-2 p-2 bg-primary-light rounded border border-primary">
+        <div class="mt-3 p-3 bg-primary-light rounded-lg border border-primary">
             <div class="flex items-center justify-between">
-                <span class="font-medium text-primary">{{ $selectedPatient['Prenom'] }}</span>
-                <span class="text-sm text-primary ml-2">Tél: {{ $selectedPatient['Telephone1'] }}</span>
+                <div class="flex-1">
+                    <div class="font-medium text-primary text-lg">
+                        {{ $selectedPatient['NomPatient'] }}
+                    </div>
+                    <div class="text-sm text-primary-dark">
+                        Tél: {{ $selectedPatient['Telephone1'] }}
+                        @if($selectedPatient['Telephone2'])
+                            | Tel 2: {{ $selectedPatient['Telephone2'] }}
+                        @endif
+                    </div>
+                    @if($selectedPatient['IdentifiantPatient'])
+                        <div class="text-xs text-primary-dark mt-1">
+                            N° Fiche: {{ $selectedPatient['IdentifiantPatient'] }}
+                        </div>
+                    @endif
+                </div>
+                <button 
+                    type="button"
+                    wire:click="clearPatient"
+                    class="text-primary hover:text-primary-dark p-2 rounded-full hover:bg-primary-light transition-colors"
+                    title="Effacer la sélection"
+                >
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
     @endif
 
-    <!-- Résultats de recherche -->
-    @if(strlen(trim($search)) >= 1 && !empty($patients))
-        <div class="fixed z-50 mt-1 w-full max-w-2xl bg-white shadow-lg rounded-md border border-gray-200 max-h-60 overflow-y-auto">
-            @if($isSearching)
-                <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                    <div class="flex items-center justify-center">
-                        <svg class="animate-spin h-5 w-5 text-primary mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Recherche en cours...
-                    </div>
+    <!-- Messages d'erreur -->
+    @if(session()->has('error'))
+        <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
                 </div>
-            @else
-                @if(!empty($patients))
-                    <div class="px-3 py-2 text-xs text-gray-500 border-b border-gray-100">
-                        {{ count($patients) }} résultat(s) trouvé(s)
-                    </div>
-                    @foreach($patients as $patient)
-                        <div class="px-4 py-2 hover:bg-primary-light cursor-pointer border-b border-gray-100 last:border-b-0 {{ $selectedPatient && $selectedPatient['ID'] == $patient['ID'] ? 'bg-primary-light' : '' }}" 
-                             wire:click="selectPatient({{ $patient['ID'] }})">
-                            <div class="flex flex-col">
-                                <div class="flex items-center">
-                                    <i class="fas fa-user-circle text-gray-400 mr-2"></i>
-                                    <span class="font-medium text-gray-900">{{ $patient['Prenom'] }}</span>
-                                    @if($selectedPatient && $selectedPatient['ID'] == $patient['ID'])
-                                        <span class="ml-2 px-2 py-1 text-xs bg-primary text-white rounded-full">Sélectionné</span>
-                                    @endif
-                                </div>
-                                <div class="ml-6 mt-1 space-y-1">
-                                    @if($patient['IdentifiantPatient'])
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-id-card w-4 mr-2"></i>
-                                            <span>N° Fiche: {{ $patient['IdentifiantPatient'] }}</span>
-                                        </div>
-                                    @endif
-                                    @if($patient['Telephone1'])
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-phone w-4 mr-2"></i>
-                                            <span>Tel: {{ $patient['Telephone1'] }}</span>
-                                        </div>
-                                    @endif
-                                    @if($patient['Telephone2'])
-                                        <div class="flex items-center text-sm text-gray-500">
-                                            <i class="fas fa-phone w-4 mr-2"></i>
-                                            <span>Tel 2: {{ $patient['Telephone2'] }}</span>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="px-4 py-3 text-sm text-gray-500 text-center">
-                        <div class="flex flex-col items-center">
-                            <i class="fas fa-search text-gray-400 text-2xl mb-2"></i>
-                            <span>Aucun patient trouvé</span>
-                            <span class="text-xs mt-1">Essayez avec d'autres critères de recherche</span>
-                        </div>
-                    </div>
-                @endif
-            @endif
+                <div class="ml-3">
+                    <p class="text-sm text-red-800">
+                        {{ session('error') }}
+                    </p>
+                </div>
+            </div>
         </div>
     @endif
 </div> 

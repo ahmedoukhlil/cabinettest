@@ -1,7 +1,7 @@
 <div class="space-y-6">
-    <div class="p-6 rounded-xl text-white shadow-lg z-30" style="background: linear-gradient(90deg, #06b6d4 0%, #0e7490 100%);">
+    <div class="p-6 rounded-xl text-white shadow-lg z-30 bg-primary">
         <h2 class="text-2xl font-bold">Facture/DEVIS</h2>
-        <p class="text-white mt-1">Sélectionnez un patient pour gérer ses paiements</p>
+        <p class="text-primary-light mt-1">Sélectionnez un patient pour gérer ses paiements</p>
     </div>
 
     <div class="bg-white rounded-lg shadow-xl overflow-hidden">
@@ -42,7 +42,7 @@
     <div class="mb-6">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold">Factures du patient</h2>
-            <button wire:click="openMedecinModal" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2">
+            <button wire:click="openMedecinModal" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors duration-200 flex items-center gap-2">
                 <i class="fas fa-plus"></i> Nouvelle facture
             </button>
         </div>
@@ -88,11 +88,11 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ number_format(($facture->TotalfactPatient ?? 0) - ($facture->TotReglPatient ?? 0), 0, '', ' ') }} MRU</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($resteAPayerPatient > 0)
-                                <span class="inline-block px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">Non réglée</span>
+                                <span class="inline-block px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200 text-xs font-semibold">Non réglée</span>
                             @elseif($resteAPayerPatient < 0)
-                                <span class="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">À rembourser</span>
+                                <span class="inline-block px-3 py-1 rounded-full bg-yellow-50 text-yellow-800 border border-yellow-200 text-xs font-semibold">À rembourser</span>
                             @else
-                                <span class="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">Réglée</span>
+                                <span class="inline-block px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-200 text-xs font-semibold">Réglée</span>
                             @endif
                         </td>
                     </tr>
@@ -113,13 +113,12 @@
                                         </thead>
                                         <tbody>
                                             @php
-                                                $details = \App\Models\Detailfacturepatient::where('fkidfacture', $facture->Idfacture)->get();
-                                                $totalPrix = 0;
+                                                $details = $facture->details ?? collect();
+                                                $totalPrix = $details->sum(function($detail) {
+                                                    return $detail->PrixFacture * $detail->Quantite;
+                                                });
                                             @endphp
                                             @foreach($details as $detail)
-                                                @php
-                                                    $totalPrix += $detail->PrixFacture * $detail->Quantite;
-                                                @endphp
                                                 <tr wire:key="detail-{{ $detail->idDetfacture }}">
                                                     <td class="px-2 py-1">
                                                         @if(in_array(Auth::user()->IdClasseUser ?? null, [2, 3]))
@@ -141,20 +140,20 @@
                                         </tbody>
                                     </table>
                                     <div class="flex flex-row gap-2 justify-end mt-4">
-                                        <button wire:click.stop="ouvrirReglementFacture({{ $facture->Idfacture }})" class="min-w-[120px] px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center justify-center">
-                                            Payer
-                                        </button>
-                                        <button wire:click.stop="openAddActeForm({{ $facture->Idfacture }})" class="min-w-[150px] px-4 py-2 text-sm font-semibold bg-green-600 text-white rounded hover:bg-green-700 flex items-center justify-center gap-2">
-                                            <i class="fas fa-plus"></i> Ajouter un acte
-                                        </button>
-                                        <a href="{{ route('consultations.facture-patient', $facture->Idfacture) }}" target="_blank" class="min-w-[120px] px-4 py-2 text-sm font-semibold bg-gray-700 text-white rounded hover:bg-gray-800 flex items-center justify-center gap-2">
-                                            <i class="fas fa-print"></i> Imprimer
-                                        </a>
+                                                                                 <button wire:click.stop="ouvrirReglementFacture({{ $facture->Idfacture }})" class="min-w-[120px] px-4 py-2 text-sm font-semibold bg-primary text-white rounded hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center">
+                                             Payer
+                                         </button>
+                                         <button wire:click.stop="openAddActeForm({{ $facture->Idfacture }})" class="min-w-[150px] px-4 py-2 text-sm font-semibold bg-primary text-white rounded hover:bg-primary-dark transition-colors duration-200 flex items-center justify-center gap-2">
+                                             <i class="fas fa-plus"></i> Ajouter un acte
+                                         </button>
+                                         <a href="{{ route('consultations.facture-patient', $facture->Idfacture) }}" target="_blank" class="min-w-[120px] px-4 py-2 text-sm font-semibold bg-gray-700 text-white rounded hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2">
+                                             <i class="fas fa-print"></i> Imprimer
+                                         </a>
                                     </div>
                                 </div>
-                                <div wire:loading wire:target="selectionnerFacture" class="text-center py-4">
-                                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-indigo-600"></div>
-                                </div>
+                                                                 <div wire:loading wire:target="selectionnerFacture" class="text-center py-4">
+                                     <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-primary"></div>
+                                 </div>
                             </td>
                         </tr>
                     @endif
@@ -179,12 +178,12 @@
             </div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                <!-- Header vert dégradé -->
-                <div class="p-6 rounded-t-lg text-white shadow relative" style="background: linear-gradient(90deg, #06b6d4 0%, #0e7490 100%);">
-                    <button wire:click="closeReglementForm" class="absolute top-4 right-4 text-white hover:text-red-200 text-2xl font-bold">&times;</button>
-                    <h2 class="text-2xl font-bold">Facture/DEVIS</h2>
-                    <p class="text-green-100 mt-1">Facture N° {{ $factureSelectionnee['numero'] ?? '---' }}</p>
-                </div>
+                                 <!-- Header harmonisé avec l'application -->
+                 <div class="p-6 rounded-t-lg text-white shadow relative bg-primary">
+                     <button wire:click="closeReglementForm" class="absolute top-4 right-4 text-white hover:text-red-200 text-2xl font-bold">&times;</button>
+                     <h2 class="text-2xl font-bold">Facture/DEVIS</h2>
+                     <p class="text-primary-light mt-1">Facture N° {{ $factureSelectionnee['numero'] ?? '---' }}</p>
+                 </div>
 
                 <!-- Détails de la facture -->
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -223,7 +222,7 @@
                             </label>
                             <div class="mt-1">
                                 <input type="number" step="0.01" wire:model="montantReglement" id="montantReglement"
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
                                     placeholder="Entrez un montant positif pour un paiement/acompte, négatif pour un remboursement">
                             </div>
                             @if(($factureSelectionnee['est_reglee'] ?? false))
@@ -243,7 +242,7 @@
                             </label>
                             <div class="mt-1">
                                 <select wire:model="modePaiement" id="modePaiement" required
-                                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md">
                                     <option value="">Sélectionnez un mode de paiement</option>
                                     @foreach($modesPaiement as $mode)
                                         <option value="{{ $mode->idtypepaie }}">{{ $mode->LibPaie }}</option>
@@ -254,10 +253,10 @@
 
                         <div class="mt-6 flex justify-end">
                             <div class="flex justify-end mt-4">
-                                <button type="button" wire:click="closeReglementForm" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <button type="button" wire:click="closeReglementForm" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                                     Annuler
                                 </button>
-                                <button type="button" wire:click="enregistrerReglement" class="ml-3 px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <button type="button" wire:click="enregistrerReglement" class="ml-3 px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-200">
                                     Payer
                                 </button>
                             </div>
@@ -267,7 +266,7 @@
 
                 <!-- Footer avec bouton Fermer -->
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
-                    <button type="button" wire:click="closeReglementForm" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" wire:click="closeReglementForm" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
                         Fermer
                     </button>
                 </div>
@@ -285,10 +284,10 @@
                 </div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                    <!-- Header vert dégradé -->
-                    <div class="p-6 rounded-t-lg text-white shadow" style="background: linear-gradient(90deg, #06b6d4 0%, #0e7490 100%);">
+                    <!-- Header harmonisé avec l'application -->
+                    <div class="p-6 rounded-t-lg text-white shadow bg-primary">
                         <h2 class="text-2xl font-bold">Ajouter un acte à la facture</h2>
-                        <p class="text-green-100 mt-1">Facture N° {{ $factures->firstWhere('id', $factureIdForActe)['numero'] ?? '' }}</p>
+                        <p class="text-primary-light mt-1">Facture N° {{ $factures->firstWhere('id', $factureIdForActe)['numero'] ?? '' }}</p>
                     </div>
                     <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 rounded-b-lg">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Ajouter un acte à la facture</h3>
@@ -304,7 +303,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Prix facturé</label>
-                                    <input type="number" wire:model="prixFacture" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500">
+                                    <input type="number" wire:model="prixFacture" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm bg-white text-gray-900 focus:border-primary focus:ring-primary">
                                 </div>
                                 @php
                                     $isAssure = $selectedPatient['Assureur'] ?? 0;
@@ -327,24 +326,24 @@
                                 @endif
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantité</label>
-                                    <input type="number" wire:model.defer="quantite" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500" min="1">
+                                    <input type="number" wire:model.defer="quantite" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm bg-white text-gray-900 focus:border-primary focus:ring-primary" min="1">
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Séance (Dent)</label>
-                                    <input type="text" wire:model.defer="seance" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500">
+                                    <input type="text" wire:model.defer="seance" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm bg-white text-gray-900 focus:border-primary focus:ring-primary">
                                 </div>
                             </div>
                             <div class="mt-6 flex justify-end">
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                <button type="submit" class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors duration-200">
                                     Ajouter
                                 </button>
                             </div>
                         </form>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
-                        <button type="button" wire:click="closeAddActeForm" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                            Fermer
-                        </button>
+                                                 <button type="button" wire:click="closeAddActeForm" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
+                             Fermer
+                         </button>
                     </div>
                 </div>
             </div>
@@ -390,7 +389,7 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
-                        <button type="button" wire:click="$set('showMedecinModal', false)" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        <button type="button" wire:click="$set('showMedecinModal', false)" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-200">
                             Annuler
                         </button>
                     </div>

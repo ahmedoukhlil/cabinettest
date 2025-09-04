@@ -79,8 +79,16 @@
                        wire:model="heure_rdv" 
                        id="heure_rdv" 
                        step="600"
-                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 @error('heure_rdv') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                
+                <!-- Affichage du créneau proposé -->
+                @if($heure_rdv)
+                    <div class="mt-1 text-xs text-gray-600">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Heure proposée : {{ $heure_rdv }} (heure actuelle + 10 min)
+                    </div>
+                @endif
             </div>
 
             <!-- Acte prévu -->

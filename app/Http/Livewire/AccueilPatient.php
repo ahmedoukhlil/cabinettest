@@ -48,6 +48,12 @@ class AccueilPatient extends Component
     public $showCabinetMenu = false;
     public $showPatientMenu = false;
     
+    // NOUVELLES PROPRIÉTÉS pour les sous-sections patient - Même logique que les sections principales
+    public $showConsultation = false;
+    public $showReglement = false;
+    public $showRendezVous = false;
+    public $showDossierMedical = false;
+    
     // Onglet actif pour le modal RDV
     public $activeRdvTab = 'create';
     
@@ -228,6 +234,12 @@ class AccueilPatient extends Component
         $this->showUsersModal = false;
         $this->showMedecinsModal = false;
         $this->showTypePaiementModal = false;
+        
+        // NOUVELLES SOUS-SECTIONS PATIENT - Même logique que les sections principales
+        $this->showConsultation = false;
+        $this->showReglement = false;
+        $this->showRendezVous = false;
+        $this->showDossierMedical = false;
     }
 
     public function setAction($action)
@@ -245,12 +257,55 @@ class AccueilPatient extends Component
         $this->emit('actionChanged', $action);
     }
 
+    // NOUVELLES MÉTHODES pour les sous-sections patient - Même logique que les sections principales
+    public function showConsultation()
+    {
+        if (!$this->selectedPatient) return;
+        
+        $this->closeAllSections();
+        $this->showConsultation = true;
+        $this->showPatientMenu = true;
+    }
+
+    public function showReglement()
+    {
+        if (!$this->selectedPatient) return;
+        
+        $this->closeAllSections();
+        $this->showReglement = true;
+        $this->showPatientMenu = true;
+    }
+
+    public function showRendezVous()
+    {
+        if (!$this->selectedPatient) return;
+        
+        $this->closeAllSections();
+        $this->showRendezVous = true;
+        $this->showPatientMenu = true;
+    }
+
+    public function showDossierMedical()
+    {
+        if (!$this->selectedPatient) return;
+        
+        $this->closeAllSections();
+        $this->showDossierMedical = true;
+        $this->showPatientMenu = true;
+    }
+
     public function setPatient($patient)
     {
         $this->selectedPatient = $patient;
         $this->action = null;
         $this->showPatientMenu = false;
         $this->showCabinetMenu = false;
+        
+        // NOUVELLES SOUS-SECTIONS PATIENT - Même logique que les sections principales
+        $this->showConsultation = false;
+        $this->showReglement = false;
+        $this->showRendezVous = false;
+        $this->showDossierMedical = false;
         
         // Réinitialiser l'état sans affecter le modal de création de rendez-vous
         $this->resetState();

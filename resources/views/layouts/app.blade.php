@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Cabinet Dentaire</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -215,6 +216,15 @@
     </main>
 
     @livewireScripts
+
+            <!-- jQuery et Select2 -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        
+        <!-- Animations des modaux de la Gestion du Cabinet -->
+        <link href="{{ asset('css/modal-animations.css') }}" rel="stylesheet">
+        <script src="{{ asset('js/modal-enhancer.js') }}"></script>
 
     <!-- Fonction globale WhatsApp -->
     <script>

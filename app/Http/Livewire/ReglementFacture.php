@@ -57,9 +57,15 @@ class ReglementFacture extends Component
     {
         if ($this->selectedPatient) {
             return Facture::where('IDPatient', $this->selectedPatient['ID'])
-                ->with(['medecin' => function($query) {
-                    $query->select('idMedecin', 'Nom');
-                }])
+                ->with([
+                    'medecin' => function($query) {
+                        $query->select('idMedecin', 'Nom');
+                    },
+                    'details' => function($query) {
+                        $query->select('idDetfacture', 'fkidfacture', 'Actes', 'PrixFacture', 'Quantite')
+                              ->orderBy('idDetfacture');
+                    }
+                ])
                 ->select([
                     'Idfacture', 'Nfacture', 'FkidMedecinInitiateur', 'DtFacture',
                     'TotFacture', 'ISTP', 'TXPEC', 'TotalPEC', 'ReglementPEC',
@@ -105,12 +111,29 @@ class ReglementFacture extends Component
     {
         if ($this->selectedPatient) {
             $this->factures = $this->getFacturesProperty();
+        } else {
+            $this->factures = null;
         }
     }
 
     public function selectionnerFacture($factureId)
     {
-        $facture = Facture::find($factureId);
+        // S'assurer que les factures sont chargées
+        if (!$this->factures && $this->selectedPatient) {
+            $this->factures = $this->getFacturesProperty();
+        }
+
+        // Utiliser les données déjà chargées dans la pagination
+        $facture = null;
+        if ($this->factures) {
+            $facture = $this->factures->firstWhere('Idfacture', $factureId);
+        }
+        
+        if (!$facture) {
+            // Fallback : charger la facture si elle n'est pas dans la pagination actuelle
+            $facture = Facture::with(['medecin', 'details'])->find($factureId);
+        }
+        
         if ($facture) {
             $this->factureSelectionnee = [
                 'id' => $facture->Idfacture,
@@ -421,11 +444,14 @@ class ReglementFacture extends Component
 
     public function loadFacturesEnAttente()
     {
-        $this->facturesEnAttente = Cache::remember('factures_en_attente', 300, function() {
+        $cacheKey = 'factures_en_attente_' . Auth::user()->fkidcabinet;
+        $this->facturesEnAttente = Cache::remember($cacheKey, 300, function() {
             return Facture::with(['patient:id,ID,Nom,Prenom', 'medecin:idMedecin,Nom'])
                 ->where('estfacturer', 0)
+                ->where('fkidCabinet', Auth::user()->fkidcabinet)
                 ->select(['Idfacture', 'Nfacture', 'IDPatient', 'FkidMedecinInitiateur', 'DtFacture'])
                 ->orderBy('DtFacture', 'desc')
+                ->limit(50) // Limiter le nombre de factures chargées
                 ->get();
         });
     }
@@ -517,27 +543,24 @@ class ReglementFacture extends Component
 
     public function render()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $isDocteur = ($user->IdClasseUser ?? null) == 2;
         $isDocteurProprietaire = ($user->IdClasseUser ?? null) == 3;
 
-        if (!is_array($this->selectedPatient)) {
-            // Logique de gestion des erreurs
-        }
-
-        if ($this->factures) {
-            // Logique de gestion des logs
-        }
-
-        if ($this->factureSelectionnee) {
-            // Logique de gestion des logs
+        // Charger les factures seulement si nécessaire
+        $factures = null;
+        if ($this->selectedPatient && !$this->factures) {
+            $this->factures = $this->getFacturesProperty();
+            $factures = $this->factures;
+        } elseif ($this->factures) {
+            $factures = $this->factures;
         }
 
         return view('livewire.reglement-facture', [
             'isDocteur' => $isDocteur,
             'isDocteurProprietaire' => $isDocteurProprietaire,
             'facturesEnAttente' => $this->facturesEnAttente,
-            'factures' => $this->getFacturesProperty()
+            'factures' => $factures
         ]);
     }
 } 

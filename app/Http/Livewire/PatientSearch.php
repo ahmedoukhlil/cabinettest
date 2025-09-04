@@ -13,6 +13,7 @@ class PatientSearch extends Component
     public $patients = [];
     public $selectedPatient = null;
     public $isSearching = false;
+    public $showResults = false;
 
     protected $listeners = ['clearPatient' => 'clearPatient'];
 
@@ -22,92 +23,97 @@ class PatientSearch extends Component
 
     public function updatedSearch()
     {
-        if (strlen($this->search) < 1) {
-            // Si un patient est sélectionné et que la recherche correspond, garder la liste
-            if ($this->selectedPatient && 
-                (stripos($this->selectedPatient['NomPatient'] . ' ' . $this->selectedPatient['Prenom'], $this->search) !== false ||
-                 stripos($this->selectedPatient['Prenom'] . ' ' . $this->selectedPatient['NomPatient'], $this->search) !== false)) {
+        if (strlen(trim($this->search)) >= 1) {
+            $this->searchPatients();
+        } else {
+            $this->patients = [];
+            $this->showResults = false;
+        }
+    }
+
+    public function updatedSearchBy()
+    {
+        $this->search = '';
+        $this->patients = [];
+        $this->showResults = false;
+    }
+
+    public function searchPatients()
+    {
+        $this->isSearching = true;
+        
+        try {
+            $user = Auth::user();
+            
+            if (!$user || !$user->fkidcabinet) {
+                session()->flash('error', 'Utilisateur non authentifié ou sans cabinet.');
                 return;
             }
-            $this->patients = [];
-            return;
-        }
 
-        $this->isSearching = true;
+            $query = Patient::query()
+                ->where('fkidcabinet', $user->fkidcabinet)
+                ->with(['assureur:IDAssureur,LibAssurance,TauxdePEC']);
 
-        try {
-            $query = Patient::query();
+            $search = trim($this->search);
             
             switch ($this->searchBy) {
-                case 'nom':
-                    $query->where('Nom', 'like', '%' . $this->search . '%');
-                    break;
-                case 'identifiant':
-                    $query->where('IdentifiantPatient', 'like', '%' . $this->search . '%');
-                    break;
                 case 'telephone':
-                    $searchPhone = preg_replace('/[^0-9]/', '', $this->search);
-                    if (!empty($searchPhone)) {
-                        $query->where(function($q) use ($searchPhone) {
-                            $q->whereRaw("REPLACE(REPLACE(REPLACE(Telephone1, ' ', ''), '-', ''), '+', '') LIKE ?", ['%' . $searchPhone . '%'])
-                                 ->orWhereRaw("REPLACE(REPLACE(REPLACE(Telephone2, ' ', ''), '-', ''), '+', '') LIKE ?", ['%' . $searchPhone . '%']);
-                        });
-                    }
+                    $query->where(function($q) use ($search) {
+                        $q->where('Telephone1', 'like', '%' . $search . '%')
+                          ->orWhere('Telephone2', 'like', '%' . $search . '%');
+                    });
+                    break;
+
+                case 'nom':
+                    $query->where(function($q) use ($search) {
+                        $q->where('Nom', 'like', '%' . $search . '%')
+                          ->orWhere('Prenom', 'like', '%' . $search . '%');
+                    });
+                    break;
+
+                case 'identifiant':
+                    $query->where('IdentifiantPatient', 'like', '%' . $search . '%');
+                    break;
+
+                default:
+                    // Recherche générale sur tous les champs
+                    $query->where(function($q) use ($search) {
+                        $q->where('Nom', 'like', '%' . $search . '%')
+                          ->orWhere('Prenom', 'like', '%' . $search . '%')
+                          ->orWhere('IdentifiantPatient', 'like', '%' . $search . '%')
+                          ->orWhere('Telephone1', 'like', '%' . $search . '%')
+                          ->orWhere('Telephone2', 'like', '%' . $search . '%');
+                    });
                     break;
             }
-            
-            $query->where('fkidcabinet', Auth::user()->fkidcabinet);
-            
-            $this->patients = $query->select(
-                'patients.ID',
-                'patients.Nom as NomPatient',
-                'patients.Prenom',
-                'patients.IdentifiantPatient',
-                'patients.Telephone1',
-                'patients.Telephone2',
-                'patients.Adresse',
-                'patients.Genre',
-                'patients.DtNaissance',
-                'patients.Assureur',
-                'assureurs.TauxdePEC',
-                'assureurs.LibAssurance'
-            )
-            ->leftJoin('assureurs', 'patients.Assureur', '=', 'assureurs.IDAssureur')
-            ->limit(10)
-            ->get()
-            ->map(function($patient) {
-                return [
-                    'ID' => $patient->ID,
-                    'NomPatient' => $patient->NomPatient,
-                    'Prenom' => $patient->Prenom,
-                    'IdentifiantPatient' => $patient->IdentifiantPatient,
-                    'Telephone1' => $patient->Telephone1,
-                    'Telephone2' => $patient->Telephone2,
-                    'Adresse' => $patient->Adresse,
-                    'Genre' => $patient->Genre,
-                    'DtNaissance' => $patient->DtNaissance,
-                    'Assureur' => $patient->Assureur,
-                    'TauxPEC' => $patient->TauxdePEC ?? 0,
-                    'NomAssureur' => $patient->LibAssurance ?? ''
-                ];
-            })
-            ->toArray();
-        } catch (\Exception $e) {
-            $this->patients = [];
-            session()->flash('error', 'Une erreur est survenue lors de la recherche du patient.');
-        }
 
-        $this->isSearching = false;
+            $this->patients = $query->select([
+                    'ID', 'Nom', 'Prenom', 'IdentifiantPatient',
+                    'Telephone1', 'Telephone2', 'DtNaissance', 'Genre',
+                    'Assureur'
+                ])
+                ->orderBy('Prenom')
+                ->orderBy('Nom')
+                ->limit(10)
+                ->get();
+
+            $this->showResults = true;
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Erreur lors de la recherche : ' . $e->getMessage());
+        } finally {
+            $this->isSearching = false;
+        }
     }
 
     public function selectPatient($patientId)
     {
         try {
             $patient = Patient::find($patientId);
-            
+
             if ($patient) {
                 $assureur = $patient->assureur;
-                
+
                 $this->selectedPatient = [
                     'ID' => $patient->ID,
                     'NomPatient' => $patient->Nom,
@@ -122,12 +128,10 @@ class PatientSearch extends Component
                     'TauxPEC' => $assureur ? $assureur->TauxdePEC : 0,
                     'NomAssureur' => $assureur ? $assureur->LibAssurance : ''
                 ];
-                
-                // Afficher le nom du patient dans la recherche
-                $this->search = $patient->Nom . ' ' . $patient->Prenom;
-                
-                // Vider la liste pour masquer la dropdown
+
+                $this->search = '';
                 $this->patients = [];
+                $this->showResults = false;
                 
                 \Log::info('Patient sélectionné dans PatientSearch', $this->selectedPatient);
                 $this->emit('patientSelected', $this->selectedPatient);
@@ -144,11 +148,10 @@ class PatientSearch extends Component
         $this->search = '';
         $this->patients = [];
         $this->selectedPatient = null;
+        $this->showResults = false;
         $this->emit('patientCleared');
-        $this->emit('patientSelected', null); // Émettre null pour indiquer qu'aucun patient n'est sélectionné
+        // Ne pas émettre patientSelected avec null, juste patientCleared
     }
-    
-
 
     public function render()
     {
