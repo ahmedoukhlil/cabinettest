@@ -146,7 +146,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center space-x-8">
                     <div class="flex items-center">
-                        <a href="{{ route('dashboard') }}" class="flex items-center">
+                        <a href="{{ route('accueil.patient') }}" class="flex items-center">
                             <span class="text-xl font-bold text-[#1e3a8a]">Cabinet Dentaire</span>
                         </a>
                     </div>

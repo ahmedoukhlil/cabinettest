@@ -7,7 +7,6 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ConsultationController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReglementFactureController;
 use App\Http\Livewire\StatistiquesManager;
 use App\Http\Controllers\CaisseController;
@@ -29,11 +28,7 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Routes protégées par l'authentification
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/accueil', function () {
-        return view('accueil');
-    })->name('accueil');
 
     Route::get('/accueil-patient', function () {
         return view('accueil-patient-page');

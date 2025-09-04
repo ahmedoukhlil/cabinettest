@@ -34,6 +34,6 @@ class CheckUserRole
         }
 
         // Rediriger vers une page d'erreur ou la page d'accueil
-        return redirect()->route('dashboard')->with('error', 'Vous n\'avez pas les permissions nécessaires pour accéder à cette page.');
+        return redirect()->route('accueil.patient')->with('error', 'Vous n\'avez pas les permissions nécessaires pour accéder à cette page.');
     }
 }

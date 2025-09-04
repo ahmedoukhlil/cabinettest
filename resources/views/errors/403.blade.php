@@ -20,8 +20,8 @@
                         <a href="{{ url()->previous() }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Retour
                         </a>
-                        <a href="{{ route('dashboard') }}" class="btn btn-primary">
-                            <i class="fas fa-home"></i> Tableau de bord
+                        <a href="{{ route('accueil.patient') }}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Accueil
                         </a>
                     </div>
                 </div>

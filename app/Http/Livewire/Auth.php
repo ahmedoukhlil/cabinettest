@@ -24,7 +24,7 @@ class Auth extends Component
 
         if (LaravelAuth::attempt(['login' => $this->login, 'password' => $this->password], $this->remember)) {
             session()->regenerate();
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/accueil-patient');
         } else {
             $this->errorMessage = 'Identifiants incorrects.';
         }
