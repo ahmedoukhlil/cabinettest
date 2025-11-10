@@ -63,6 +63,12 @@ class User extends Authenticatable
         return $this->belongsTo(Medecin::class, 'fkidmedecin', 'idMedecin');
     }
 
+    // Relation avec le cabinet
+    public function cabinet()
+    {
+        return $this->belongsTo(Infocabinet::class, 'fkidcabinet', 'idEntete');
+    }
+
     // Méthodes de vérification des rôles
     public function isDocteurProprietaire()
     {

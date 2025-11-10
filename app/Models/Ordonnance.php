@@ -43,4 +43,20 @@ class Ordonnance extends Model
 		'Utilisation',
 		'fkiduser'
 	];
+
+	/**
+	 * Relation avec l'ordonnance référence
+	 */
+	public function ordonnanceRef()
+	{
+		return $this->belongsTo(Ordonnanceref::class, 'fkidrefOrd', 'id');
+	}
+
+	/**
+	 * Relation avec l'utilisateur
+	 */
+	public function user()
+	{
+		return $this->belongsTo(\App\Models\TUser::class, 'fkiduser', 'Iduser');
+	}
 }

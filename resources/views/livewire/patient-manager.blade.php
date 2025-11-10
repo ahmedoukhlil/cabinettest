@@ -130,22 +130,28 @@
 
     <!-- Modal de création/édition -->
     @if($showModal)
-    <div class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop animate-backdrop-fade-in p-2 sm:p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full h-full max-w-4xl max-h-[95vh] p-0 relative modal-container animate-modal-fade-in flex flex-col">
-            <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 rounded-t-2xl modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white flex-shrink-0">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <i class="fas fa-user-plus header-icon text-white text-lg sm:text-xl"></i>
-                    <h2 class="text-lg sm:text-xl font-bold text-white">{{ $patientId ? 'Modifier le patient' : 'Nouveau patient' }}</h2>
+    <div class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black bg-opacity-50">
+        <div class="relative p-4 w-full max-w-4xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow-sm">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
+                    <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-user-plus text-blue-600"></i>
+                        <span>{{ $patientId ? 'Modifier le patient' : 'Nouveau patient' }}</span>
+                    </h3>
+                    <button type="button" 
+                            wire:click="closeModal"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Fermer</span>
+                    </button>
                 </div>
-                <button wire:click="closeModal" 
-                        class="modal-close-button">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="flex-1 overflow-hidden">
-                <form wire:submit.prevent="save" class="h-full flex flex-col">
-                    <div class="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 modal-body animate-modal-content-slide-in">
+                <!-- Modal body -->
+                <form wire:submit.prevent="save">
+                    <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <div class="space-y-4 sm:space-y-6">
                             <!-- Informations personnelles -->
                             <div class="bg-gray-50 p-4 rounded-lg animate-speed-fade-in" style="animation-delay: 0.1s;">
@@ -256,23 +262,23 @@
                         </div>
                     </div>
                     
-                    <div class="modal-footer">
+                    <!-- Modal footer -->
+                    <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b">
                         <button type="button" 
                                 wire:click="closeModal"
-                                class="modal-btn modal-btn-secondary">
-                            <i class="fas fa-times mr-2"></i>
+                                class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">
                             Annuler
                         </button>
                         <button type="submit" 
                                 wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50 cursor-not-allowed"
-                                class="modal-btn modal-btn-primary">
+                                class="py-2.5 px-5 ms-3 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300">
                             <span wire:loading.remove wire:target="save">
                                 <i class="fas fa-save mr-2"></i>
                                 Enregistrer
                             </span>
                             <span wire:loading wire:target="save" class="flex items-center">
-                                <div class="animate-speed-loading rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                 Enregistrement...
                             </span>
                         </button>

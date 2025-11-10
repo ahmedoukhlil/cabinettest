@@ -12,6 +12,7 @@ use App\Models\DetailFacturePatient;
 use App\Models\CaisseOperation;
 use App\Models\Rendezvou;
 use App\Models\RefTypePaiement;
+use App\Models\Fichetraitement;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -299,6 +300,9 @@ class ConsultationForm extends Component
                 // Créer le détail de la facture
                 $this->createDetailFacture($facture);
                 
+                // Créer la fiche de traitement (dossier médical)
+                $this->createFicheTraitement($facture);
+                
                 // Créer l'opération de caisse
                 $this->createCaisseOperation($facture);
 
@@ -466,6 +470,35 @@ class ConsultationForm extends Component
         $facture->update(['IDRdv' => $rendezVous->IDRdv]);
 
         return $rendezVous;
+    }
+
+    protected function createFicheTraitement($facture)
+    {
+        $medecin = Medecin::find($this->medecin_id);
+        if (!$medecin) {
+            throw new \Exception('Médecin non trouvé');
+        }
+
+        $acte = Acte::find($this->acte_id);
+        if (!$acte) {
+            throw new \Exception('Acte non trouvé');
+        }
+
+        // Créer la fiche de traitement liée à la facture
+        return Fichetraitement::create([
+            'fkidfacture' => $facture->Idfacture,
+            'fkidacte' => $acte->ID,
+            'fkidmedecin' => $this->medecin_id,
+            'Acte' => $acte->Acte,
+            'Traitement' => $this->acte_nom ?? 'Consultation',
+            'Prix' => $this->montant ?? $acte->PrixRef ?? 0,
+            'dateTraite' => Carbon::now(),
+            'NomMedecin' => $medecin->Nom ?? 'Médecin',
+            'Ordre' => 1,
+            'IsImprimer' => 0,
+            'IsSupprimer' => 0,
+            'fkidCabinet' => Auth::user()->fkidcabinet
+        ]);
     }
 
     protected function resetForm()

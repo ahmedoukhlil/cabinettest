@@ -47,7 +47,8 @@ class AccueilPatient extends Component
     public $showTypePaiementModal = false;
     public $showCabinetMenu = false;
     public $showPatientMenu = false;
-    
+    public $showOrdonnanceModal = false;
+
     // NOUVELLES PROPRIÉTÉS pour les sous-sections patient - Même logique que les sections principales
     public $showConsultation = false;
     public $showReglement = false;
@@ -85,7 +86,16 @@ class AccueilPatient extends Component
         'acteCreated' => 'handleActeCreated',
         'refreshData' => 'refreshCachedData',
         'openModal' => 'handleOpenModal',
-        'refreshReminders' => 'calculateRdvRemindersCount'
+        'refreshReminders' => 'calculateRdvRemindersCount',
+        'ordonnanceCreated' => 'handleOrdonnanceCreated',
+        'fermerOrdonnanceModal' => 'fermerOrdonnanceModal',
+        'fermerDossierMedicalModal' => 'fermerDossierMedicalModal',
+        'fermerConsultationModal' => 'fermerConsultationModal',
+        'fermerReglementModal' => 'fermerReglementModal',
+        'fermerRendezVousModal' => 'fermerRendezVousModal',
+        'fermerCaisseOperationsModal' => 'fermerCaisseOperationsModal',
+        'fermerDepensesModal' => 'fermerDepensesModal',
+        'fermerStatistiquesModal' => 'fermerStatistiquesModal'
     ];
 
     public function mount()
@@ -234,7 +244,8 @@ class AccueilPatient extends Component
         $this->showUsersModal = false;
         $this->showMedecinsModal = false;
         $this->showTypePaiementModal = false;
-        
+        // Ne pas fermer showOrdonnanceModal ici, il sera géré par ouvrirOrdonnanceModal
+
         // NOUVELLES SOUS-SECTIONS PATIENT - Même logique que les sections principales
         $this->showConsultation = false;
         $this->showReglement = false;
@@ -262,36 +273,129 @@ class AccueilPatient extends Component
     {
         if (!$this->selectedPatient) return;
         
-        $this->closeAllSections();
+        // Fermer les autres modals mais garder le menu patient ouvert
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showDepenses = false;
+        $this->showStatistiques = false;
+        $this->showOrdonnanceModal = false;
+        $this->showDossierMedical = false;
+        $this->showReglement = false;
+        $this->showRendezVous = false;
+        
+        // Ouvrir le modal consultation
         $this->showConsultation = true;
         $this->showPatientMenu = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('consultation-modal-opened');
+    }
+
+    public function fermerConsultationModal()
+    {
+        $this->showConsultation = false;
     }
 
     public function showReglement()
     {
         if (!$this->selectedPatient) return;
         
-        $this->closeAllSections();
+        // Fermer les autres modals mais garder le menu patient ouvert
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showDepenses = false;
+        $this->showStatistiques = false;
+        $this->showOrdonnanceModal = false;
+        $this->showDossierMedical = false;
+        $this->showConsultation = false;
+        $this->showRendezVous = false;
+        
+        // Ouvrir le modal reglement
         $this->showReglement = true;
         $this->showPatientMenu = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('reglement-modal-opened');
+    }
+
+    public function fermerReglementModal()
+    {
+        $this->showReglement = false;
     }
 
     public function showRendezVous()
     {
         if (!$this->selectedPatient) return;
         
-        $this->closeAllSections();
+        // Fermer les autres modals mais garder le menu patient ouvert
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showDepenses = false;
+        $this->showStatistiques = false;
+        $this->showOrdonnanceModal = false;
+        $this->showDossierMedical = false;
+        $this->showConsultation = false;
+        $this->showReglement = false;
+        
+        // Ouvrir le modal rendez-vous
         $this->showRendezVous = true;
         $this->showPatientMenu = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('rendez-vous-modal-opened');
+    }
+
+    public function fermerRendezVousModal()
+    {
+        $this->showRendezVous = false;
     }
 
     public function showDossierMedical()
     {
         if (!$this->selectedPatient) return;
         
-        $this->closeAllSections();
+        // Fermer les autres modals mais garder le menu patient ouvert
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showDepenses = false;
+        $this->showStatistiques = false;
+        $this->showOrdonnanceModal = false;
+        
+        // Ouvrir le modal dossier médical
         $this->showDossierMedical = true;
         $this->showPatientMenu = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('dossier-medical-modal-opened');
+    }
+
+    public function fermerDossierMedicalModal()
+    {
+        $this->showDossierMedical = false;
     }
 
     public function setPatient($patient)
@@ -364,14 +468,66 @@ class AccueilPatient extends Component
 
     public function showCaisseOperations()
     {
-        $this->closeAllSections();
+        // Fermer les autres modals
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showDepenses = false;
+        $this->showStatistiques = false;
+        $this->showOrdonnanceModal = false;
+        $this->showDossierMedical = false;
+        $this->showConsultation = false;
+        $this->showReglement = false;
+        $this->showRendezVous = false;
+        $this->showPatientMenu = false;
+        $this->showCabinetMenu = false;
+        
+        // Ouvrir le modal caisse operations
         $this->showCaisseOperations = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('caisse-operations-modal-opened');
+    }
+
+    public function fermerCaisseOperationsModal()
+    {
+        $this->showCaisseOperations = false;
     }
 
     public function openDepenses()
     {
-        $this->closeAllSections();
+        // Fermer les autres modals
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showStatistiques = false;
+        $this->showOrdonnanceModal = false;
+        $this->showDossierMedical = false;
+        $this->showConsultation = false;
+        $this->showReglement = false;
+        $this->showRendezVous = false;
+        $this->showPatientMenu = false;
+        $this->showCabinetMenu = false;
+        
+        // Ouvrir le modal depenses
         $this->showDepenses = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('depenses-modal-opened');
+    }
+
+    public function fermerDepensesModal()
+    {
+        $this->showDepenses = false;
     }
 
     public function ouvrirAssureurModal()
@@ -428,8 +584,34 @@ class AccueilPatient extends Component
 
     public function showStatistiques()
     {
-        $this->closeAllSections();
+        // Fermer les autres modals
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showDepenses = false;
+        $this->showOrdonnanceModal = false;
+        $this->showDossierMedical = false;
+        $this->showConsultation = false;
+        $this->showReglement = false;
+        $this->showRendezVous = false;
+        $this->showPatientMenu = false;
+        $this->showCabinetMenu = false;
+        
+        // Ouvrir le modal statistiques
         $this->showStatistiques = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('statistiques-modal-opened');
+    }
+
+    public function fermerStatistiquesModal()
+    {
+        $this->showStatistiques = false;
     }
 
     public function ouvrirMedecinsModal()
@@ -450,6 +632,52 @@ class AccueilPatient extends Component
     public function fermerTypePaiementModal()
     {
         $this->showTypePaiementModal = false;
+    }
+
+    public function ouvrirOrdonnanceModal()
+    {
+        \Log::info('ouvrirOrdonnanceModal appelé', [
+            'selectedPatient' => $this->selectedPatient ? 'existe' : 'null',
+            'showOrdonnanceModal_avant' => $this->showOrdonnanceModal
+        ]);
+
+        if (!$this->selectedPatient) {
+            session()->flash('error', 'Veuillez sélectionner un patient.');
+            \Log::warning('Aucun patient sélectionné');
+            return;
+        }
+
+        // Fermer les autres modals mais garder le menu patient ouvert
+        $this->showAssureurModal = false;
+        $this->showListeActesModal = false;
+        $this->showUsersModal = false;
+        $this->showMedecinsModal = false;
+        $this->showTypePaiementModal = false;
+        $this->showCreateRdvModal = false;
+        $this->showCreatePatientModal = false;
+        $this->showCaisseOperations = false;
+        $this->showDepenses = false;
+        $this->showStatistiques = false;
+        
+        // Ouvrir le modal ordonnance
+        $this->showOrdonnanceModal = true;
+        
+        // Forcer le re-render
+        $this->dispatchBrowserEvent('ordonnance-modal-opened');
+        
+        \Log::info('showOrdonnanceModal mis à true', [
+            'showOrdonnanceModal' => $this->showOrdonnanceModal
+        ]);
+    }
+
+    public function fermerOrdonnanceModal()
+    {
+        $this->showOrdonnanceModal = false;
+    }
+
+    public function handleOrdonnanceCreated($ordonnanceId)
+    {
+        session()->flash('message', 'Ordonnance créée avec succès.');
     }
 
     public function toggleCabinetMenu()

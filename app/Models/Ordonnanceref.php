@@ -48,4 +48,36 @@ class Ordonnanceref extends Model
 		'fkidCabinet',
 		'TypeOrdonnance'
 	];
+
+	/**
+	 * Relation avec le patient
+	 */
+	public function patient()
+	{
+		return $this->belongsTo(Patient::class, 'fkidpatient', 'ID');
+	}
+
+	/**
+	 * Relation avec le prescripteur (médecin)
+	 */
+	public function prescripteur()
+	{
+		return $this->belongsTo(\App\Models\TUser::class, 'fkidprescripteur', 'Iduser');
+	}
+
+	/**
+	 * Relation avec les lignes d'ordonnance
+	 */
+	public function ordonnances()
+	{
+		return $this->hasMany(Ordonnance::class, 'fkidrefOrd', 'id');
+	}
+
+	/**
+	 * Relation avec le cabinet
+	 */
+	public function cabinet()
+	{
+		return $this->belongsTo(\App\Models\Infocabinet::class, 'fkidCabinet', 'idEntete');
+	}
 }

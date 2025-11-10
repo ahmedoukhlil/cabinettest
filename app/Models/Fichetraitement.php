@@ -60,4 +60,20 @@ class Fichetraitement extends Model
 		'IsSupprimer',
 		'fkidCabinet'
 	];
+
+	// Relations
+	public function facture()
+	{
+		return $this->belongsTo(\App\Models\Facture::class, 'fkidfacture', 'Idfacture');
+	}
+
+	public function acte()
+	{
+		return $this->belongsTo(\App\Models\Acte::class, 'fkidacte', 'ID');
+	}
+
+	public function medecin()
+	{
+		return $this->belongsTo(\App\Models\Medecin::class, 'fkidmedecin', 'idMedecin');
+	}
 }

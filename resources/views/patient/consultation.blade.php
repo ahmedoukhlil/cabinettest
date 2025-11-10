@@ -94,7 +94,7 @@
                                     <i class="fas fa-pills mr-2"></i>Traitement
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    <i class="fas fa-euro-sign mr-2"></i>Montant
+                                    <i class="fas fa-money-bill mr-2"></i>Montant
                                 </th>
                             </tr>
                         </thead>
@@ -129,7 +129,7 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">
-                                            {{ number_format($consultation->Montant ?? 0, 2) }} €
+                                            {{ number_format($consultation->Montant ?? 0, 2) }} UM
                                         </div>
                                     </td>
                                 </tr>

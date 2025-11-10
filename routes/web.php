@@ -121,6 +121,18 @@ Route::get('/test-modals', function () {
         Route::get('/facture-patient/{facture}', [ConsultationController::class, 'showFacturePatient'])->name('consultations.facture-patient');
     });
 
+    // Routes pour les ordonnances
+    Route::prefix('ordonnances')->name('ordonnance.')->group(function () {
+        Route::get('/blank', [\App\Http\Controllers\OrdonnanceController::class, 'blank'])->name('blank');
+        Route::get('/{id}/print', [\App\Http\Controllers\OrdonnanceController::class, 'print'])->name('print');
+        Route::get('/{id}/download', [\App\Http\Controllers\OrdonnanceController::class, 'download'])->name('download');
+    });
+
+    Route::prefix('dossier-medical')->name('dossier-medical.')->group(function () {
+        Route::get('/{factureId}/print', [\App\Http\Controllers\DossierMedicalController::class, 'print'])->name('print');
+        Route::get('/{factureId}/download', [\App\Http\Controllers\DossierMedicalController::class, 'download'])->name('download');
+    });
+
     Route::get('/reglement-facture', function () {
         return view('reglement-facture');
     })->name('reglement-facture');
