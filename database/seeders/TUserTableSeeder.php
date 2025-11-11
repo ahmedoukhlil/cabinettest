@@ -34,7 +34,7 @@ class TUserTableSeeder extends Seeder
                 'login' => 'secretaire',
                 'password' => Hash::make('secretaire123'),
                 'ismasquer' => 0,
-                'NomComplet' => 'Secrétaire Cabinet Dentaire',
+                'NomComplet' => 'Secrétaire Cabinet Savwa',
                 'IdClasseUser' => 1, // Secrétaire
                 'fonction' => 'Secrétaire',
                 'fkidmedecin' => 0,

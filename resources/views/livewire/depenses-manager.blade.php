@@ -155,7 +155,7 @@
                 </h2>
             </div>
             <div class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <!-- Date début -->
                     <div>
                         <label class="block text-sm font-semibold text-white mb-2">Date début</label>
@@ -180,20 +180,6 @@
                                 <option value="{{ $type->IdTypeTiers }}">{{ $type->LibelleTypeTiers }}</option>
                             @endforeach
                         </select>
-                    </div>
-
-                    <!-- Montant min -->
-                    <div>
-                        <label class="block text-sm font-semibold text-white mb-2">Montant min</label>
-                        <input type="number" wire:model="montantMin" step="0.01" min="0"
-                               class="w-full px-4 py-3 rounded-lg border border-[#1e3a8a] focus:ring-2 focus:ring-[#1e3a8a] focus:border-[#1e3a8a] transition-colors">
-                    </div>
-
-                    <!-- Montant max -->
-                    <div>
-                        <label class="block text-sm font-semibold text-white mb-2">Montant max</label>
-                        <input type="number" wire:model="montantMax" step="0.01" min="0"
-                               class="w-full px-4 py-3 rounded-lg border border-[#1e3a8a] focus:ring-2 focus:ring-[#1e3a8a] focus:border-[#1e3a8a] transition-colors">
                     </div>
                 </div>
 

@@ -913,7 +913,7 @@
     <div class="mb-3 sm:mb-4 md:mb-6 lg:mb-8 p-3 sm:p-4 md:p-6 rounded-xl bg-primary text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
         <div class="text-center md:text-left">
             <h1 class="text-xl sm:text-2xl md:text-3xl font-bold mb-1">
-                Cabinet Dentaire
+                Cabinet Savwa
             </h1>
             <p class="text-primary-light text-sm sm:text-base md:text-lg">
                     {{ is_array(Auth::user()->typeuser) ? (Auth::user()->typeuser['Libelle'] ?? '') : (is_object(Auth::user()->typeuser) ? Auth::user()->typeuser->Libelle : Auth::user()->typeuser) }}
@@ -922,7 +922,7 @@
                 </span>
             </p>
         </div>
-        <i class="fas fa-tooth text-3xl sm:text-4xl md:text-5xl opacity-30"></i>
+        <i class="fas fa-staff-snake text-3xl sm:text-4xl md:text-5xl opacity-30"></i>
     </div>
 
     {{-- Encadré recherche patient + nouveau patient --}}
@@ -1037,9 +1037,9 @@
              </button>
                 {{-- Dossier médical - Même logique que les sections principales --}}
                 <button wire:click="showDossierMedical"
-                    class="nav-button patient-nav-button flex items-center gap-2 md:gap-3 px-3 md:px-6 py-2 md:py-3 w-full sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-500 ease-out text-base md:text-lg justify-center transform active:scale-95 {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
+                    class="nav-button patient-nav-button flex items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-6 py-2 md:py-3 w-full xs:w-auto sm:w-48 md:w-56 border-2 border-primary bg-white text-primary rounded-xl shadow-lg hover:bg-primary hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-500 ease-out text-sm sm:text-base md:text-lg justify-center transform active:scale-95 {{ !$selectedPatient ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed hover:scale-100' : '' }}">
                     <span class="icon-container inline-flex items-center justify-center rounded-full p-1 md:p-2 bg-white text-primary transition-all duration-500 ease-out">
-                     <i class="fas fa-folder-medical text-primary text-xl md:text-2xl transition-all duration-500 ease-out"></i>
+                     <i class="fas fa-file-medical text-primary text-xl md:text-2xl transition-all duration-500 ease-out"></i>
                  </span>
                  <span class="font-semibold transition-all duration-500 ease-out">Dossier médical</span>
              </button>
@@ -1068,8 +1068,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:patient-manager />
@@ -1098,32 +1098,32 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Onglets -->
+                    </button>
+                </div>
+                
+                <!-- Onglets -->
                     <div class="border-b border-gray-200">
-                        <nav class="flex space-x-4 sm:space-x-8 px-4 sm:px-6 overflow-x-auto" aria-label="Tabs">
-                            <button wire:click="$set('activeRdvTab', 'create')" 
+                    <nav class="flex space-x-4 sm:space-x-8 px-4 sm:px-6 overflow-x-auto" aria-label="Tabs">
+                        <button wire:click="$set('activeRdvTab', 'create')" 
                                 class="py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap {{ $activeRdvTab === 'create' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                                 <i class="fas fa-plus mr-1 sm:mr-2"></i>
-                                <span class="hidden xs:inline">Gestion RDV</span>
-                                <span class="xs:hidden">RDV</span>
-                            </button>
-                            <button wire:click="$set('activeRdvTab', 'reminders')" 
+                            <span class="hidden xs:inline">Gestion RDV</span>
+                            <span class="xs:hidden">RDV</span>
+                        </button>
+                        <button wire:click="$set('activeRdvTab', 'reminders')" 
                                 class="py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap {{ $activeRdvTab === 'reminders' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} relative">
                                 <i class="fas fa-bell mr-1 sm:mr-2"></i>
-                                <span class="hidden xs:inline">Rappels RDV</span>
-                                <span class="xs:hidden">Rappels</span>
-                                @if($rdvRemindersCount > 0)
-                                    <span class="ml-1 sm:ml-2 inline-flex items-center justify-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
-                                        {{ $rdvRemindersCount }}
-                                    </span>
-                                @endif
-                            </button>
-                        </nav>
-                    </div>
-                    
+                            <span class="hidden xs:inline">Rappels RDV</span>
+                            <span class="xs:hidden">Rappels</span>
+                            @if($rdvRemindersCount > 0)
+                                <span class="ml-1 sm:ml-2 inline-flex items-center justify-center px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                                    {{ $rdvRemindersCount }}
+                                </span>
+                            @endif
+                        </button>
+                    </nav>
+                </div>
+                
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <div id="modal-loading" class="hidden flex items-center justify-center py-6 sm:py-8">
@@ -1166,8 +1166,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:patient-manager />
@@ -1249,8 +1249,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:assureur-manager wire:key="assureur-manager-modal" />
@@ -1279,8 +1279,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:acte-manager wire:key="acte-manager-modal" />
@@ -1309,8 +1309,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:medecin-manager wire:key="medecin-manager-modal" />
@@ -1339,8 +1339,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:type-paiement-manager wire:key="type-paiement-manager-modal" />
@@ -1369,8 +1369,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                             </svg>
                             <span class="sr-only">Fermer</span>
-                        </button>
-                    </div>
+                    </button>
+                </div>
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                         <livewire:user-manager wire:key="user-manager-modal" />

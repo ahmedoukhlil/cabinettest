@@ -58,58 +58,6 @@
         </div>
         <!-- Affichage des statistiques (reprendre la structure de caisse-operations-manager) -->
         @if($operations->count() > 0)
-            <!-- Liste des opérations -->
-            <div class="bg-gradient-to-r from-[#1e3a8a] to-[#1e3a8a]/80 px-8 py-6">
-                <h2 class="text-2xl font-bold text-white flex items-center">
-                    <i class="fas fa-list mr-3"></i>
-                    Liste des opérations
-                </h2>
-            </div>
-            <div class="bg-white shadow-2xl rounded-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl mb-8">
-                <div class="p-8">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-[#1e3a8a]/20">
-                            <thead class="bg-[#1e3a8a]/5">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Date</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Médecin</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Patient</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Opération</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Montant</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Moyen de paiement</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-[#1e3a8a]/20">
-                                @foreach($operations as $operation)
-                                    <tr class="hover:bg-[#1e3a8a]/5 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
-                                            {{ \Carbon\Carbon::parse($operation->dateoper)->format('d/m/Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
-                                            {{ $operation->medecin->Nom ?? ($medecins->firstWhere('idMedecin', $operation->fkidmedecin)->Nom ?? 'N/A') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
-                                            {{ $operation->tiers->Nom ?? 'N/A' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
-                                            {{ $operation->designation }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm {{ $operation->entreEspece ? 'text-[#1e3a8a]' : 'text-red-600' }}">
-                                            {{ number_format($operation->MontantOperation, 0, ',', ' ') }} MRU
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
-                                            {{ $operation->TypePAie ?? 'CASH' }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="px-6 py-4 border-t border-[#1e3a8a]/20">
-                        {{ $operations->links() }}
-                    </div>
-                </div>
-            </div>
             <!-- Totaux généraux -->
             <div class="bg-gradient-to-r from-[#1e3a8a] to-[#1e3a8a]/80 px-8 py-6">
                 <h2 class="text-2xl font-bold text-white flex items-center">
@@ -222,6 +170,59 @@
                     </div>
                 </div>
             @endif
+
+            <!-- Liste des opérations -->
+            <div class="bg-gradient-to-r from-[#1e3a8a] to-[#1e3a8a]/80 px-8 py-6">
+                <h2 class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-list mr-3"></i>
+                    Liste des opérations
+                </h2>
+            </div>
+            <div class="bg-white shadow-2xl rounded-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl mb-8">
+                <div class="p-8">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-[#1e3a8a]/20">
+                            <thead class="bg-[#1e3a8a]/5">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Médecin</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Patient</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Opération</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Montant</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[#1e3a8a] uppercase tracking-wider">Moyen de paiement</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-[#1e3a8a]/20">
+                                @foreach($operations as $operation)
+                                    <tr class="hover:bg-[#1e3a8a]/5 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
+                                            {{ \Carbon\Carbon::parse($operation->dateoper)->format('d/m/Y') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
+                                            {{ $operation->medecin->Nom ?? ($medecins->firstWhere('idMedecin', $operation->fkidmedecin)->Nom ?? 'N/A') }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
+                                            {{ $operation->tiers->Nom ?? 'N/A' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
+                                            {{ $operation->designation }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm {{ $operation->entreEspece ? 'text-[#1e3a8a]' : 'text-red-600' }}">
+                                            {{ number_format($operation->MontantOperation, 0, ',', ' ') }} MRU
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-[#1e3a8a]">
+                                            {{ $operation->TypePAie ?? 'CASH' }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 border-t border-[#1e3a8a]/20">
+                        {{ $operations->links() }}
+                    </div>
+                </div>
+            </div>
         @else
             <div class="bg-white shadow-2xl rounded-2xl overflow-hidden transform transition-all duration-300 hover:shadow-3xl">
                 <div class="p-8 text-center">

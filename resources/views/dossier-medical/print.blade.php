@@ -85,7 +85,7 @@
                     $adresse = $cabinet['Adresse'] ?? $cabinet->Adresse ?? null;
                     $telephone = $cabinet['Telephone'] ?? $cabinet->Telephone ?? null;
                     
-                    $defaultValues = ['Cabinet Dentaire', 'Adresse de Cabinet Dentaire', 'Téléphone de Cabinet Dentaire'];
+                    $defaultValues = ['Cabinet Savwa', 'Adresse de Cabinet Savwa', 'Téléphone de Cabinet Savwa'];
                     if (in_array($nomCabinet, $defaultValues)) $nomCabinet = null;
                     if (in_array($adresse, $defaultValues)) $adresse = null;
                     if (in_array($telephone, $defaultValues)) $telephone = null;

@@ -32,9 +32,9 @@ class ConsultationController extends Controller
             $cabinet = cache()->remember('cabinet_info_' . Auth::id(), 3600, function() {
                 $user = Auth::user();
                 return [
-                    'NomCabinet' => $user->cabinet->NomCabinet ?? 'Cabinet Dentaire',
-                    'Adresse' => $user->cabinet->Adresse ?? 'Adresse de Cabinet Dentaire',
-                    'Telephone' => $user->cabinet->Telephone ?? 'Téléphone de Cabinet Dentaire'
+                    'NomCabinet' => $user->cabinet->NomCabinet ?? 'Cabinet Savwa',
+                    'Adresse' => $user->cabinet->Adresse ?? 'Adresse de Cabinet Savwa',
+                    'Telephone' => $user->cabinet->Telephone ?? 'Téléphone de Cabinet Savwa'
                 ];
             });
 
@@ -73,9 +73,9 @@ class ConsultationController extends Controller
         $cabinet = cache()->remember('cabinet_info_' . Auth::id(), 86400, function() {
             $user = Auth::user();
             return [
-                'NomCabinet' => $user->cabinet->NomCabinet ?? 'Cabinet Dentaire',
-                'Adresse' => $user->cabinet->Adresse ?? 'Adresse de Cabinet Dentaire',
-                'Telephone' => $user->cabinet->Telephone ?? 'Téléphone de Cabinet Dentaire'
+                'NomCabinet' => $user->cabinet->NomCabinet ?? 'Cabinet Savwa',
+                'Adresse' => $user->cabinet->Adresse ?? 'Adresse de Cabinet Savwa',
+                'Telephone' => $user->cabinet->Telephone ?? 'Téléphone de Cabinet Savwa'
             ];
         });
 

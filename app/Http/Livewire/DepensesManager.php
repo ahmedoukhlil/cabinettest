@@ -25,8 +25,6 @@ class DepensesManager extends Component
     public $dateDebut;
     public $dateFin;
     public $typeTiersFilter;
-    public $montantMin;
-    public $montantMax;
 
     // Propriétés pour l'édition
     public $editingId;
@@ -70,12 +68,6 @@ class DepensesManager extends Component
         }
         if ($this->typeTiersFilter) {
             $query->where('fkIdTypeTiers', $this->typeTiersFilter);
-        }
-        if ($this->montantMin) {
-            $query->where('retraitEspece', '>=', $this->montantMin);
-        }
-        if ($this->montantMax) {
-            $query->where('retraitEspece', '<=', $this->montantMax);
         }
 
         // Restriction par utilisateur
@@ -193,8 +185,7 @@ class DepensesManager extends Component
     public function resetFilters()
     {
         $this->reset([
-            'dateDebut', 'dateFin', 'typeTiersFilter',
-            'montantMin', 'montantMax'
+            'dateDebut', 'dateFin', 'typeTiersFilter'
         ]);
         $this->dateDebut = now()->startOfMonth()->format('Y-m-d');
         $this->dateFin = now()->endOfMonth()->format('Y-m-d');
